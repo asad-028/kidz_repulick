@@ -1,0 +1,468 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Subject",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "Subject",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Activity",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "BiWeeklyReport",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "biweeklystatus_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "parentfeedback_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "biweeklystatus_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "child",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "forwardDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "biweeklystatus_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "child",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "forwardDate",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "biweeklystatus_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "biweeklystatus_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "biweeklystatus_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "parentfeedback_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "child",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "forwardDate",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "child_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "parentid_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "child_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "parentid_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "result_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "Subject",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "biweeklystatus_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "Subject",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "biweeklystatus_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "Subject",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "arrayConfig": "CONTAINS"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Activity",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "Subject",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Consent",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "class_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Consent",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "class_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "subject_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Consent",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "category_",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "class_",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "role",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "Activity",
+      "fieldPath": "Subject",
+      "ttl": false,
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "arrayConfig": "CONTAINS",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        },
+        {
+          "arrayConfig": "CONTAINS",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "BabyData",
+      "fieldPath": "fathersEmail",
+      "ttl": false,
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "arrayConfig": "CONTAINS",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    }
+  ]
+}

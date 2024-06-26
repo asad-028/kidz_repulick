@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "553845047105",
+    "project_id": "kids-republik-e8265",
+    "storage_bucket": "kids-republik-e8265.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:553845047105:android:87b5bc4b7e1eb63a2aebc0",
+        "android_client_info": {
+          "package_name": "com.kidzrepublik.kidz_republik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGt_OCLQQzUj1EgQaw3jlHFI5SVuiaIA0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:553845047105:android:091c89c80dd8f2de2aebc0",
+        "android_client_info": {
+          "package_name": "com.kidsrepublik.kids_republik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGt_OCLQQzUj1EgQaw3jlHFI5SVuiaIA0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
