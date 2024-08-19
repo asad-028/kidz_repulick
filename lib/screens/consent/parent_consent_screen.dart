@@ -21,11 +21,11 @@ class ParentConsentScreen extends StatefulWidget {
 }
 
 class _ParentConsentScreenState extends State<ParentConsentScreen> {
-  final collectionReference = FirebaseFirestore.instance.collection('BabyData');
+  final collectionReference = FirebaseFirestore.instance.collection(BabyData);
   CollectionReference collectionReferenceConsent =
-      FirebaseFirestore.instance.collection('Consent');
+      FirebaseFirestore.instance.collection(Consent);
   CollectionReference collectionReferenceActivity =
-      FirebaseFirestore.instance.collection('Activity');
+      FirebaseFirestore.instance.collection(Activity);
 
 
   @override
@@ -838,7 +838,7 @@ backgroundColor: Colors.transparent,
     QuerySnapshot querySnapshot;
     (className == "All Parents")
         ? querySnapshot = await FirebaseFirestore.instance
-            .collection('BabyData')
+            .collection(BabyData)
             .where('class_', whereIn: [
             'Infant',
             'Toddler',
@@ -847,7 +847,7 @@ backgroundColor: Colors.transparent,
             'Kinder Garten - II'
           ]).get()
         : querySnapshot = await FirebaseFirestore.instance
-            .collection('BabyData')
+            .collection(BabyData)
             .where('class_', isEqualTo: className)
             .get();
     return querySnapshot.docs;
@@ -856,7 +856,7 @@ backgroundColor: Colors.transparent,
   Future<void> addConsentStatementToClass(className, heading, statement) async {
     List<DocumentSnapshot> students = await getStudentsByClass(className);
     CollectionReference consentCollection =
-        FirebaseFirestore.instance.collection('Activity');
+        FirebaseFirestore.instance.collection(Activity);
 
     students.forEach((student) async {
       String studentid = student.id;

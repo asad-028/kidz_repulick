@@ -23,8 +23,8 @@ class AssignClassToChildren extends StatefulWidget {
 
 class _AssignClassToChildrenState extends State<AssignClassToChildren> {
 bool deleteionLoading = false;
-  final collectionReference = FirebaseFirestore.instance.collection('BabyData');
-  final collectionReferenceClassRoom = FirebaseFirestore.instance.collection('ClassRoom');
+  final collectionReference = FirebaseFirestore.instance.collection(BabyData);
+  final collectionReferenceClassRoom = FirebaseFirestore.instance.collection(ClassRoom);
   ScrollController scrollController = ScrollController();
 
   @override
@@ -109,7 +109,8 @@ bool deleteionLoading = false;
           ),
         ));
   }
-Widget classwisestudents(classname){
+
+  Widget classwisestudents(classname){
   final mQ = MediaQuery.of(context).size;
     return
       Padding(
@@ -207,6 +208,7 @@ Widget classwisestudents(classname){
       );
 
 }
+
 Future<void> deleteDocumentFromFirestore(String documentId) async {
     // Reference to the Firestore collection and document
 
@@ -216,10 +218,11 @@ Future<void> deleteDocumentFromFirestore(String documentId) async {
         deleteionLoading = false;
       });
       await collectionReference.doc(documentId).delete();
+    // Get.back();
     } catch (e) {
       print('Error deleting document: $e');
+    // Get.back();
     }
-    Get.back();
     // Navigator.of(context).pop();
   }
 

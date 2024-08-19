@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kids_republik/main.dart';
+import 'package:kids_republik/screens/accounts/manager_accounts_home.dart';
 import 'package:kids_republik/screens/activities/select_childs_for_activity.dart';
 import 'package:kids_republik/screens/activities/view_bi_weekly_activities.dart';
 import 'package:kids_republik/screens/consent/parent_consent_screen.dart';
@@ -13,6 +14,7 @@ import 'package:kids_republik/screens/home/checkin_checkout_screen.dart';
 import 'package:kids_republik/screens/home/home_user_management.dart';
 import 'package:kids_republik/screens/home/teacher_management.dart';
 import 'package:kids_republik/screens/widgets/base_drawer.dart';
+import 'package:kids_republik/select_campus.dart';
 import 'package:kids_republik/utils/const.dart';
 import 'package:kids_republik/utils/getdatefunction.dart';
 import 'package:kids_republik/utils/image_slide_show.dart';
@@ -21,7 +23,6 @@ import '../dailysheet/manager_report/manager_report_select_child.dart';
 import '../reminder/reminderstoparent.dart';
 
 final subject_  =  <String>  [ 'Check In', 'Food', 'Fluids', 'Health', 'Activity', 'Check Out'];
-
 
 int strengthinclass = 0;
 int presentinclass = 0;
@@ -36,11 +37,11 @@ class PrincipalHomeScreen extends StatefulWidget {
   State<PrincipalHomeScreen> createState() => _PrincipalHomeScreenState();
 }
 
-final collectionReferenceClass = FirebaseFirestore.instance.collection('ClassRoom');
-final collectionReferenceActivity = FirebaseFirestore.instance.collection('Activity');
-final collectionReferenceUsers = FirebaseFirestore.instance.collection('users');
-
 class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
+
+CollectionReference collectionReferenceClass = FirebaseFirestore.instance.collection(ClassRoom);
+CollectionReference collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
+CollectionReference collectionReferenceUsers = FirebaseFirestore.instance.collection(users);
   bool deleteionLoading = false;
   User? user = FirebaseAuth.instance.currentUser;
   Widget checkforwardedreportsandshowbadge(mQ,status,color, Widget displayonthis) {
@@ -118,15 +119,13 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
 
     // return Text('error');
     }
-    return
-
-    badges.Badge(
+    return badges.Badge(
                     position: badges.BadgePosition.topEnd(top: -10, end: -3),
                     badgeAnimation: badges.BadgeAnimation.slide(
                       disappearanceFadeAnimationDuration: Duration(milliseconds: 200),
                       curve: Curves.easeInCubic,
                     ),
-                    showBadge: (snapshot.data!.docs.length > 0),
+                    showBadge: (!snapshot.hasData),
                     badgeStyle: badges.BadgeStyle(
                       badgeColor: color,
                     ),
@@ -140,18 +139,39 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
     },
             ));
     }
+  @override
+  void initState() {
+  setcollectionnames(table_);
+
+    super.initState();
+//     _activitiesFuture = apiService.getAllActivities();
+  }
 
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Colors.blue[50],
-        drawer: BaseDrawer(),
+        drawer:
+              BaseDrawer(),
         appBar: AppBar(
           iconTheme: IconThemeData(color: kWhite),
-          title: Text(
-            'Home',
-            style: TextStyle(color: kWhite,fontSize: 14),
+          title: Row(
+            children: [
+              Text(
+              role_ == 'Director'?
+                'Dashboard':'Home',
+                style: TextStyle(color: kWhite,fontSize: 14),
+              ),
+              Spacer(),
+              role_ == 'Director'?
+              Container(
+                width: 150,
+                child:
+                TextButton(onPressed: () { Get.to(CampusSelectionScreen()); }, child: Text('Select Campus',style: TextStyle(color: Colors.white),),)
+              ):Container(),
+
+            ],
           ),
           backgroundColor: kprimary,
         ),
@@ -161,7 +181,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
           // (isloadingDate)
           //     ?
                 SizedBox(height: mQ.height * 0.01,),
-              Container(color: grey100,width: mQ.width*0.9,child: Text("${role_}'s Dashboard" ,textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14)),),
+              Container(color: grey100,width: mQ.width*0.9,child: Text("${role_} ${table_ == 'tsn_'? "TSN":'KRDC'}" ,textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14)),),
                 // SizedBox(height: mQ.height * 0.01,),
 
               // setattendance(mQ, "Infant"),
@@ -284,6 +304,34 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                     ),
                   ],
                 ),
+                SizedBox(height: mQ.height * 0.005,),
+                role_=="Director"? ElevatedButton.icon(onPressed:() {Get.to(ManagerAccountsHomeScreen());}, icon: Icon(
+                        Icons.bar_chart,
+                        size: 18.0,
+                        color: Colors .white,
+                        ), label: Text(
+                        'Accounts',
+                        style: TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        ),
+                        ), style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Color(0xff2962FF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0),), shadowColor: Colors.grey[200], minimumSize: Size(200, 50), elevation: 2.0,),): Container(),
+                    // role_=="Director"? ElevatedButton.icon(onPressed:() async {await confirm(context)?updateApprovedActivities():null;}, icon: Icon(Icons.delete,
+                    //         size: 18.0,
+                    //         color: Colors.white,
+                    //         ), label: Text('Delete BiWeekly',
+                    //         style: TextStyle(fontSize: 16.0, color: Colors.white,
+                    //         fontWeight: FontWeight.w500,
+                    //         ),
+                    //         ), style: ElevatedButton.styleFrom(
+                    //         foregroundColor: Colors.white, backgroundColor: Color(0xff2962FF), shape: RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(10.0),
+                    //         ), // Adjust for proper contrast with primary color
+                    //         shadowColor: Colors.grey[200],
+                    //         minimumSize: Size(200, 50), // Adjust size as needed
+                    //         elevation: 2.0,
+                    //         ),): Container(),
 
               ],
             ),
@@ -295,7 +343,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
 
   Widget BadgeScreen (){
     return  StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').snapshots(),
+      stream: FirebaseFirestore.instance.collection(users).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(child: CircularProgressIndicator());
@@ -311,7 +359,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
           String role = user['role'];
           String status = user['status'];
 
-          if (role == 'Teacher') {
+          if (role == 'Teacher')  {
             teacherCount++;
           } else if (role == 'Parent') {
             parentCount++;
@@ -364,6 +412,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
     );
   }
   Widget classSummary(mQ,class_,decorationcolor_){
+
     return
       FutureBuilder<DocumentSnapshot>(
           future: collectionReferenceClass.doc(class_).get(),
@@ -377,7 +426,7 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
             }
 
             if (!snapshot.hasData || !snapshot.data!.exists) {
-              return Center(child: Text('Class does not exist.'));
+              return Center(child: Text('$class_'));
             }
 
             final classData = snapshot.data!;
@@ -468,6 +517,30 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
           }
       );
   }
+// Assuming you have initialized Firebase and Firestore
+
+  Future<void> updateApprovedActivities() async {
+    try {
+      final activitiesRef = FirebaseFirestore.instance.collection(Activity);
+      final snapshot = await activitiesRef.where('biweeklystatus_', isEqualTo: 'Approved').get();
+
+      // if (snapshot.isEmpty) {
+      //   print('No documents found to update.');
+      //   return;
+      // }
+
+      final batch = FirebaseFirestore.instance.batch();
+      for (final doc in snapshot.docs) {
+        batch.update(doc.reference, {'biweeklystatus_': 'Restored'});
+      }
+
+      await batch.commit();
+      print('Approved activities updated successfully.');
+    } catch (error) {
+      print('Error updating documents: $error');
+    }
+  }
+
 }
 
 

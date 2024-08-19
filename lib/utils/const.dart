@@ -114,3 +114,5 @@ const kGrey15500 = TextStyle(
   fontWeight: FontWeight.w500,
 );
 var kPrimaryBold = TextStyle(color: kprimary, fontWeight: FontWeight.bold);
+
+

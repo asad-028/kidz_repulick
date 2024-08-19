@@ -136,7 +136,7 @@ CarouselSlider(
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         width: mQ.width,
-        height: mQ.height*0.15,
+        // height: mQ.height*0.15,
         decoration: BoxDecoration(
           color:
           Colors.grey.shade50,
@@ -169,7 +169,8 @@ CarouselSlider(
   ),
 )
 :Container(
-alignment: Alignment.center,    height: mQ.height*0.4,
+  alignment: Alignment.center,
+  height: mQ.height*0.4,
   child: Text('No Photos'),
     )
 
@@ -186,7 +187,7 @@ alignment: Alignment.center,    height: mQ.height*0.4,
             // SizedBox(height: mQ.height*0.003,),
             Container(
               width: mQ.width,
-              // height: mQ.height*0.035,
+              height: mQ.height*0.035,
               decoration: BoxDecoration(
                 color: Colors.orange.shade100,
                 borderRadius: BorderRadius.circular(5), // Apply rounded corners if desired
@@ -282,7 +283,7 @@ alignment: Alignment.center,    height: mQ.height*0.4,
     try {
       // First, query the "babyData" collection to get the "babyId" for the user's children.
       final babyDataSnapshot = await FirebaseFirestore.instance
-          .collection('BabyData')
+          .collection(BabyData)
           .where('fathersEmail', isEqualTo: widget.fatherEmail)
           .get();
 
@@ -290,9 +291,9 @@ alignment: Alignment.center,    height: mQ.height*0.4,
 
       // Now, query the "activity" collection using the babyIds to get the children's activities.
       final activitySnapshot = await FirebaseFirestore.instance
-          .collection('Activity')
+          .collection(Activity)
           .where('photostatus_', isEqualTo: 'Approved')
-          .where('id', whereIn: babyIds)
+          .where('id', whereIn: babyIds).orderBy('date_', descending: true)
           .get();
 
       if (activitySnapshot.docs.isNotEmpty) {
@@ -316,10 +317,11 @@ alignment: Alignment.center,    height: mQ.height*0.4,
   Future<List<Map<String, dynamic>>?> fetchChildrenForSchool() async {
     try {
       final activitySnapshot = await FirebaseFirestore.instance
-          .collection('Activity')
+          .collection(Activity)
           .where('photostatus_', whereIn: ['Forwarded','Approved'])
           // .where('date_', isEqualTo: getCurrentDate())
           .where('id', isEqualTo: widget.babyId)
+          .orderBy('date_', descending: true)
           .get();
 
       if (activitySnapshot.docs.isNotEmpty) {

@@ -1,3 +1,4 @@
+import 'package:kids_republik/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,7 +27,7 @@ class _AddNewReminderScreenState extends State<AddNewReminderScreen> {
     super.initState();
     addNewConsentController.currentDate.value = addNewConsentController.getCurrentDate();
   }
-CollectionReference collectionReferenceConsent = FirebaseFirestore.instance.collection('Consent');
+CollectionReference collectionReferenceConsent = FirebaseFirestore.instance.collection(Consent);
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;

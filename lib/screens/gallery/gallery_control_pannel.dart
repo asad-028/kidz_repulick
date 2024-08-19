@@ -3,6 +3,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:kids_republik/screens/gallery/image_view_screen.dart';
 
+import '../../main.dart';
+
 class GalleryControllPannelPage extends StatefulWidget {
   @override
   _GalleryControllPannelPageState createState() =>
@@ -200,7 +202,7 @@ class _GalleryControllPannelPageState extends State<GalleryControllPannelPage> {
           DateTime fileDate = metadata.timeCreated ?? DateTime.now();
 
           // QuerySnapshot<Map<String, dynamic>> activitySnapshot = await FirebaseFirestore.instance
-          //     .collection('Activity')
+          //     .collection(Activity)
           //     .where('image_', isEqualTo: ref.fullPath)
           //     .get();
 
@@ -252,7 +254,7 @@ Future<void> checkFileActivityAssociation(String imagePath) async {
     // Check if the image exists
     // Query the Activity collection for documents with matching image_
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
-        .collection('Activity')
+        .collection(Activity)
         .where('image_', isEqualTo: imagePath)
         .get();
 

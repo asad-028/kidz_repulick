@@ -26,8 +26,8 @@ class ManagerReportSelectChild extends StatefulWidget {
 Color color = Colors.red;
 
 class _ManagerReportSelectChildState extends State<ManagerReportSelectChild> {
-  final collectionReference = FirebaseFirestore.instance.collection('BabyData');
-  final collectionReferenceActivity = FirebaseFirestore.instance.collection('Activity');
+  final collectionReference = FirebaseFirestore.instance.collection(BabyData);
+  final collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
   ScrollController scrollController = ScrollController();
 @override
   void initState() {
@@ -258,7 +258,7 @@ classwisestudents('Kinder Garten - II')
   double leftposn = 0;
   return StreamBuilder<DocumentSnapshot>(
     stream: FirebaseFirestore.instance
-        .collection('Reports')
+        .collection(Reports)
         .doc(babyid_)
         .snapshots(),
     builder: (context, snapshot) {

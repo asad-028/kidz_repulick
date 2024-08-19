@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toast/toast.dart';
 
+import '../main.dart';
+
 class AddActivityController extends GetxController {
   RxString currentDate = ''.obs;
   RxString currentTime = ''.obs;
@@ -15,7 +17,7 @@ class AddActivityController extends GetxController {
   final formKey = GlobalKey<FormState>();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   CollectionReference collectionReferenceActivity =
-  FirebaseFirestore.instance.collection('Activity');
+  FirebaseFirestore.instance.collection(Activity);
 
   TextEditingController babyIDActivity_ = TextEditingController();
   TextEditingController activity_ = TextEditingController();
@@ -82,10 +84,6 @@ class AddActivityController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    // currentDate.value = getCurrentDate();
-    // currentTime.value = getCurrentTime();
-    // babyIDActivity_.text = ;
-    //fetchData();
   }
 
   String getCurrentDate() {

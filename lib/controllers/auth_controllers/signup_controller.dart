@@ -6,17 +6,20 @@ import 'package:get/get.dart';
 import 'package:kids_republik/screens/main_tabs.dart';
 import 'package:toast/toast.dart';
 
+import '../../main.dart';
+
 class SignUpController extends GetxController {
   RxBool isLoading = false.obs;
   final formKey = GlobalKey<FormState>();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   CollectionReference collectionReferenceUser =
-  FirebaseFirestore.instance.collection('users');
+  FirebaseFirestore.instance.collection(users);
   TextEditingController nameController = TextEditingController();
   TextEditingController invitationCodeController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController selectedCampus = TextEditingController();
 
   void signupUser(BuildContext context) async {
     if (formKey.currentState!.validate()) {
@@ -45,6 +48,7 @@ class SignUpController extends GetxController {
           }
         }
 
+
         await collectionReferenceUser.doc(result.user!.email).set({
           "id": emailController.text,
           "status": '',
@@ -55,6 +59,7 @@ class SignUpController extends GetxController {
           "full_name": nameController.text,
           "invitation_code": invitationCodeController.text,
           "contact_number": phoneController.text,
+          "campus": selectedCampus.text,
           "userImage": "https://firebasestorage.googleapis.com/v0/b/kids-republik-e8265.appspot.com/o/images%2Fnullpicturenew.png?alt=media&token=a723ae08-0bd8-45a1-9b44-e5b51f7d647e",
           "searchIndex": indexList,
         });
@@ -103,7 +108,7 @@ class SignUpController extends GetxController {
   Future<bool> validateInvitationCode(String code) async {
     try {
       final querySnapshot = await FirebaseFirestore.instance
-          .collection('invitation_codes')
+          .collection(invitation_codes)
           .where('invitation_code', isEqualTo: code)
           .get();
       return querySnapshot.docs.isNotEmpty;

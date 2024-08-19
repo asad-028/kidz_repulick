@@ -8,18 +8,18 @@ import 'package:kids_republik/main.dart';
 
 import 'login.dart';
 
-final user = FirebaseAuth.instance.currentUser;
+final selecteduserfordelete = FirebaseAuth.instance.currentUser;
 
 Future<bool> deleteUserData() async {
   try {
-    if (user == null) return false;
+    if (selecteduserfordelete == null) return false;
 
     // Deleting the document with the user's email
-    final userDocRefByEmail = FirebaseFirestore.instance.collection('users').doc(user!.email);
+    final userDocRefByEmail = FirebaseFirestore.instance.collection(users).doc(selecteduserfordelete!.email);
     await userDocRefByEmail.delete();
 
     // Deleting the user from Firebase Authentication
-    await user!.delete();
+    await selecteduserfordelete!.delete();
     return true;
   } catch (e) {
     print('Error deleting user data: $e');
@@ -106,7 +106,7 @@ class _DataDeletionPageState extends State<DataDeletionPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(Icons.account_circle),
-                  Text('${user!.uid}'),
+                  Text('${selecteduserfordelete!.uid}'),
                 ],
               ),
               Spacer(),
@@ -114,7 +114,7 @@ class _DataDeletionPageState extends State<DataDeletionPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(Icons.email),
-                  Text('${user!.email}'),
+                  Text('${selecteduserfordelete!.email}'),
                 ],
               ),
               SizedBox(height: 20),

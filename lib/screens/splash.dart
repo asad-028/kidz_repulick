@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kids_republik/controllers/splash_controller.dart';
 import 'package:kids_republik/utils/const.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashScreen extends StatelessWidget {
   SplashScreen({Key? key}) : super(key: key);
@@ -29,6 +30,8 @@ class SplashScreen extends StatelessWidget {
           ),
         ),
         child: Column(children: [
+
+          // Text('version is $app_version'),
           SizedBox(
             height: mQ.height * 0.237,
           ),
@@ -47,7 +50,7 @@ class SplashScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Image.asset(
-                  'assets/app_icon.png',
+                  'assets/l_d_app_icon.png',
                   fit: BoxFit.fill,
                 ),
               ),
@@ -60,5 +63,16 @@ class SplashScreen extends StatelessWidget {
     );
   }
 
+  Future<void> getVersionInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String appName = packageInfo.appName;
+    String packageName = packageInfo.packageName;
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
 
+    print('App Name: $appName');
+    print('Package Name: $packageName');
+    print('Version: $version');
+    print('Build Number: $buildNumber');
+  }
 }

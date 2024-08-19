@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kids_republik/screens/activities/create_activity_multiple_childs.dart';
 
+import '../../main.dart';
 import '../../utils/const.dart';
 import '../../utils/image_slide_show.dart';
 import '../kids/widgets/empty_background.dart';
@@ -20,7 +21,7 @@ class SelectChildsForActivity extends StatefulWidget {
 }
 
 class _SelectChildsForActivityState extends State<SelectChildsForActivity> {
-  final collectionReference = FirebaseFirestore.instance.collection('BabyData');
+  final collectionReference = FirebaseFirestore.instance.collection(BabyData);
   ScrollController scrollController = ScrollController();
     List<Map<String, dynamic>> selectedBabies = [];
   int selectedChildIndex = -1; // Initialize with -1, indicating no selection
@@ -160,7 +161,7 @@ class _SelectChildsForActivityState extends State<SelectChildsForActivity> {
                       ),
                     ),
                     TextButton(
-                        onPressed:() {print(selectedBabies);
+                        onPressed:() {
                       Get.to(CreateActivityForMultipleChildsScreen(selectedBabies: selectedBabies,selectedsubject_: widget.selectedsubject_,));
                       },
                         child: Text(textAlign: TextAlign.center,'Proceed>>')

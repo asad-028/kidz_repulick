@@ -13,8 +13,8 @@ class CreateActivityScreenController extends GetxController {
   RxBool isLoadingInitial = true.obs;
   // CollectionReference collectionReference = FirebaseFirestore.instance
   //     .collection('ClassActivity');
-  CollectionReference collectionReferenceActivity = FirebaseFirestore.instance.collection('Activity');
-  CollectionReference collectionReferenceReports = FirebaseFirestore.instance.collection('Reports');
+  CollectionReference collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
+  CollectionReference collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
 
 
   // TextEditingController selectedBabyID_ = TextEditingController();
@@ -129,7 +129,7 @@ class CreateActivityScreenController extends GetxController {
           ),
         ),
         if (selectedTime != null)
-            Text('${selectedTime!.format(context)}')
+            Text(selectedTime!.format(context))
 
 
 

@@ -21,9 +21,9 @@ class ViewBiweeklyActivities extends StatefulWidget {
 }
 
 class _ViewBiweeklyActivitiesState extends State<ViewBiweeklyActivities> {
-  final collectionReferenceBiweekly =   FirebaseFirestore.instance.collection('Consent');
+  final collectionReferenceBiweekly =   FirebaseFirestore.instance.collection(Consent);
 
-  // final collectionReferenceActivity = FirebaseFirestore.instance.collection('Activity');
+  // final collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
 
   @override
   void initState() {
@@ -578,7 +578,7 @@ class _ViewBiweeklyActivitiesState extends State<ViewBiweeklyActivities> {
     QuerySnapshot querySnapshot;
     (className == "All Students")
         ? querySnapshot = await FirebaseFirestore.instance
-        .collection('BabyData')
+        .collection(BabyData)
         .where('class_', whereIn: [
       'Infant',
       'Toddler',
@@ -589,7 +589,7 @@ class _ViewBiweeklyActivitiesState extends State<ViewBiweeklyActivities> {
         :
   (className == "All Present")
         ? querySnapshot = await FirebaseFirestore.instance
-        .collection('BabyData')
+        .collection(BabyData)
         .where('class_', whereIn: [
       'Infant',
       'Toddler',
@@ -598,7 +598,7 @@ class _ViewBiweeklyActivitiesState extends State<ViewBiweeklyActivities> {
       'Kinder Garten - II'
     ]).where('checkedin' == "Checked In").get()
         : querySnapshot = await FirebaseFirestore.instance
-        .collection('BabyData')
+        .collection(BabyData)
         .where('class_', isEqualTo: className)
         .get();
     return querySnapshot.docs;
@@ -607,7 +607,7 @@ class _ViewBiweeklyActivitiesState extends State<ViewBiweeklyActivities> {
   Future<void> addConsentStatementToClass(className, heading, statement) async {
     List<DocumentSnapshot> students = await getStudentsByClass(className);
     CollectionReference consentCollection =
-    FirebaseFirestore.instance.collection('Activity');
+    FirebaseFirestore.instance.collection(Activity);
 
     students.forEach((student) async {
       String studentid = student.id;

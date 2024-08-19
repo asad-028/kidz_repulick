@@ -3,7 +3,6 @@ import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kids_republik/main.dart';
-import 'package:kids_republik/screens/widgets/base_drawer.dart';
 import 'package:kids_republik/utils/const.dart';
 import 'package:kids_republik/utils/getdatefunction.dart';
 import 'package:kids_republik/utils/image_slide_show.dart';
@@ -18,8 +17,8 @@ class TeacherManagementScreen extends StatefulWidget {
 }
 
 class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
-  final collectionReference = FirebaseFirestore.instance.collection('users');
-  final collectionReferenceClass = FirebaseFirestore.instance.collection('ClassRoom');
+  final collectionReference = FirebaseFirestore.instance.collection(users);
+  final collectionReferenceClass = FirebaseFirestore.instance.collection(ClassRoom);
   bool deleteionLoading = false;
   User? user = FirebaseAuth.instance.currentUser;
   // UpdateClassController updateCropController = Get.put(UpdateClassController());
@@ -38,7 +37,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
         ),
         backgroundColor: kprimary,
       ),
-drawer: BaseDrawer(),
+// drawer: BaseDrawer(),
       body: SingleChildScrollView(
           child: Column(
         children: [
@@ -100,7 +99,7 @@ drawer: BaseDrawer(),
                     ),
                     Center(
                       child: Image.asset(
-                        'assets/empty_2.png',
+                        'assets/${table_}empty_2.png',
                         height: mQ.height * 0.2,
                         width: mQ.width * 0.9,
                         fit: BoxFit.contain,

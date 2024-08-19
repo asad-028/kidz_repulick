@@ -22,7 +22,7 @@ class CheckinCheckoutScreen extends StatefulWidget {
 }
 
 class _CheckinCheckoutScreenState extends State<CheckinCheckoutScreen> {
-  final collectionReference = FirebaseFirestore.instance.collection('BabyData');
+  final collectionReference = FirebaseFirestore.instance.collection(BabyData);
   Widget setattendance(mQ, attendanceclass_) {
     return
       Padding(
@@ -133,11 +133,11 @@ class _CheckinCheckoutScreenState extends State<CheckinCheckoutScreen> {
         ),
       );
   }
-  final collectionReferenceActivity = FirebaseFirestore.instance.collection('Activity');
-  final collectionReferenceReports = FirebaseFirestore.instance.collection('Reports');
+  final collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
+  final collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
 
   final collectionReferenceClass =
-      FirebaseFirestore.instance.collection('ClassRoom');
+      FirebaseFirestore.instance.collection(ClassRoom);
 
 
   @override
@@ -325,15 +325,25 @@ class _CheckinCheckoutScreenState extends State<CheckinCheckoutScreen> {
             TextButton(
               child: Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Get.back();
               },
             ),
             TextButton(
               child: Text('Proceed'),
               onPressed: () async {
+                Get.back();
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) => Center(
+                    child: CircularProgressIndicator(),
+
+                  ),
+                );
+
                 await checkinsavefunction(snapshot,index,childData,status_);
 
-                Navigator.of(context).pop();
+                Get.back();
               },
             ),
           ],

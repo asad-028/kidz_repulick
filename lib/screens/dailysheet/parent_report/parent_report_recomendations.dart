@@ -30,8 +30,8 @@ final String reportType_;
 }
 
 class _ParentDailySheetScreenState extends State<ParentDailySheetScreen> {
-  final collectionReference = FirebaseFirestore.instance.collection('Activity');
-  final collectionReferenceReports = FirebaseFirestore.instance.collection('Reports');
+  final collectionReference = FirebaseFirestore.instance.collection(Activity);
+  final collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
   bool deleteionLoading = false;
   ScrollController scrollController = ScrollController();
 

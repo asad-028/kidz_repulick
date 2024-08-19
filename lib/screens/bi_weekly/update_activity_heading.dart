@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+
 class UpdateActivityForm extends StatefulWidget {
   final String babyID;
 
@@ -83,7 +85,7 @@ class _UpdateActivityFormState extends State<UpdateActivityForm> {
   }
 
   void updateActivityData(String dateRange, int checkedIn, int absent) {
-    FirebaseFirestore.instance.collection('Activity')
+    FirebaseFirestore.instance.collection(Activity)
         .where('child', isEqualTo: widget.babyID)
         .where('dateRange', isEqualTo: dateRange)
         .get()

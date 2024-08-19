@@ -21,13 +21,13 @@ String babyid_;
 }
 
 class _ParentReminderScreenState extends State<ParentReminderScreen> {
-  final collectionReference = FirebaseFirestore.instance.collection('BabyData');
+  final collectionReference = FirebaseFirestore.instance.collection(BabyData);
   final collectionReferenceReminders =
-  FirebaseFirestore.instance.collection('Activity');
+  FirebaseFirestore.instance.collection(Activity);
   CollectionReference collectionReferenceConsents =
-      FirebaseFirestore.instance.collection('Consent');
+      FirebaseFirestore.instance.collection(Consent);
 
-  // final collectionReferenceActivity = FirebaseFirestore.instance.collection('Activity');
+  // final collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
 
   @override
   void initState() {
@@ -299,8 +299,7 @@ mainAxisAlignment: MainAxisAlignment.center,
 
 
   bool _isEnable = false;
-  showEditingDialog(documentId, activity_, description, subject, class_, mQ,
-      childData, snapshot, index) {
+  showEditingDialog(documentId, activity_, description, subject, class_, mQ, childData, snapshot, index) {
     TextEditingController activity_text_controller =
     TextEditingController(text: activity_);
     TextEditingController description_text_controller =
@@ -325,7 +324,8 @@ mainAxisAlignment: MainAxisAlignment.center,
                   borderRadius: BorderRadius.circular(15),
                   color: Colors.grey.shade100
               ),
-              child: Column(mainAxisAlignment: MainAxisAlignment.start,
+              child:
+              Column(mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Row(
                     children: [
@@ -352,12 +352,14 @@ mainAxisAlignment: MainAxisAlignment.center,
                     ],
                   ),
                   // content:
+                  _isEnable?
                   TextFormField(
                     controller: description_text_controller,
                     maxLines: null, // Automatically adjust the number of lines based on content
                     enabled: _isEnable,
                     textAlign: TextAlign.justify,
-                  ),
+                  ):
+                  Text(description_text_controller.text),
                   // TextField(
                   //   controller: description_text_controller,
                   //   maxLines: 10,
@@ -460,7 +462,7 @@ mainAxisAlignment: MainAxisAlignment.center,
     QuerySnapshot querySnapshot;
     (className == "All Parents")
         ? querySnapshot = await FirebaseFirestore.instance
-            .collection('BabyData')
+            .collection(BabyData)
             .where('class_', whereIn: [
             'Infant',
             'Toddler',
@@ -469,7 +471,7 @@ mainAxisAlignment: MainAxisAlignment.center,
             'Kinder Garten - II'
           ]).get()
        : querySnapshot = await FirebaseFirestore.instance
-            .collection('BabyData')
+            .collection(BabyData)
             .where('class_', isEqualTo: className)
             .get();
 
@@ -479,7 +481,7 @@ mainAxisAlignment: MainAxisAlignment.center,
   Future<void> addConsentStatementToClass(className, heading, statement) async {
     List<DocumentSnapshot> students = await getStudentsByClass(className);
     CollectionReference consentCollection =
-        FirebaseFirestore.instance.collection('Activity');
+        FirebaseFirestore.instance.collection(Activity);
 
     students.forEach((student) async {
       String studentid = student.id;

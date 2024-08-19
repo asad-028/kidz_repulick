@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:kids_republik/screens/gallery/zoomable_image.dart';
 import 'package:kids_republik/utils/const.dart';
 import 'package:kids_republik/utils/getdatefunction.dart';
-import 'package:toast/toast.dart';
+import 'package:snackbar/snackbar.dart';
 
 import '../../../main.dart';
 import 'parent_report_recomendations.dart';
@@ -29,9 +29,9 @@ class DailyReportShape extends StatelessWidget {
     required this.date_,
     required this.class_, required this.childPicture_, required this.reportType_,
   }) : super(key: key);
-  final collectionReference = FirebaseFirestore.instance.collection('Activity');
-  final collectionReferencebabydata = FirebaseFirestore.instance.collection('BabyData');
-  final collectionReferenceReports = FirebaseFirestore.instance.collection('Reports');
+  final collectionReference = FirebaseFirestore.instance.collection(Activity);
+  final collectionReferencebabydata = FirebaseFirestore.instance.collection(BabyData);
+  final collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
   List<Map<String, dynamic>>? activityPhotos;
 
 
@@ -62,8 +62,7 @@ class DailyReportShape extends StatelessWidget {
                 // icon: Icon(Icons.done,size: 24,color: Colors.white,)
                 // ,
                   onPressed: () async => {
-                await confirm(context)?updateDocumentsWithStatusForwarded(babyID_,"Forwarded","Approved",context):null,
-                Get.back(),
+                await confirm(context)?updateDocumentsWithStatusForwarded(babyID_,"Forwarded","Approved",context):Get.back(),
 
               },)
               :TextButton(
@@ -331,8 +330,8 @@ class DailyReportShape extends StatelessWidget {
 }
 
 void updateDocumentsWithStatusForwarded(babyid_,existingstatus_, update_,context) async {
-  final CollectionReference collection = FirebaseFirestore.instance.collection('Activity');
-  final CollectionReference collectionReferenceReports = FirebaseFirestore.instance.collection('Reports');
+  final CollectionReference collection = FirebaseFirestore.instance.collection(Activity);
+  final CollectionReference collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
   final QuerySnapshot snapshot = await collection
       .where('status_', isEqualTo: existingstatus_)
       .where('date_',isEqualTo: getCurrentDate())
@@ -344,11 +343,6 @@ void updateDocumentsWithStatusForwarded(babyid_,existingstatus_, update_,context
     await collection.doc(doc.id).update({'status_': update_});
     await collectionReferenceReports.doc(babyid_).update({'DailySheet_$update_': FieldValue.increment(1),'DailySheet_$existingstatus_': FieldValue.increment(-1)});
   }
-  ToastContext().init(context);
-  Toast.show(
-    'Report ${update_} successfully',
-    // Get.context,
-    // duration: 10,  backgroundRadius: 5,
-    //gravity: Toast.top,
-  );
+  snack('Report ${update_} successfully', );
+  Get.back();
 }

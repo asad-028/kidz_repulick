@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:kids_republik/utils/getdatefunction.dart';
 import 'package:toast/toast.dart';
 
+import '../../main.dart';
 import '../../utils/const.dart';
 import '../../utils/image_slide_show.dart';
 
@@ -17,11 +18,11 @@ class ViewConsentResults extends StatefulWidget {
 }
 
 class _ViewConsentResultsState extends State<ViewConsentResults> {
-  final collectionReference = FirebaseFirestore.instance.collection('BabyData');
+  final collectionReference = FirebaseFirestore.instance.collection(BabyData);
   CollectionReference collectionReferenceConsent =
-  FirebaseFirestore.instance.collection('Consent');
+  FirebaseFirestore.instance.collection(Consent);
   CollectionReference collectionReferenceActivity =
-  FirebaseFirestore.instance.collection('Activity');
+  FirebaseFirestore.instance.collection(Activity);
 
 
   @override
@@ -304,7 +305,7 @@ class _ViewConsentResultsState extends State<ViewConsentResults> {
                                   // Display BabyData details for each entry
                                   StreamBuilder<DocumentSnapshot>(
                                     stream: FirebaseFirestore.instance
-                                        .collection('BabyData')
+                                        .collection(BabyData)
                                         .doc(childData['child_'])
                                         .snapshots(),
                                     builder: (context, snapshot) {
@@ -402,7 +403,7 @@ class _ViewConsentResultsState extends State<ViewConsentResults> {
                                     padding: const EdgeInsets.all(1.0),
                                     child: StreamBuilder<DocumentSnapshot>(
                                       stream: FirebaseFirestore.instance
-                                          .collection('BabyData')
+                                          .collection(BabyData)
                                           .doc(childData['child_'])
                                           .snapshots(),
                                       builder: (context, snapshot) {

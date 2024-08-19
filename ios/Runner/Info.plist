@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Kidz Republik</string>
+	<string>LittleDiary</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -23,15 +23,15 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>4</string>
+	<string>9</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Allow access to camera to upload photos to profile and activities from your camera</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Allow access to photos to upload photos from your library</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Allow access to photos to upload photos to profile and activities from your library.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allow access to photos to upload photos from your library</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow access to photos to upload photos to profile and activities from your library.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

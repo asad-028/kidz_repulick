@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toast/toast.dart';
+import 'package:kids_republik/main.dart';
 
 class AddChildController extends GetxController {
   RxString selectedChildAge = 'Years'.obs;
@@ -22,7 +23,7 @@ class AddChildController extends GetxController {
   final formKey = GlobalKey<FormState>();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   CollectionReference collectionReference =
-      FirebaseFirestore.instance.collection('BabyData');
+      FirebaseFirestore.instance.collection(BabyData);
 
   TextEditingController childFullName = TextEditingController();
   TextEditingController ChildAgeYears = TextEditingController();

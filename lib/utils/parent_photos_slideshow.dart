@@ -192,14 +192,14 @@ class _ParentPhotoSlideshowState extends State<ParentPhotoSlideshow> {
   Future<List<Map<String, dynamic>>?> fetchChildrenForUser() async {
     try {
       final babyDataSnapshot = await FirebaseFirestore.instance
-          .collection('BabyData')
+          .collection(BabyData)
           .where('fathersEmail', isEqualTo: widget.fatherEmail)
           .get();
 
       final babyIds = babyDataSnapshot.docs.map((doc) => doc.id).toList();
 
       final activitySnapshot = await FirebaseFirestore.instance
-          .collection('Activity')
+          .collection(Activity)
           .where('photostatus_', isEqualTo: 'Approved')
           .where('id', whereIn: babyIds)
           .get();
@@ -224,7 +224,7 @@ class _ParentPhotoSlideshowState extends State<ParentPhotoSlideshow> {
   Future<List<Map<String, dynamic>>?> fetchChildrenForSchool() async {
     try {
       final activitySnapshot = await FirebaseFirestore.instance
-          .collection('Activity')
+          .collection(Activity)
           .where('photostatus_', whereIn: ['Forwarded', 'Approved'])
           .where('id', isEqualTo: widget.babyId)
           .get();

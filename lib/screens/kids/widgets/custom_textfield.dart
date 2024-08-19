@@ -9,7 +9,7 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     required this.inputType,
     this.validators,
-    this.onChanged,
+    // this.onChanged,
     this.maxLines = 1, // Add maxLines property with a default value of 1
   }) : super(key: key);
 
@@ -18,7 +18,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType inputType;
   final Function(String)? validators;
-  final ValueChanged<String>? onChanged;
+  // final ValueChanged<String>? onChanged;
   final int maxLines; // New property for maxLines
 
   @override
@@ -29,11 +29,11 @@ class CustomTextField extends StatelessWidget {
           enabled: enabled ?? true,
           controller: controller,
           keyboardType: inputType,
-          onChanged: onChanged,
+          // onChanged: onChanged,
           maxLines: maxLines, // Set maxLines property
           style: TextStyle(
             color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.65),
-            fontSize: 14.0,
+            fontSize: 10.0,
           ),
           decoration: InputDecoration(
             isDense: true,
@@ -42,7 +42,7 @@ class CustomTextField extends StatelessWidget {
               color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.25),
             ),
             hintStyle: kLabelStyle.copyWith(
-              fontSize: 12,
+              fontSize: 10,
               color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.3),
             ),
             border: const OutlineInputBorder(),
@@ -55,8 +55,8 @@ class CustomTextField extends StatelessWidget {
           ),
           validator: validators as String? Function(String?)?,
         ),
-        SizedBox(height: MediaQuery.of(context).size.height * 0.007,)
-      ],
+        SizedBox(height: MediaQuery.of(context).size.height * 0.004,)
+       ],
     );
   }
 }

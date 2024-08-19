@@ -8,15 +8,15 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kids_republik/main.dart';
 import 'package:kids_republik/utils/getdatefunction.dart';
-import 'package:toast/toast.dart';
-
+import 'package:snackbar/snackbar.dart';
 import '../../utils/const.dart';
+import 'biweekly_report_principal.dart';
 
 RxBool isLoading = true.obs;
 int? checkedInCount ;
 int? absentCount ;
 List<String> attendanceDateRange = [];
-final collectionReferencebabydata = FirebaseFirestore.instance.collection('BabyData');
+final collectionReferencebabydata = FirebaseFirestore.instance.collection(BabyData);
 class BiWeeklyReportShapeScreen extends StatefulWidget {
   final String babyID_;
   final String babypicture_;
@@ -32,7 +32,7 @@ class BiWeeklyReportShapeScreen extends StatefulWidget {
     required this.class_,
     required this.babypicture_,
   }) : super(key: key);
-  final collectionReference = FirebaseFirestore.instance.collection('Activity');
+  final collectionReference = FirebaseFirestore.instance.collection(Activity);
 
   @override
   State<BiWeeklyReportShapeScreen> createState() => _BiWeeklyReportShapeScreenState();
@@ -61,17 +61,15 @@ class _BiWeeklyReportShapeScreenState extends State<BiWeeklyReportShapeScreen> {
                   Icon(color: Colors.white, Icons.send, size: 24),
                   onPressed: () async =>
                   {
-                    await confirm(
-                        title: Text('Forward Report',
-                            style: TextStyle(fontSize: 12)),
-                        content: Text(
-                            'Do you want to continue?',
-                            style: TextStyle(fontSize: 12)),
-                        textOK: Text('Yes'),
-                        textCancel: Text('No'),
-                        context)
-                        ? await updateDocumentsWithStatusForwarded(widget.babyID_, "New", "Forwarded", context)
-                        : null,
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) => Center(
+                        child: CircularProgressIndicator(),
+
+                      ),
+                    ),
+                    await confirm(title: Text('Forward Report', style: TextStyle(fontSize: 12)), content: Text('Do you want to continue?', style: TextStyle(fontSize: 12)), textOK: Text('Yes'), textCancel: Text('No'), context) ? await updateDocumentsWithStatusForwarded(widget.babyID_, "New", "Forwarded", context) : Get.back(),
                   }),
             ],
           ),
@@ -119,12 +117,10 @@ class _BiWeeklyReportShapeScreenState extends State<BiWeeklyReportShapeScreen> {
 
   Future <void> updateDocumentsWithStatusForwarded(babyid_, existingstatus_, update_,
       context) async {
-    final CollectionReference collection = FirebaseFirestore.instance.collection('Activity');
-    final CollectionReference collectionReferenceReports = FirebaseFirestore.instance.collection('Reports');
+    final CollectionReference collection = FirebaseFirestore.instance.collection(Activity);
+    final CollectionReference collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
     final QuerySnapshot snapshot = await collection
         .where('biweeklystatus_', isEqualTo: existingstatus_)
-    // .where('date_', isEqualTo: getCurrentDate())
-    // .where('Subject',isEqualTo: getCurrentDate())
         .where('id', isEqualTo: babyid_)
         .get();
 
@@ -132,10 +128,8 @@ class _BiWeeklyReportShapeScreenState extends State<BiWeeklyReportShapeScreen> {
       // Update the status to a new value, e.g., 'UpdatedStatus'
       await collection.doc(doc.id).update({
         'biweeklystatus_': update_,
-    // (role_=='Teacher')?
         'BiWeeklyReport':
-        '${DateFormat('dd MMM').format(startDate!)} to ${DateFormat('dd MMM yyyy').format(endDate!)}'
-      // :"",
+         '${DateFormat('dd MMM').format(startDate!)} to ${DateFormat('dd MMM yyyy').format(endDate!)}'
       });
       try {
         await collectionReferenceReports.doc(babyid_).set({
@@ -147,17 +141,8 @@ class _BiWeeklyReportShapeScreenState extends State<BiWeeklyReportShapeScreen> {
       }
 
     }
-    // (role_=='Teacher')? () async {
-      await addToFirestore(update_);
-    // }:Null;
-    ToastContext().init(context);
-    Toast.show(
-      'Report ${update_} successfully',
-      // Get.context,
-      duration: 10, backgroundRadius: 5,
-      //gravity: Toast.top,
-    );
-    Get.back();
+    await addToFirestore(update_);
+    snack('Report ${update_} successfully', );
   }
 
   Future <void> addToFirestore(update_) async {
@@ -181,16 +166,16 @@ class _BiWeeklyReportShapeScreenState extends State<BiWeeklyReportShapeScreen> {
       };
 
       // Add the data to Firestore
-      await firestore.collection('Activity').add(data);
+      await firestore.collection(Activity).add(data);
 
-      // await firestore.collection('BabyData').docs(widget.babyID_).update("($update_=='New')?'New':($update_=='Forwarded')?'Forwarded':'Approved'" :  +1);
 
       print('Data added to Firestore successfully!');
+    Get.back();
     } catch (error) {
       print('Error adding data to Firestore: $error');
+    Get.back();
     }
-    // }
-
+    Get.back();
   }
 }
 
@@ -226,7 +211,7 @@ class BiWeeklySharingWithParents extends StatefulWidget {
   var endDate;
 
 class _BiWeeklySharingWithParentsState extends State<BiWeeklySharingWithParents> {
-  final collectionReference = FirebaseFirestore.instance.collection('Activity');
+  final collectionReference = FirebaseFirestore.instance.collection(Activity);
   bool deleteionLoading = false;
   ScrollController scrollController = ScrollController();
   @override
@@ -282,7 +267,7 @@ await _selectEndDate(context);
             padding: const EdgeInsets.all(18.0),
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('Activity')
+                  .collection(Activity)
                   .where('id', isEqualTo: widget.baby)
                   .where('Subject', isEqualTo: 'Attendance')
                   // .where('Activity', whereIn: ['Checked In', 'Absent'])
@@ -341,12 +326,12 @@ print(DateFormat('dd-MM-yyyy').format(endDate));
                               height: mQ.height * 0.05,
                               child: Column(
                                 children: [
-                                  // (Academic Session 2023-2024),
+                                  // (Academic Session 2024-2025),
                                   Text('BI-WEEKLY ACTIVITIES',
                                       style: TextStyle(
                                           fontSize: mQ.height * 0.018,
                                           fontWeight: FontWeight.bold)),
-                                  Text('(Academic Session 2023-2024)',
+                                  Text('(Academic Session 2024-2025)',
                                       style: TextStyle(
                                           fontSize: mQ.height * 0.013,
                                           fontWeight: FontWeight.bold)),
@@ -446,7 +431,7 @@ print(DateFormat('dd-MM-yyyy').format(endDate));
               return Center(child: Text('Error: ${snapshot.error}'));
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Text('${widget.subject} - record will be displayed here');
+              return Text('No Activities recorded');
             }
 
 
@@ -681,6 +666,11 @@ print(DateFormat('dd-MM-yyyy').format(endDate));
         deleteionLoading = false;
       });
       await collectionReference.doc(documentId).delete();
+      await collectionReferenceReports.doc(widget.baby).update({
+        // "BiWeekly_Forwarded": FieldValue.increment(1),
+        "BiWeekly_New": FieldValue.increment(-1),
+      });
+
     } catch (e) {
       print('Error deleting document: $e');
     }

@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+
 class OrphanedImageDeletionScreen extends StatelessWidget {
   final CollectionReference _collectionReference =
-  FirebaseFirestore.instance.collection('Activity');
+  FirebaseFirestore.instance.collection(Activity);
 
   final Reference _storageReference =
   FirebaseStorage.instance.ref('image'); // Reference to your Firebase Storage "image" folder

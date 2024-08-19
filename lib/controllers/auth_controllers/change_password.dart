@@ -31,7 +31,7 @@ class ChangePasswordController extends GetxController {
             newpasswordcontroller.text,
           );
           // FirebaseFirestore.instance
-          //     .collection('users')
+          //     .collection(users)
           //     .doc(FirebaseAuth.instance.currentUser!.uid)
           //     .set({
           //   'password': newpasswordcontroller.text,

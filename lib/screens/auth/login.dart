@@ -5,6 +5,8 @@ import 'package:kids_republik/screens/auth/forgot_password.dart';
 import 'package:kids_republik/screens/auth/signup.dart';
 import 'package:kids_republik/screens/widgets/auth_field.dart';
 import 'package:kids_republik/utils/const.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,11 +19,23 @@ class _LoginScreenState extends State<LoginScreen> {
   bool oldPVisible = false;
   bool newPVisible = false;
 
-  LoginController loginController = Get.put(LoginController());
+  late Future<dynamic> _activitiesFuture;
 
+  LoginController loginController = Get.put(LoginController());
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+      // Get.offAndToNamed(AppRoutes.home);
+  }
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
+    // if (useremail != null) {
+    //   Future.delayed(Duration(seconds: 2)).then((val) {
+    //     Get.off(SplashScreen());
+    //   });
+    // }
 
     return Scaffold(
       backgroundColor: Colors.blue[50],
@@ -33,6 +47,20 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: FutureBuilder<PackageInfo>(
+                    future: PackageInfo.fromPlatform(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData)
+                      {
+                        PackageInfo packageInfo = snapshot.data!;
+                        return Text('App Version: ${packageInfo.version}');
+                      }
+                      return const CircularProgressIndicator();
+                    },
+                  ),
+                ),
+
                 SizedBox(height: mQ.height * 0.045),
                 const Padding(
                   padding: EdgeInsets.only(left: 14),
@@ -42,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Padding(
                   padding: EdgeInsets.only(left: 14),
                   child: Text(
-                    "Welcome back to Kidz Republik",
+                    "Welcome back",
                     style: kGrey15500,
                   ),
                 ),
@@ -149,7 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(height: mQ.height * 0.06),
                           Obx(
                             () => loginController.isLoading.value
-                                ? const CircularProgressIndicator()
+                                ?
+                            const CircularProgressIndicator()
                                 : Column(
                                     children: [
                                       SizedBox(
@@ -159,17 +188,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: kprimary,
                                             elevation: 0,
-                                            // textStyle: TextStyle(
-                                            //     fontWeight: FontWeight.bold,
-                                            //     letterSpacing: 0.3,
-                                            //     fontSize: 16,
-                                            //     color: kWhite) ,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(22.0),
                                             ),
                                           ),
-                                          onPressed: () {
+                                          onPressed: () async {
+                                            showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) => Center(
+                                                child: Container()
+                                                // CircularProgressIndicator(),
+
+                                              ),
+                                            );
+                                            // loginController.signInUserAPI(context);
                                             loginController.signInUser(context);
                                           },
                                           child: const Text("Login",
@@ -236,4 +270,17 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+   Future<void> getVersionInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String appName = packageInfo.appName;
+    String packageName = packageInfo.packageName;
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
+
+    print('App Name: $appName');
+    print('Package Name: $packageName');
+    print('Version: $version');
+    print('Build Number: $buildNumber');
+  }
+
 }

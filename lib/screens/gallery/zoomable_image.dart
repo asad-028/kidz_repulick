@@ -1,17 +1,15 @@
+
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/material.dart';
-import 'package:gallery_saver/gallery_saver.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-import '../../main.dart';
 
 var saveurl;
 class ZoomableImageGallery extends StatefulWidget {
@@ -36,43 +34,119 @@ class _ZoomableImageGalleryState extends State<ZoomableImageGallery> {
 
   }
 
-
   Future<void> saveImageToGallery(BuildContext context, String imageUrl, String subfoldername, String filename) async {
     try {
-    var status = await Permission.storage.status;
+      // Check for storage permission
+      var status = await Permission.storage.status;
       AndroidDeviceInfo build = await DeviceInfoPlugin().androidInfo;
+
+      // For Android 11 and above
       if (build.version.sdkInt >= 30) {
         var re = await Permission.manageExternalStorage.request();
         if (re.isGranted) {
-          _saveImage(context, imageUrl, subfoldername, filename);
-          // saveImageToGallery(context, imageUrl, subfoldername, filename);
+          await _saveImage(context, imageUrl, subfoldername, filename);
+        } else {
+          _showPermissionError(context, status);
         }
       } else {
+        // For Android 10 and below
         if (!status.isGranted) {
           status = await Permission.storage.request();
         }
 
         if (status.isGranted) {
-          _saveImage(context, imageUrl, subfoldername, filename);
+          await _saveImage(context, imageUrl, subfoldername, filename);
         } else {
+          _showPermissionError(context, status);
+        }
+      }
+    } catch (e) {
+      print('Error saving image: $e');
+    }
+  }
+
+  Future<void> _saveImage(BuildContext context, String imageUrl, String subfoldername, String filename) async {
+    try {
+      // Fetch the image from the network
+      var response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        // Save image to gallery
+        final result = await ImageGallerySaver.saveImage(
+          response.bodyBytes,
+          name: "$subfoldername/$filename",
+          isReturnImagePathOfIOS: true,
+        );
+        if (result['isSuccess']) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              backgroundColor: Colors.blue,
-              content: Text(
-                'Storage permission is required to save images. \n error: $status',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
-              ),
-              duration: Duration(seconds: 3),
+              content: Text('Image saved successfully!'),
             ),
           );
         }
-      }} catch (e) {
-      print(e); // Error handling code...
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to download image.'),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error saving image: $e');
     }
   }
+
+  void _showPermissionError(BuildContext context, PermissionStatus status) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.blue,
+        content: Text(
+          'Storage permission is required to save images. \n error: $status',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+          ),
+        ),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  // Future<void> saveImageToGallery(BuildContext context, String imageUrl, String subfoldername, String filename) async {
+  //   try {
+  //   var status = await Permission.storage.status;
+  //     AndroidDeviceInfo build = await DeviceInfoPlugin().androidInfo;
+  //     if (build.version.sdkInt >= 30) {
+  //       var re = await Permission.manageExternalStorage.request();
+  //       if (re.isGranted) {
+  //         _saveImage(context, imageUrl, subfoldername, filename);
+  //         // saveImageToGallery(context, imageUrl, subfoldername, filename);
+  //       }
+  //     } else {
+  //       if (!status.isGranted) {
+  //         status = await Permission.storage.request();
+  //       }
+  //
+  //       if (status.isGranted) {
+  //         _saveImage(context, imageUrl, subfoldername, filename);
+  //       } else {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             backgroundColor: Colors.blue,
+  //             content: Text(
+  //               'Storage permission is required to save images. \n error: $status',
+  //               style: TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 12,
+  //               ),
+  //             ),
+  //             duration: Duration(seconds: 3),
+  //           ),
+  //         );
+  //       }
+  //     }} catch (e) {
+  //     print(e); // Error handling code...
+  //   }
+  // }
 
   // Future<void> _saveImage(BuildContext context, String imageUrl, String subfoldername, String filename) async {
   //   try {
@@ -134,105 +208,105 @@ class _ZoomableImageGalleryState extends State<ZoomableImageGallery> {
   // }
 
 
-  Future<void> _saveImage(BuildContext context, String imageUrl, String subfoldername, String filename) async {
-    try {
-      final directory = await getExternalStorageDirectory();
-      if (directory == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.blue,
-            content: Text(
-              'Error saving image: Directory not found',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-              ),
-            ),
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-
-      final parentDirectory = directory.parent.parent.parent.parent;
-      final folderPath = '${parentDirectory.path}/krdc/$subfoldername';
-      final imagePath = '$folderPath/$filename.jpg';
-      final imageFile = File(imagePath);
-
-      if (await imageFile.exists()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.blue,
-            content: Text(
-              'The image has already been saved to your gallery.',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-              ),
-            ),
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-
-      final response = await http.get(Uri.parse(imageUrl));
-      if (response.statusCode == 200) {
-        final folder1 = Directory('${parentDirectory.path}/krdc');
-        if (!await folder1.exists()) {
-          await folder1.create(recursive: true);
-        }
-
-        final folder = Directory(folderPath);
-        if (!await folder.exists()) {
-          await folder.create(recursive: true);
-        }
-
-        final imageBytes = response.bodyBytes;
-        await imageFile.writeAsBytes(imageBytes);
-
-        final savedFile = await GallerySaver.saveImage(imagePath);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.blue,
-            content: Text(
-              'The image has been saved to your gallery. $savedFile ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-              ),
-            ),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.blue,
-            content: Text(
-              'Failed to fetch image from URL: ${response.statusCode}',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-              ),
-            ),
-            duration: Duration(seconds: 3),
-          ),
-        );
-        print('Failed to fetch image from URL: ${response.statusCode}');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.blue,
-          content: Text('Error saving image: $e', style: TextStyle(color: Colors.white, fontSize: 12,),),
-          duration: Duration(seconds: 3),
-        ),
-      );
-      print('Error saving image: $e');
-    }
-  }
+  // Future<void> _saveImage(BuildContext context, String imageUrl, String subfoldername, String filename) async {
+  //   try {
+  //     final directory = await getExternalStorageDirectory();
+  //     if (directory == null) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           backgroundColor: Colors.blue,
+  //           content: Text(
+  //             'Error saving image: Directory not found',
+  //             style: TextStyle(
+  //               color: Colors.white,
+  //               fontSize: 12,
+  //             ),
+  //           ),
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //       return;
+  //     }
+  //
+  //     final parentDirectory = directory.parent.parent.parent.parent;
+  //     final folderPath = '${parentDirectory.path}/krdc/$subfoldername';
+  //     final imagePath = '$folderPath/$filename.jpg';
+  //     final imageFile = File(imagePath);
+  //
+  //     if (await imageFile.exists()) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           backgroundColor: Colors.blue,
+  //           content: Text(
+  //             'The image has already been saved to your gallery.',
+  //             style: TextStyle(
+  //               color: Colors.white,
+  //               fontSize: 12,
+  //             ),
+  //           ),
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //       return;
+  //     }
+  //
+  //     final response = await http.get(Uri.parse(imageUrl));
+  //     if (response.statusCode == 200) {
+  //       final folder1 = Directory('${parentDirectory.path}/krdc');
+  //       if (!await folder1.exists()) {
+  //         await folder1.create(recursive: true);
+  //       }
+  //
+  //       final folder = Directory(folderPath);
+  //       if (!await folder.exists()) {
+  //         await folder.create(recursive: true);
+  //       }
+  //
+  //       final imageBytes = response.bodyBytes;
+  //       await imageFile.writeAsBytes(imageBytes);
+  //
+  //       final savedFile = await GallerySaver.saveImage(imagePath);
+  //
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           backgroundColor: Colors.blue,
+  //           content: Text(
+  //             'The image has been saved to your gallery. $savedFile ',
+  //             style: TextStyle(
+  //               color: Colors.white,
+  //               fontSize: 12,
+  //             ),
+  //           ),
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           backgroundColor: Colors.blue,
+  //           content: Text(
+  //             'Failed to fetch image from URL: ${response.statusCode}',
+  //             style: TextStyle(
+  //               color: Colors.white,
+  //               fontSize: 12,
+  //             ),
+  //           ),
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //       print('Failed to fetch image from URL: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         backgroundColor: Colors.blue,
+  //         content: Text('Error saving image: $e', style: TextStyle(color: Colors.white, fontSize: 12,),),
+  //         duration: Duration(seconds: 3),
+  //       ),
+  //     );
+  //     print('Error saving image: $e');
+  //   }
+  // }
 
   void nextImage() {
     if (_currentIndex < widget.imageUrls.length - 1) {
@@ -275,20 +349,20 @@ class _ZoomableImageGalleryState extends State<ZoomableImageGallery> {
             },
           ),
 
-          role_ == 'Parent' ? Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton(
-              backgroundColor: Colors.transparent,
-              onPressed: () => saveImageToGallery(
-                  context,
-                  widget.imageUrls[_currentIndex]['image_'],
-                  '${widget.imageUrls[_currentIndex]['childFullName']}',
-                  '${widget.imageUrls[_currentIndex]['date_']} - ${widget.imageUrls[_currentIndex]['Activity']} - $_currentIndex'
-              ),
-              child: Icon(Icons.file_download_sharp, color: Colors.white,),
-            ),
-          ) : Container(),
+          // role_ == 'Parent' ? Positioned(
+          //   bottom: 16,
+          //   right: 16,
+          //   child: FloatingActionButton(
+          //     backgroundColor: Colors.transparent,
+          //     onPressed: () => saveImageToGallery(
+          //         context,
+          //         widget.imageUrls[_currentIndex]['image_'],
+          //         '${widget.imageUrls[_currentIndex]['childFullName']}',
+          //         '${widget.imageUrls[_currentIndex]['date_']} - ${widget.imageUrls[_currentIndex]['Activity']} - $_currentIndex'
+          //     ),
+          //     child: Icon(Icons.file_download_sharp, color: Colors.white,),
+          //   ),
+          // ) : Container(),
 // role_=='Parent'?Positioned(
           //   bottom: 16,
           //   right: 16,

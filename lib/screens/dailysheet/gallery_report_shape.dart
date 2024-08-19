@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kids_republik/screens/dailysheet/gallery_screen_staff.dart';
 
+import '../../main.dart';
+
 
 RxBool isLoading = true.obs;
 final subjects_ = <String> ['Food','Fluids','Health','Activity'];
@@ -24,7 +26,7 @@ class GalleryReportShapeScreen extends StatelessWidget {
     required this.class_,
     required this.babypicture_, required this.fathersEmail_,
   }) : super(key: key);
-  final collectionReference = FirebaseFirestore.instance.collection('Activity');
+  final collectionReference = FirebaseFirestore.instance.collection(Activity);
 
 
   @override

@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:kids_republik/main.dart';
+import 'package:kids_republik/screens/accounts/reports/reports.dart';
 import 'package:kids_republik/screens/bi_weekly/biweekly_report_principal.dart';
 import 'package:toast/toast.dart';
 
@@ -21,23 +21,30 @@ import '../widgets/base_drawer.dart';
 Color color = Colors.red;
 
 class ParentHomeScreen extends StatefulWidget {
-  ParentHomeScreen({super.key});
+  const ParentHomeScreen({super.key});
 
   @override
   State<ParentHomeScreen> createState() => _ParentHomeScreenState();
 }
 
 class _ParentHomeScreenState extends State<ParentHomeScreen> {
-  final collectionReference = FirebaseFirestore.instance.collection('BabyData');
-  final collectionReferenceActivity = FirebaseFirestore.instance.collection('Activity');
+  final collectionReference = FirebaseFirestore.instance.collection(BabyData);
+  final collectionReferenceActivity =
+      FirebaseFirestore.instance.collection(Activity);
+  final collectionReferenceReports =
+      FirebaseFirestore.instance.collection(Reports);
+  final collectionReferenceAccounts =
+      FirebaseFirestore.instance.collection(accounts);
   User? user = FirebaseAuth.instance.currentUser;
-  // final collectionReferenceActivity = FirebaseFirestore.instance.collection('Activity');
+  // final collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
   }
+    int  dailyApproved = 0 ;
+    int BiWeeklyApproved = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +60,9 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         ),
         backgroundColor: kprimary,
       ),
-      body: SingleChildScrollView(
-        child: Column(children: [
+      body:
+    SingleChildScrollView(child:
+    Column(children: [
           ImageSlideShowfunction(context),
           SingleChildScrollView(
               child: Column(children: [
@@ -64,7 +72,9 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
             Container(
               color: kprimary.withOpacity(0.3),
               width: mQ.width * 0.99,
-              child: Text("${role_}'s Dashboard", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              child: Text("$role_'s Dashboard",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             ),
             SizedBox(
               height: 30,
@@ -72,14 +82,17 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
             Container(
               color: Colors.indigoAccent.withOpacity(0.15),
               width: mQ.width * 0.95,
-              child: Text("My Kids", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              child: Text("My Kids",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             ),
             // Text('My Kids', textAlign: TextAlign.center),
             SizedBox(
               height: 10,
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 0.1, horizontal: 10),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 0.1, horizontal: 10),
               child: StreamBuilder<QuerySnapshot>(
                 stream: collectionReference
                     .where('fathersEmail', isEqualTo: useremail)
@@ -101,7 +114,8 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
 
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                     return EmptyBackground(
-                      title: 'No student is registered for ${user?.email} account',
+                      title:
+                          'No student is registered for ${user?.email} account',
                     ); // No data
                   }
 
@@ -119,13 +133,18 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                     shrinkWrap: true,
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
-                      final childData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                      final childData = snapshot.data!.docs[index].data()
+                          as Map<String, dynamic>;
+                      fetchBiWeeklyApproved(snapshot.data!.docs[index].id);
                       fetchAndDisplayActivities(snapshot.data!.docs[index].id);
 
                       return Container(
-                        height: 98,
-                        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                        height: 95,
+                        padding:
+                            EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -139,8 +158,10 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                     width: 50,
                                     height: 50,
                                     fit: BoxFit.fill,
-                                    placeholder: (context, url) => CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) => Image.asset(
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Image.asset(
                                       'assets/staff.jpg',
                                       width: 50,
                                       // MediaQuery.of(context).size.width * 0.12,
@@ -149,17 +170,19 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: 30,
+                                  width: 20,
                                 ),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "${childData['childFullName']}  ${childData['fathersName']}",
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black87.withOpacity(0.7),
+                                          color:
+                                              Colors.black87.withOpacity(0.7),
                                           fontSize: 12,
                                         ),
                                       ),
@@ -168,7 +191,8 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                         '${childData['checkin']}',
                                         style: TextStyle(
                                           // fontWeight: FontWeight.bold,
-                                          color: Colors.black87.withOpacity(0.7),
+                                          color:
+                                              Colors.black87.withOpacity(0.7),
                                           fontSize: 10,
                                         ),
                                         textAlign: TextAlign.left,
@@ -194,16 +218,33 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                     ),
                                   ),
                                 ),
+                                consentbadges(
+                                    mQ,
+                                    "Waiting",
+                                    snapshot.data!.docs[index].id,
+                                    "Consent",
+                                    IconButton(
+                                      icon:
+                                          // mQ,
+                                          // 'Consents',
+                                          Icon(Icons.assignment),
+                                      onPressed: () {
+                                        Get.to(ParentConsentScreen(
+                                          babyid: snapshot.data!.docs[index].id,
+                                        ));
+                                      },
+                                    )),
                               ],
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                checkforwardedreportsandshowbadge(
-                                  mQ, 'Approved',
-                                  snapshot.data!.docs[index].id, 'DailySheet',
+                                reports_showbadge(
+                                  mQ,  'DailySheet',
+                                  snapshot.data!.docs[index].id,
                                   // buildCard(mQ, 'Daily', Icons.notifications),
-                                  buildCard(mQ, 'Daily', Icons.calendar_today, () {
+                                  buildCard(mQ, 'Daily', Icons.calendar_today,
+                                      () {
                                     Get.to(DailyReportShape(
                                       babyID_: snapshot.data!.docs[index].id,
                                       name_: childData['childFullName'],
@@ -214,40 +255,43 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                     ));
                                   }),
                                 ),
-                                checkforwardedreportsandshowbadge(
+                                reports_showbadge(
                                     mQ,
-                                    'Approved',
-                                    snapshot.data!.docs[index].id,
                                     "BiWeekly",
+                                    snapshot.data!.docs[index].id,
                                     buildCard(
                                       mQ,
                                       'Bi Weekly',
                                       Icons.calendar_view_week,
                                       () {
-                                        Get.to(() => BiWeeklyReportPrincipalScreen(
-                                              babyID_: snapshot.data!.docs[index].id,
+                                        Get.to(() =>
+                                            BiWeeklyReportPrincipalScreen(
+                                              babyID_:
+                                                  snapshot.data!.docs[index].id,
                                               name_: childData['childFullName'],
                                               date_: getCurrentDate(),
                                               class_: childData['class_'],
-                                              babypicture_: childData['picture'],
+                                              babypicture_:
+                                                  childData['picture'],
                                             ));
                                       },
                                     )),
-                                consentbadges(
+                                feesbadges(
+                                  mQ,
+                                  "Not Paid",
+                                  snapshot.data!.docs[index].id,
+                                  "Fees",
+                                  buildCard(
                                     mQ,
-                                    "Waiting",
-                                    snapshot.data!.docs[index].id,
-                                    "Consent",
-                                    buildCard(
-                                      mQ,
-                                      'Consents',
-                                      Icons.assignment,
-                                      () {
-                                        Get.to(ParentConsentScreen(
-                                          babyid: snapshot.data!.docs[index].id,
-                                        ));
-                                      },
-                                    )),
+                                    'Payments',
+                                    Icons.assignment,
+                                    () {
+                                      Get.to(ViewReports(
+                                        selectedIndex: 0,
+                                      ));
+                                    },
+                                  ),
+                                ),
                               ],
                             ),
                             // status
@@ -274,6 +318,9 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
       case 'Consents':
         cardColor = Colors.green[50]!; // Example color
         break;
+      case 'Payments':
+        cardColor = Colors.green[50]!; // Example color
+        break;
       case 'Daily':
         cardColor = Colors.teal[100]!; // Example color
         break;
@@ -291,7 +338,9 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         elevation: 1,
         color: cardColor,
         child: Container(
-          width: title == 'Notifications' ? mQ.width * 0.160 : mQ.width * 0.260,
+          width: title == 'Notifications' || title == 'Consents'
+              ? mQ.width * 0.160
+              : mQ.width * 0.260,
           height: 25,
           // width: mQ.width * 0.20,
           // height: mQ.height * 0.045,
@@ -299,10 +348,11 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: Colors.black, size: 14), // Set icon color to white
+              Icon(icon,
+                  color: Colors.black, size: 14), // Set icon color to white
               SizedBox(width: 2),
               Text(
-                title == 'Notifications' ? "" : title,
+                title == 'Notifications' || title == 'Consents' ? "" : title,
                 style: TextStyle(
                     color: Colors.black, // Set text color to white
                     fontWeight: FontWeight.normal,
@@ -319,11 +369,9 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
     return Padding(
       padding: const EdgeInsets.all(0.0),
       child: StreamBuilder<QuerySnapshot>(
-        stream: collectionReferenceActivity
+        stream: collectionReferenceReports
             .where('id', isEqualTo: babyid_)
-            .where('date_', isEqualTo: getCurrentDate().toString())
-            .where('category_', isEqualTo: category_)
-            // .where('status_',isEqualTo:status)
+            // .where('id', isEqualTo: babyid_)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -339,19 +387,28 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {}
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            // return pppasa; // No data, just show pppasa
+          }
+
+          // Get first document (assuming there's only one report per baby per day)
+          final docData = snapshot.data!.docs[0].data() as Map<String, dynamic>;
+          int dailyApproved = (category_ == "DailySheet") ? docData['DailySheet_Approved'] : 0;
+          int BiWeeklyApproved = (category_ == "BiWeekly") ? docData['BiWeekly_Approved'] :0;
+          // final biweeklyApproved = docData['BiWeekly_Approved'] ?? 0; // Handle potential null value
+
           return badges.Badge(
             position: badges.BadgePosition.topEnd(top: 1, end: 0),
             badgeAnimation: badges.BadgeAnimation.slide(
               disappearanceFadeAnimationDuration: Duration(milliseconds: 200),
               curve: Curves.easeInCubic,
             ),
-            showBadge: (snapshot.data!.docs.length > 0),
+            showBadge:category_ == "DailySheet"? (dailyApproved > 0) : (BiWeeklyApproved > 0), // Show badge only if Daily_Approved is greater than 0
             badgeStyle: badges.BadgeStyle(
               badgeColor: color,
             ),
             badgeContent: Text(
-              snapshot.data!.docs.length.toString(),
+              category_ == "BiWeekly"? BiWeeklyApproved.toString():dailyApproved.toString(), // Convert dailyApproved to string
               style: TextStyle(fontSize: 8, color: Colors.white),
             ),
             child: pppasa,
@@ -359,6 +416,82 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         },
       ),
     );
+  }
+  Widget reports_showbadge(mQ, category_,babyId, Widget pppasa) {
+          return FutureBuilder(
+            future: category_ == "DailySheet" ? _fetchDailyApproved(babyId) : _fetchBiWeeklyApproved(babyId),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+    switch (snapshot.connectionState) {
+      case ConnectionState.waiting:
+      // Show a loading indicator while fetching data
+        return CircularProgressIndicator();
+      default:
+        if (snapshot.hasError) {
+          // Handle error fetching data (optional)
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final approvedCount = snapshot.data ?? 0; // Use default 0 if no data
+
+          return badges.Badge(
+            position: badges.BadgePosition.topEnd(top: 1, end: 0),
+            badgeAnimation: badges.BadgeAnimation.slide(
+              disappearanceFadeAnimationDuration: Duration(milliseconds: 200),
+              curve: Curves.easeInCubic,
+            ),
+            showBadge: category_ == "DailySheet"
+                ? (dailyApproved > 0)
+                : (BiWeeklyApproved > 0),
+            // Show badge only if Daily_Approved is greater than 0
+            badgeStyle: badges.BadgeStyle(
+              badgeColor: color,
+            ),
+            badgeContent: Text(
+              category_ == "BiWeekly"
+                  ? BiWeeklyApproved.toString()
+                  : dailyApproved.toString(), // Convert dailyApproved to string
+              style: TextStyle(fontSize: 8, color: Colors.white),
+            ),
+            child: pppasa,
+          );
+        }
+    }});
+  }
+  Future<int> _fetchDailyApproved(String babyId) async {
+    final DocumentSnapshot reportSnapshot =
+    await FirebaseFirestore.instance.collection(Reports).doc(babyId).get();
+
+    if (reportSnapshot.exists) {
+      final reportData = reportSnapshot.data() as Map<String, dynamic>;
+      // BiWeeklyApproved = reportData['BiWeekly_Approved'] ;
+      dailyApproved = reportData['DailySheet_Approved'] ;
+    }
+    // Implement your logic to fetch daily approved count
+    // ...
+    return dailyApproved; // Return the actual count
+  }
+
+  Future<int> _fetchBiWeeklyApproved(String babyId) async {
+    final DocumentSnapshot reportSnapshot =
+    await FirebaseFirestore.instance.collection(Reports).doc(babyId).get();
+
+    if (reportSnapshot.exists) {
+      final reportData = reportSnapshot.data() as Map<String, dynamic>;
+      // BiWeeklyApproved = reportData['BiWeekly_Approved'] ;
+      dailyApproved = reportData['DailySheet_Approved'] ;
+    }
+    // Implement your logic to fetch biweekly approved count
+    // ...
+    return BiWeeklyApproved; // Return the actual count
+  }
+  Future<void> fetchBiWeeklyApproved(String babyId) async {
+    final DocumentSnapshot reportSnapshot =
+    await FirebaseFirestore.instance.collection(Reports).doc(babyId).get();
+
+    if (reportSnapshot.exists) {
+      final reportData = reportSnapshot.data() as Map<String, dynamic>;
+       BiWeeklyApproved = reportData['BiWeekly_Approved'] ;
+       dailyApproved = reportData['DailySheet_Approved'] ;
+    }
   }
 
   // Function to fetch and display activities
@@ -376,10 +509,11 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
           Map<String, dynamic> activityData = doc.data();
 
           // Display the activity information using Toast
-          DateTime parsedTime = DateTime.parse(activityData['time_']);
-          String formattedTime = DateFormat.jm().format(parsedTime);
+          // DateTime parsedTime = DateTime.parse(activityData['time_']);
+          // String formattedTime = DateFormat.jm().format(parsedTime);
           showToast(
-            ' ${activityData['description']} at ${formattedTime}',
+            ' ${activityData['description']} at ${activityData["time_"]}',
+            // ' ${activityData['description']} at $formattedTime',
           );
           await Future.delayed(Duration(seconds: 5));
         }
@@ -438,7 +572,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
               disappearanceFadeAnimationDuration: Duration(milliseconds: 100),
               curve: Curves.easeInCubic,
             ),
-            showBadge: (snapshot.data!.docs.length > 0),
+            showBadge: (snapshot.data!.docs.isNotEmpty),
             badgeStyle: badges.BadgeStyle(
               badgeColor: color,
             ),
@@ -452,4 +586,53 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
       ),
     );
   }
+
+  Widget feesbadges(mQ, status, babyid_, category, Widget widgetforbadge) {
+    return Padding(
+      padding: const EdgeInsets.all(0.0),
+      child: StreamBuilder<QuerySnapshot>(
+        stream: collectionReferenceAccounts
+            .where('child_', isEqualTo: babyid_)
+            // .where('category_', isEqualTo: category)
+            .where('fathersEmail', isEqualTo: user?.email)
+            .where('status', isEqualTo: status)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 2.0),
+                child: CircularProgressIndicator(),
+              ),
+            ); // Show loading indicator
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            // _showCartBadge = false;
+          }
+          return badges.Badge(
+            position: badges.BadgePosition.topEnd(top: 1, end: 0),
+            badgeAnimation: const badges.BadgeAnimation.slide(
+              disappearanceFadeAnimationDuration: Duration(milliseconds: 100),
+              curve: Curves.easeInCubic,
+            ),
+            showBadge: (snapshot.data!.docs.isNotEmpty),
+            badgeStyle: badges.BadgeStyle(
+              badgeColor: color,
+            ),
+            badgeContent: Text(
+              snapshot.data!.docs.length.toString(),
+              style: TextStyle(fontSize: 8, color: Colors.white),
+            ),
+            child: widgetforbadge,
+          );
+        },
+      ),
+    );
+  }
+
 }

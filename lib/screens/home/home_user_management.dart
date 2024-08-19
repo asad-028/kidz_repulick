@@ -24,7 +24,7 @@ class UserManagementScreen extends StatefulWidget {
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
   SignUpController signUpController = Get.put(SignUpController());
-  final collectionRefrence = FirebaseFirestore.instance.collection('users');
+  final collectionRefrence = FirebaseFirestore.instance.collection(users);
   bool deleteionLoading = false;
   User? user = FirebaseAuth.instance.currentUser;
   // UpdateClassController updateCropController = Get.put(UpdateClassController());
@@ -469,7 +469,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
     if (invitationCode.isNotEmpty) {
       // Get a reference to the collection
-      CollectionReference invitationCodesCollection = FirebaseFirestore.instance.collection('invitation_codes');
+      CollectionReference invitationCodesCollection = FirebaseFirestore.instance.collection(invitation_codes);
 
       // Check if the invitation code already exists
       invitationCodesCollection.doc(invitationCode).get().then((docSnapshot) {

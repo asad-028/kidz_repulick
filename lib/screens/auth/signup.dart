@@ -6,6 +6,8 @@ import 'package:kids_republik/screens/widgets/auth_field.dart';
 import 'package:kids_republik/screens/widgets/circle_button.dart';
 import 'package:kids_republik/utils/const.dart';
 
+import '../../main.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -16,6 +18,8 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   bool oldPVisible = false;
   bool newPVisible = false;
+  String selectedCampus = 'KRDC';
+  List <String> campuses = ['KRDC', 'TSN' ];
 
   SignUpController signUpController = Get.put(SignUpController());
 
@@ -53,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const Padding(
                   padding: EdgeInsets.only(left: 14),
                   child: Text(
-                    "Welcome to Kids Republik",
+                    "Welcome",
                     style: kGrey15500,
                   ),
                 ),
@@ -165,10 +169,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             hintText: "Enter Invitation Code",
                             validators: (String? value) {
                               if (value!.isEmpty) {
-                                return 'Obtain Invitation Code from Kidz Republik Day Care Center and Pre School';
+                                return 'Obtain Invitation Code from Manager';
                               }
                               return null;
                             },
+                          ),
+                          SizedBox(height: mQ.height * 0.035),
+                          Container(
+                            width: 150,
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButtonFormField(
+                                value: selectedCampus, // Replace with your initial selected currency
+                                decoration: InputDecoration(labelText: 'Select Campus',border: InputBorder.none),
+                                items: campuses.map((String campus) {
+                                  return DropdownMenuItem<String>(
+                                    value: campus,
+                                    child: Text(campus),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newCampus) async {
+                                    selectedCampus = newCampus!;
+                                    table_ = (newCampus == 'TSN')?'tsn_':'';
+                                    await setcollectionnames(table_);
+                                  setState(() {
+                                    signUpController.selectedCampus.text = selectedCampus;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please select a Campus.';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
                           ),
                           SizedBox(height: mQ.height * 0.035),
                           Obx(
@@ -193,7 +227,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                     BorderRadius.circular(22.0),
                                               ),
                                             ),
-                                            onPressed: () {
+                                            onPressed: () async {
+                                              table_ = signUpController.selectedCampus.text == 'KRDC'?'': 'tsn_';
+                                            await setcollectionnames(table_);
                                               signUpController
                                                   .signupUser(context);
                                             },

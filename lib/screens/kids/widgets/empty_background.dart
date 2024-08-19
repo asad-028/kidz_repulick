@@ -27,7 +27,7 @@ class EmptyBackground extends StatelessWidget {
         ),
         Center(
           child: Image.asset(
-            'assets/empty_2.png',
+            'assets/${table_}empty_2.png',
             height: mQ.height * 0.2,
             width: mQ.width * 0.9,
             fit: BoxFit.contain,

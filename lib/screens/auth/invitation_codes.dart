@@ -19,7 +19,7 @@ class InvitationCodesScreen extends StatefulWidget {
 
 class _InvitationCodesScreenState extends State<InvitationCodesScreen> {
   SignUpController signUpController = Get.put(SignUpController());
-  final collectionRefrence = FirebaseFirestore.instance.collection('users');
+  final collectionRefrence = FirebaseFirestore.instance.collection(users);
   bool deleteionLoading = false;
   User? user = FirebaseAuth.instance.currentUser;
   // UpdateClassController updateCropController = Get.put(UpdateClassController());
@@ -110,7 +110,7 @@ class _InvitationCodesScreenState extends State<InvitationCodesScreen> {
                   SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: StreamBuilder(
-                      stream: FirebaseFirestore.instance.collection('invitation_codes').snapshots(),
+                      stream: FirebaseFirestore.instance.collection(invitation_codes).snapshots(),
                       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
@@ -151,7 +151,7 @@ class _InvitationCodesScreenState extends State<InvitationCodesScreen> {
                                           if (await confirm(context,title: Text('Confirm', ),content: Text('Do you want to delete?'))) {
                                             String documentId = snapshot.data!.docs[index].id; // Get the document ID
                                             await FirebaseFirestore.instance
-                                                .collection('invitation_codes')
+                                                .collection(invitation_codes)
                                                 .doc(documentId)
                                                 .delete();
                                           }
@@ -183,7 +183,7 @@ class _InvitationCodesScreenState extends State<InvitationCodesScreen> {
 
     if (invitationCode.isNotEmpty) {
       // Get a reference to the collection
-      CollectionReference invitationCodesCollection = FirebaseFirestore.instance.collection('invitation_codes');
+      CollectionReference invitationCodesCollection = FirebaseFirestore.instance.collection(invitation_codes);
 
       // Check if the invitation code already exists
       invitationCodesCollection.doc(invitationCode).get().then((docSnapshot) {

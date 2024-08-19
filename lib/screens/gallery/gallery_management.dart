@@ -3,6 +3,8 @@ import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+
 class GalleryManagementScreen extends StatefulWidget {
   GalleryManagementScreen({Key? key}) : super(key: key);
 
@@ -12,7 +14,7 @@ class GalleryManagementScreen extends StatefulWidget {
 }
 
 class _GalleryManagementScreenState extends State<GalleryManagementScreen> {
-  final CollectionReference _collectionReference = FirebaseFirestore.instance.collection('Activity');
+  final CollectionReference _collectionReference = FirebaseFirestore.instance.collection(Activity);
 
   List<String> _imageUrls = [];
   List<String> _allImageUrls = [];
@@ -40,7 +42,7 @@ class _GalleryManagementScreenState extends State<GalleryManagementScreen> {
       });
 
       // Fetch URLs from BabyData collection
-      QuerySnapshot babyDataSnapshot = await FirebaseFirestore.instance.collection('BabyData').get();
+      QuerySnapshot babyDataSnapshot = await FirebaseFirestore.instance.collection(BabyData).get();
       List<String> babyDataUrls = _extractBabyDataImageUrls(babyDataSnapshot);
       setState(() {
         _imageUrls.addAll(babyDataUrls);

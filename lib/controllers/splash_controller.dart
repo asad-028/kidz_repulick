@@ -7,13 +7,14 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:kids_republik/main.dart';
 import 'package:kids_republik/screens/auth/login.dart';
 import 'package:kids_republik/screens/main_tabs.dart';
+import 'package:kids_republik/select_campus.dart';
 
 class SplashController extends GetxController {
   final isLogged = false.obs;
   RxString name = ''.obs;
   RxString email = ''.obs;
   final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection('users');
+      FirebaseFirestore.instance.collection(users);
 
   @override
   void onInit() {
@@ -36,6 +37,17 @@ class SplashController extends GetxController {
       try {
         DocumentSnapshot userSnapshot =
             await usersCollection.doc(user.email).get();
+        table_ = '';
+        await setcollectionnames(table_);
+        if (!userSnapshot.exists) {
+          table_ = 'tsn_';
+          await setcollectionnames(table_);
+        userSnapshot =
+          await
+          FirebaseFirestore.instance.collection('tsn_users')
+              .doc(user.email)
+              .get();
+        }
         if (userSnapshot.exists) {
           name.value = userSnapshot['full_name'] ?? '';
           email.value = userSnapshot['email'] ?? '';
@@ -44,9 +56,11 @@ class SplashController extends GetxController {
           userImage_ = userSnapshot['userImage']??'';
           teachersClass_ = userSnapshot['class']??'';
         }
+
       } catch (e) {
         print('Error fetching user data: $e');
       }
+      role_ == 'Director'? Get.to(CampusSelectionScreen()):
 
       Get.off(MainTabs());
     }
@@ -114,13 +128,6 @@ class SplashController extends GetxController {
       },
     );
 
-    // Don't cancel the listener
-    // It will keep running until you explicitly cancel it
-
-    // You can add additional logic here if needed, e.g., reconnect attempts
-
-    // You may want to store the subscription so that you can cancel it when needed
-    // await listener.cancel();
   }
 
 }

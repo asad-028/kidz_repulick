@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kids_republik/main.dart';
+import 'package:kids_republik/screens/accounts/manager_accounts_home.dart';
 import 'package:kids_republik/screens/activities/view_bi_weekly_activities.dart';
 import 'package:kids_republik/screens/consent/parent_consent_screen.dart';
 import 'package:kids_republik/screens/home/checkin_checkout_screen.dart';
@@ -15,7 +15,6 @@ import 'package:kids_republik/screens/reminder/reminderstoparent.dart';
 import 'package:kids_republik/screens/widgets/base_drawer.dart';
 import 'package:kids_republik/utils/const.dart';
 import 'package:kids_republik/utils/image_slide_show.dart';
-
 import '../activities/select_childs_for_activity.dart';
 
 class ManagerHomeScreen extends StatefulWidget {
@@ -26,8 +25,7 @@ class ManagerHomeScreen extends StatefulWidget {
 }
 
 class _ManagerHomeScreenState extends State<ManagerHomeScreen> {
-  bool deleteionLoading = false;
-  User? user = FirebaseAuth.instance.currentUser;
+  CollectionReference collectionReferenceClass = FirebaseFirestore.instance.collection(ClassRoom);
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
@@ -36,26 +34,18 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen> {
 
         // backgroundColor: Colors.blue[50],
         drawer: BaseDrawer(),
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: kWhite),
-          title: Text(
-            'Home',
-            style: TextStyle(fontSize: 14,color: kWhite),
-          ),
-          backgroundColor: kprimary,
-        ),
+        appBar: AppBar(iconTheme: IconThemeData(color: kWhite), title: Text('Home', style: TextStyle(fontSize: 14,color: kWhite),), backgroundColor: kprimary,),
         body: SingleChildScrollView(
             // padding:EdgeInsets.symmetric(horizontal:
             // mQ.width*0.05),
-
             child: Column(
                 children: <Widget>[
-              ImageSlideShowfunction(context),
-              SizedBox(height: mQ.height * 0.03,),
-              Container(color: grey100,width: mQ.width*0.9,child: Text("${role_}'s Dashboard" ,textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14)),),
-              Row(
+                  ImageSlideShowfunction(context),
+                  SizedBox(height: mQ.height * 0.0083,),
+                  Container(color: grey100,width: mQ.width*0.9,child: Text("$role_'s Dashboard" ,textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14)),),
+                  Row(
                 children: [
-                  Padding (
+                  Padding(
                     padding: EdgeInsets.only(left: mQ.width*0.05),
                     child: Container(
                       width: mQ.width*0.15,
@@ -89,60 +79,123 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen> {
                   classSummary(mQ, "Kinder Garten - II",Colors.brown[50]),
                 ],
               ),
-              SizedBox(height: mQ.height * 0.03,),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  SizedBox(height: mQ.height * 0.0083,),
+                  Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-            IconButton(
-              onPressed: () {
-                Get.to(RegistrationForm());
-              },
-              icon: Image.asset('assets/manager/registration.png',
-                  width: mQ.width * 0.27),
-              // child: const Text('Consent Statements'),
-            ),
-            IconButton(
+                    Container(
+                      width: mQ.width*0.3,
+                      height: mQ.height*0.16,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/manager/registration.png'),
+                          fit: BoxFit.cover, // Adjust fit as needed (cover, contain, fill, etc.)
+                        ),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          Get.to(RegistrationForm());
+                        },
+                        icon: Icon(Icons.add,color: Colors.transparent,),
+                      ),
+                    ),
+                    Container(
+                      width: mQ.width*0.3,
+                      height: mQ.height*0.16,
+                      decoration: BoxDecoration(
+
+                        image: DecorationImage(
+                          image: AssetImage('assets/manager/students.png'),
+                          fit: BoxFit.cover, // Adjust fit as needed (cover, contain, fill, etc.)
+                        ),
+                      ),
+                      child: IconButton(
               onPressed: () {
                 Get.to(AssignClassToChildren(selectedclass_: 'All Classes'));
               },
-              icon: Image.asset('assets/manager/students.png',
-                  width: mQ.width * 0.27),
-              // child: const Text('Consent Statements'),
+                        icon: Icon(Icons.add,color: Colors.transparent,),
             ),
-            IconButton(
-              icon: Image.asset('assets/manager/staff.png',
-                  width: mQ.width * 0.27),
+                    ),
+                    Container(
+                      width: mQ.width*0.3,
+                      height: mQ.height*0.16,
+                      decoration: BoxDecoration(
+
+                        image: DecorationImage(
+                          image: AssetImage('assets/manager/staff.png'),
+                          fit: BoxFit.cover, // Adjust fit as needed (cover, contain, fill, etc.)
+                        ),
+                      ),
+                      child: IconButton(
               onPressed: () {
                 Get.to(TeacherManagementScreen());
               },
+                        icon: Icon(Icons.add,color: Colors.transparent,),
             ),
+                    ),
           ]),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  SizedBox(height: mQ.height * 0.0083,),
+                  Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                IconButton(
-                  onPressed: () {
-                    Get.to(ViewBiweeklyActivities());
-                  },
-                  icon: Image.asset('assets/manager/biweekly1.png',
-                      width: mQ.width * 0.27),
-                ),
-                IconButton(
-                  onPressed: () {
-                    Get.to(ParentConsentScreen(babyid: 'null',));
-                  },
-                  icon: Image.asset('assets/manager/consent.png',
-                      width: mQ.width * 0.27),
-                ),
-                IconButton(
-                  onPressed: () {
-                    Get.to(ParentReminderScreen(babyid_: "All Reminders",));
-                  },
-                  icon: Image.asset('assets/manager/reminder1.png',
-                      width: mQ.width * 0.27),
-                ),
+                    Container(
+                      width: mQ.width*0.3,
+                      height: mQ.height*0.16,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/manager/biweekly1.png'),
+                          fit: BoxFit.cover, // Adjust fit as needed (cover, contain, fill, etc.)
+                        ),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          Get.to(ViewBiweeklyActivities());
+                        },
+                        icon: Icon(Icons.add,color: Colors.transparent,),
+                      ),
+                    ),
+                    Container(
+                      width: mQ.width*0.3,
+                      height: mQ.height*0.16,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/manager/consent.png'),
+                          fit: BoxFit.cover, // Adjust fit as needed (cover, contain, fill, etc.)
+                        ),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          Get.to(ParentConsentScreen(babyid: 'null',));
+                        },
+                        icon: Icon(Icons.add,color: Colors.transparent,),
+                      ),
+                    ),
+                    Container(
+                      width: mQ.width*0.3,
+                      height: mQ.height*0.16,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/manager/reminder1.png'),
+                          fit: BoxFit.cover, // Adjust fit as needed (cover, contain, fill, etc.)
+                        ),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          Get.to(ParentReminderScreen(babyid_: "All Reminders",));
+                        },
+                        icon: Icon(Icons.add,color: Colors.transparent,),
+                      ),
+                    ),
               ]),
-
+                  SizedBox(height: mQ.height * 0.0083,),
+                  IconButton(
+                    onPressed: () {
+                      Get.to(ManagerAccountsHomeScreen());
+                    },
+                    icon: Image.asset('assets/accounts.png',
+                        // width: mQ.width * 0.55 ,
+                        height: mQ.height * 0.1) ,
+                  ),
             ]
             )
         )
@@ -169,7 +222,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen> {
     );
   }
 
-    Widget classSummary(mQ,class_,decorationcolor_){
+  Widget classSummary(mQ,class_,decorationcolor_){
       return
         FutureBuilder<DocumentSnapshot>(
             future: collectionReferenceClass.doc(class_).get(),
@@ -249,4 +302,37 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen> {
         );
     }
 
+}
+class ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const ActionButton({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 32, // Adjust icon size as needed
+            color: Colors.blue, // Customize icon color
+          ),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12), // Customize text style
+          ),
+        ],
+      ),
+    );
+  }
 }

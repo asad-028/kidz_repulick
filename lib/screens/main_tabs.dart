@@ -1,11 +1,17 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:kids_republik/screens/auth/manager_user_management.dart';
 import 'package:kids_republik/screens/home/principal_home.dart';
 import 'package:kids_republik/screens/home/teacher_home_select_activity_screen.dart';
 import 'package:kids_republik/screens/kids/assign_class_to_child_screen.dart';
+import 'package:kids_republik/screens/splash.dart';
 import 'package:kids_republik/utils/const.dart';
 import 'package:kids_republik/utils/parent_photos_slideshow.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
@@ -28,7 +34,8 @@ class MainTabs extends StatefulWidget {
 class _MainTabsState extends State<MainTabs> {
   var _currentIndex = 0;
 
-  buildScreen() {
+
+buildScreen() {
     switch (role_) {
       case 'Director':
         switch (_currentIndex) {
@@ -95,12 +102,92 @@ class _MainTabsState extends State<MainTabs> {
     // TODO: implement initState
     super.initState();
   }
+  final collectionReference = FirebaseFirestore.instance.collection(users);
+  late Future<void> _initializeControllerFuture;
+  bool imagedownloading = false;
+  User? user = FirebaseAuth.instance.currentUser;
 
+  bool logoutbool = false;
+
+  Future<bool> _onLogoutPressed() async {
+    messageAllert('Do you want to logout?', 'Logout!');
+    return true;
+  }
+
+  messageAllert(String msg, String ttl) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return CupertinoAlertDialog(
+              title: Padding(
+                padding: const EdgeInsets.only(bottom: 10.0),
+                child: Text(ttl),
+              ),
+              content: Text(msg),
+              actions: [
+                CupertinoDialogAction(
+                  isDefaultAction: false,
+                  child: logoutbool
+                      ? const CircularProgressIndicator()
+                      : Column(
+                    children: const <Widget>[
+                      Text('Yes'),
+                    ],
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      logoutbool = true;
+                    });
+
+                    signOut();
+                  },
+                ),
+                CupertinoDialogAction(
+                  isDefaultAction: false,
+                  child: Column(
+                    children: const <Widget>[
+                      Text('No'),
+                    ],
+                  ),
+                  onPressed: () => Navigator.of(context).pop(false),
+                ),
+              ],
+            );
+          });
+        });
+  }
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+      table_ = '';
+      role_ = '';
+      setcollectionnames(table_);
+
+      // Navigate to the login screen or any other screen you desire
+      Get.offAll(SplashScreen());
+    } catch (e) {
+      print("Error logging out: $e");
+    }
+  }
+
+
+  Future<bool> _onWillPop()
+  async {
+    _onLogoutPressed();
+
+  return Future.value(false); // Prevent default back behavior
+}
   @override
   Widget build(BuildContext context) {
     // checkconnecntivity();
 
-    return Scaffold(
+    return  WillPopScope(
+        onWillPop: role_ != "Director"?_onWillPop:null,
+        child: Scaffold(
       body: buildScreen(),
       bottomNavigationBar: SalomonBottomBar(
         // backgroundColor: Color(0xFFD4E7E9),
@@ -136,7 +223,7 @@ class _MainTabsState extends State<MainTabs> {
 
         ],
       ),
-    );
+    ));
   }
 
   Future<void> checkconnecntivity() async
@@ -195,4 +282,78 @@ class _MainTabsState extends State<MainTabs> {
     // await listener.cancel();
   }
 
+}
+typedef UserSelectedCallback = void Function(String);
+
+class UserDropdownButton extends StatefulWidget {
+  final String? selectedUserEmail;
+  final UserSelectedCallback onUserSelected;
+
+  const UserDropdownButton({
+    required this.selectedUserEmail,
+    required this.onUserSelected,
+  });
+
+  @override
+  _UserDropdownButtonState createState() => _UserDropdownButtonState();
+}
+
+class _UserDropdownButtonState extends State<UserDropdownButton> {
+  late String? selectedUserEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedUserEmail = widget.selectedUserEmail;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<QuerySnapshot>(
+      future:
+      FirebaseFirestore.instance.collection(users).where('role',isEqualTo: 'Parent')
+          // .where('supervisor_', isEqualTo: useremail)
+          .get(),
+      builder: (context, usersSnapshot) {
+        if (usersSnapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox(); // Return an empty widget while data is loading
+        }
+
+        if (usersSnapshot.hasError) {
+          return Text('Error: ${usersSnapshot.error}');
+        }
+
+        final List<DocumentSnapshot> documents = usersSnapshot.data!.docs;
+
+        // Convert list of users to list of DropdownMenuItems
+        List<DropdownMenuItem<String>> dropdownItems = documents.map((DocumentSnapshot document) {
+          Map<String, dynamic> userData = document.data() as Map<String, dynamic>;
+          String userName = userData['full_name'];
+          String userEmail = userData['email'];
+          // String land_alotted = userData['land_alotted']??0;
+          return DropdownMenuItem(
+
+            value: userEmail,
+            child: Text('$userName ',
+                style: TextStyle(color: kprimary)),
+          );
+        }).toList();
+
+        return Center(
+          child: DropdownButton<String>(
+
+            onChanged: (String? selectedValue) {
+              setState(() {
+                selectedUserEmail = selectedValue;
+                widget.onUserSelected(selectedValue!); // Pass selected email to callback function
+              });
+            },
+            hint: Text('Select Parent',style: TextStyle(color: kprimary),), // Hint text added here
+            value: selectedUserEmail,
+            items: dropdownItems,style: TextStyle(color: kprimary),dropdownColor: Colors.grey[100],
+          ),
+        );
+      },
+    );
+  }
 }
