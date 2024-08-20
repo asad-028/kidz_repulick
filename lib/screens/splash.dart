@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,16 +20,13 @@ class SplashScreen extends StatelessWidget {
         height: mQ.height,
         width: mQ.width,
         decoration: BoxDecoration(
-
           image: DecorationImage(
-          alignment: Alignment.bottomCenter,
-            image: AssetImage(
-                'assets/splash_screen.png'), // Replace with your image path
+            alignment: Alignment.bottomCenter,
+            image: AssetImage('assets/splash_screen.png'), // Replace with your image path
             fit: BoxFit.fitWidth, // Adjust the fit as needed
           ),
         ),
         child: Column(children: [
-
           // Text('version is $app_version'),
           SizedBox(
             height: mQ.height * 0.237,
@@ -50,14 +46,14 @@ class SplashScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Image.asset(
-                  'assets/l_d_app_icon.png',
+                  'assets/little_logo.png',
                   fit: BoxFit.fill,
                 ),
               ),
             ),
           ),
-          SizedBox( height: mQ.height * 0.2),
-          CupertinoActivityIndicator(color: kBlackColor,radius: 18),
+          SizedBox(height: mQ.height * 0.2),
+          CupertinoActivityIndicator(color: kBlackColor, radius: 18),
         ]),
       ),
     );

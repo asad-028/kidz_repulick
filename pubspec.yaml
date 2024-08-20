@@ -78,7 +78,7 @@ flutter_icons:
   android: true
   ios: true
   remove_alpha_ios: true
-  image_path: "assets/l_d_app_icon.png"
+  image_path: "assets/little_logo.jpg"
 
   flutter_lints: ^2.0.0
 
