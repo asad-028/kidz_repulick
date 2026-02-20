@@ -1,17 +1,16 @@
-
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+
 import 'package:http/http.dart' as http;
 import 'dart:async';
-
+import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-
 var saveurl;
+
 class ZoomableImageGallery extends StatefulWidget {
   final List<Map<String, dynamic>> imageUrls;
   final int initialIndex;
@@ -31,10 +30,10 @@ class _ZoomableImageGalleryState extends State<ZoomableImageGallery> {
     super.initState();
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: widget.initialIndex);
-
   }
 
-  Future<void> saveImageToGallery(BuildContext context, String imageUrl, String subfoldername, String filename) async {
+  Future<void> saveImageToGallery(BuildContext context, String imageUrl,
+      String subfoldername, String filename) async {
     try {
       // Check for storage permission
       var status = await Permission.storage.status;
@@ -65,24 +64,25 @@ class _ZoomableImageGalleryState extends State<ZoomableImageGallery> {
     }
   }
 
-  Future<void> _saveImage(BuildContext context, String imageUrl, String subfoldername, String filename) async {
+  Future<void> _saveImage(BuildContext context, String imageUrl,
+      String subfoldername, String filename) async {
     try {
       // Fetch the image from the network
       var response = await http.get(Uri.parse(imageUrl));
+      final imageSaver = ImageGallerySaver();
       if (response.statusCode == 200) {
         // Save image to gallery
-        final result = await ImageGallerySaver.saveImage(
+        final result = await imageSaver.saveImage(
           response.bodyBytes,
-          name: "$subfoldername/$filename",
-          isReturnImagePathOfIOS: true,
+          // name: "$subfoldername/$filename",
+          // isReturnImagePathOfIOS: true,
         );
-        if (result['isSuccess']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Image saved successfully!'),
-            ),
-          );
-        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Image saved successfully!'),
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -207,7 +207,6 @@ class _ZoomableImageGalleryState extends State<ZoomableImageGallery> {
   //   }
   // }
 
-
   // Future<void> _saveImage(BuildContext context, String imageUrl, String subfoldername, String filename) async {
   //   try {
   //     final directory = await getExternalStorageDirectory();
@@ -310,27 +309,29 @@ class _ZoomableImageGalleryState extends State<ZoomableImageGallery> {
 
   void nextImage() {
     if (_currentIndex < widget.imageUrls.length - 1) {
-      _pageController.nextPage(duration: Duration(milliseconds: 300), curve: Curves.ease);
+      _pageController.nextPage(
+          duration: Duration(milliseconds: 300), curve: Curves.ease);
     }
   }
 
   void previousImage() {
     if (_currentIndex > 0) {
-      _pageController.previousPage(duration: Duration(milliseconds: 300), curve: Curves.ease);
+      _pageController.previousPage(
+          duration: Duration(milliseconds: 300), curve: Curves.ease);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-      Stack(
+      body: Stack(
         children: [
           PhotoViewGallery.builder(
             itemCount: widget.imageUrls.length,
             builder: (context, index) {
               return PhotoViewGalleryPageOptions(
-                imageProvider: CachedNetworkImageProvider(widget.imageUrls[index]['image_']),
+                imageProvider: CachedNetworkImageProvider(
+                    widget.imageUrls[index]['image_']),
                 minScale: PhotoViewComputedScale.contained,
                 maxScale: PhotoViewComputedScale.covered * 2,
               );

@@ -148,9 +148,10 @@ classwisestudents('Kinder Garten - II')
             return Column(
               children: <Widget>[
                 Container(width: mQ.width,color: Colors.green[50] ,height: mQ.height*0.022,child: Text(classname,textAlign: TextAlign.center,style: TextStyle(color: Colors.teal),)),
-                Container(alignment: Alignment.center,
+                Container(
+                  alignment: Alignment.center,
                   color: Colors.transparent,
-                  height: mQ.height * 0.098,
+                  height: mQ.height * 0.13,
                   child: ListView.builder(
                     physics: AlwaysScrollableScrollPhysics(),
                     itemCount: snapshot.data!.docs.length,
@@ -159,87 +160,221 @@ classwisestudents('Kinder Garten - II')
                     itemBuilder: (context, position) {
                       final childData = snapshot.data!.docs[position].data()
                       as Map<String, dynamic>;
+                      final avatarSize = mQ.width * 0.14;
 
                       return GestureDetector(
-                        onTap: () {
-                        },
-                        child:
-                        checkforwardedreportsandshowbadge(mQ,(role_ == "Teacher")?"New":(role_ == "Principal")?"Forwarded":(role_ == "Parent")?"Approved":(role_ == "Director")?"Forwarded":"",snapshot.data!.docs[position].id,
-                        Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            PopupMenuButton<String>(
-                              icon: Container(
-                                width: mQ.width * 0.1,
-                                height: mQ.height * 0.042,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(alignment: FractionalOffset.topCenter,
-                                      image:
-                                      CachedNetworkImageProvider(childData['picture']),
-                                      fit: BoxFit.fill),
+                        onTap: () {},
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: mQ.width * 0.015),
+                          child: Card(
+                            elevation: 3,
+                            clipBehavior: Clip.antiAlias,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(mQ.width * 0.05),
+                            ),
+                            color: Colors.blue[50],
+                            child: Container(
+                              width: mQ.width * 0.26,
+                              padding: EdgeInsets.symmetric(
+                                vertical: mQ.height * 0.006,
+                                horizontal: mQ.width * 0.012,
+                              ),
+                              child: checkforwardedreportsandshowbadge(
+                                mQ,
+                                (role_ == "Teacher")
+                                    ? "New"
+                                    : (role_ == "Principal")
+                                        ? "Forwarded"
+                                        : (role_ == "Parent")
+                                            ? "Approved"
+                                            : (role_ == "Director")
+                                                ? "Forwarded"
+                                                : "",
+                                snapshot.data!.docs[position].id,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    PopupMenuButton<String>(
+                                      icon: Container(
+                                        width: avatarSize,
+                                        height: avatarSize,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                            alignment: FractionalOffset.topCenter,
+                                            image: CachedNetworkImageProvider(childData['picture']),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      surfaceTintColor: Colors.green,
+                                      shadowColor: Colors.limeAccent,
+                                      color: Colors.purple[50], // Generate the menu items from the list
+                                      itemBuilder: (BuildContext context) {
+                                        return reports_.map((String item) {
+                                          return PopupMenuItem<String>(
+                                            value: item,
+                                            child: Text(
+                                                item == 'New'
+                                                    ? "Initiated"
+                                                    : item == 'Activities'
+                                                        ? "Gallery"
+                                                        : item == 'Daily'
+                                                            ? role_ == 'Director'
+                                                                ? "Forwarded"
+                                                                : role_ == 'Principal'
+                                                                    ? "Received"
+                                                                    : role_ == 'Teacher'
+                                                                        ? "Initiated"
+                                                                        : item
+                                                            : item,
+                                                style: TextStyle(
+                                                    color: item == 'New'
+                                                        ? Colors.green
+                                                        : item == 'Daily'
+                                                            ? (role_ == "Teacher")
+                                                                ? Colors.green
+                                                                : (role_ == "Parent")
+                                                                    ? Colors.red
+                                                                    : Colors.blue
+                                                            : item == 'Forwarded'
+                                                                ? Colors.blue
+                                                                : item == 'Approved'
+                                                                    ? Colors.red
+                                                                    : item == 'BiWeekly'
+                                                                        ? Colors.indigo
+                                                                        : item == 'Activities'
+                                                                            ? Colors.purple
+                                                                            : Colors.black)),
+                                          );
+                                        }).toList();
+                                      },
+                                      onSelected: (String selectedItem) async {
+                                        await confirm(
+                                                title: Text("View Report",
+                                                    style: TextStyle(fontSize: 12)),
+                                                content: Text('Do you want to continue?'),
+                                                textOK: Text('Yes'),
+                                                textCancel: Text('No'),
+                                                context)
+                                            ? (selectedItem == 'Daily')
+                                                ? Get.to(DailyReportShape(
+                                                    babyID_: snapshot.data!.docs[position].id,
+                                                    name_: childData['childFullName'],
+                                                    date_: reportDate_,
+                                                    class_: childData['class_'],
+                                                    childPicture_: childData['picture'],
+                                                    reportType_: (role_ == 'Principal' ||
+                                                            role_ == 'Director')
+                                                        ? 'Forwarded'
+                                                        : (role_ == 'Parent')
+                                                            ? 'Approved'
+                                                            : 'New'))
+                                                : (selectedItem == 'Forwarded')
+                                                    ? Get.to(DailyReportShape(
+                                                        babyID_:
+                                                            snapshot.data!.docs[position].id,
+                                                        name_: childData['childFullName'],
+                                                        date_: reportDate_,
+                                                        class_: childData['class_'],
+                                                        childPicture_: childData['picture'],
+                                                        reportType_: 'Forwarded'))
+                                                    : (selectedItem == 'Approved')
+                                                        ? Get.to(DailyReportShape(
+                                                            babyID_: snapshot
+                                                                .data!.docs[position].id,
+                                                            name_: childData['childFullName'],
+                                                            date_: reportDate_,
+                                                            class_: childData['class_'],
+                                                            childPicture_: childData['picture'],
+                                                            reportType_: 'Approved'))
+                                                        : (selectedItem == 'New')
+                                                            ? Get.to(DailyReportShape(
+                                                                babyID_: snapshot.data!
+                                                                    .docs[position].id,
+                                                                name_: childData[
+                                                                    'childFullName'],
+                                                                date_: reportDate_,
+                                                                class_: childData['class_'],
+                                                                childPicture_:
+                                                                    childData['picture'],
+                                                                reportType_: 'New'))
+                                                            : (selectedItem == 'Activities')
+                                                                ? Get.to(
+                                                                    GalleryReportShapeScreen(
+                                                                    babyID_: snapshot
+                                                                        .data!
+                                                                        .docs[position]
+                                                                        .id,
+                                                                    name_: childData[
+                                                                        'childFullName'],
+                                                                    date_: reportDate_,
+                                                                    class_: childData[
+                                                                        'class_'],
+                                                                    babypicture_: childData[
+                                                                        'picture'],
+                                                                    fathersEmail_:
+                                                                        childData[
+                                                                            'fathersEmail'],
+                                                                  ))
+                                                                // Get.to(BiWeeklyReportShapeScreen(babyID_: snapshot.data!.docs[position].id, name_: childData['childFullName'], date_: getCurrentDate(), class_: childData['class_'], babypicture_:  childData['picture'])):
+                                                                : (role_ != 'Teacher')
+                                                                    ? Get.to(
+                                                                        BiWeeklyReportPrincipalScreen(
+                                                                        babyID_: snapshot
+                                                                            .data!
+                                                                            .docs[position]
+                                                                            .id,
+                                                                        name_: childData[
+                                                                            'childFullName'],
+                                                                        date_: reportDate_,
+                                                                        class_: childData[
+                                                                            'class_'],
+                                                                        babypicture_:
+                                                                            childData[
+                                                                                'picture'],
+                                                                      ))
+                                                                    : Get.to(
+                                                                        BiWeeklyReportShapeScreen(
+                                                                        babyID_: snapshot
+                                                                            .data!
+                                                                            .docs[position]
+                                                                            .id,
+                                                                        name_: childData[
+                                                                            'childFullName'],
+                                                                        reportdate_:
+                                                                            reportDate_,
+                                                                        class_: childData[
+                                                                            'class_'],
+                                                                        babypicture_:
+                                                                            childData[
+                                                                                'picture'],
+                                                                      ))
+                                            // Get.to(ReportShapeScreen(babyID_:  snapshot.data!.docs[position].id ,name_:  childData['childFullName'], date_: getCurrentDate(), class_:  childData['class_'],babypicture_: childData['picture'],))
+                                            : Null;
+                                        // collectionReference.doc(snapshot.data!.docs[position].id).update({"class_": selectedItem});
+                                      },
+                                    ),
+                                    SizedBox(height: mQ.height * 0.003),
+                                    Text(
+                                      " ${childData['childFullName']} ",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          // fontFamily: 'Comic Sans MS',
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.blue),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              surfaceTintColor: Colors.green,shadowColor: Colors.limeAccent,
-                              color: Colors.purple[50], // Generate the menu items from the list
-                              itemBuilder:
-                                  (BuildContext
-                              context) {
-                                return reports_.map(
-                                        (String item) {
-                                      return PopupMenuItem<
-                                          String>(
-                                        value: item,
-                                        child:
-                                        Text(
-                                            item=='New'?"Initiated":
-                                            item=='Activities'?"Gallery":
-                                            item=='Daily'?
-                                            role_=='Director'? "Forwarded":
-                                            role_=='Principal'?"Received":
-                                            role_=='Teacher'? "Initiated":
-                                                item:item,
-                                            style: TextStyle(
-                                                color: item=='New'?Colors.green
-                                                    :item=='Daily'?(role_=="Teacher")?Colors.green :(role_=="Parent")?Colors.red :Colors.blue
-                                                    :item=='Forwarded'?Colors.blue
-                                                    :item=='Approved'?Colors.red
-                                                    :item=='BiWeekly'?Colors.indigo
-                                                    :item=='Activities'? Colors.purple
-                                                    :Colors.black
-                                            )),
-                                      );
-                                    }).toList();
-                              },
-                              onSelected: (String selectedItem) async {
-
-                                await confirm(title: Text("View Report",style: TextStyle(fontSize: 12)),content: Text('Do you want to continue?'), textOK: Text('Yes'),textCancel: Text('No'),context)?
-                              (selectedItem == 'Daily')? Get.to(DailyReportShape(babyID_: snapshot.data!.docs[position].id , name_: childData['childFullName'], date_: reportDate_, class_: childData['class_'], childPicture_:  childData['picture'],reportType_:(role_=='Principal'||role_=='Director')? 'Forwarded':(role_=='Parent')? 'Approved':'New'))
-                                    : (selectedItem == 'Forwarded')? Get.to(DailyReportShape(babyID_: snapshot.data!.docs[position].id , name_: childData['childFullName'], date_: reportDate_, class_: childData['class_'], childPicture_:  childData['picture'],reportType_: 'Forwarded'))
-                                    : (selectedItem == 'Approved')? Get.to(DailyReportShape(babyID_: snapshot.data!.docs[position].id , name_: childData['childFullName'], date_: reportDate_, class_: childData['class_'], childPicture_:  childData['picture'],reportType_: 'Approved'))
-                                : (selectedItem == 'New')? Get.to(DailyReportShape(babyID_: snapshot.data!.docs[position].id , name_: childData['childFullName'], date_: reportDate_, class_: childData['class_'], childPicture_:  childData['picture'],reportType_: 'New'))
-                                :(selectedItem == 'Activities')? Get.to(GalleryReportShapeScreen(babyID_:  snapshot.data!.docs[position].id ,name_:  childData['childFullName'], date_: reportDate_, class_:  childData['class_'],babypicture_: childData['picture'], fathersEmail_: childData['fathersEmail'],)):
-                                // Get.to(BiWeeklyReportShapeScreen(babyID_: snapshot.data!.docs[position].id, name_: childData['childFullName'], date_: getCurrentDate(), class_: childData['class_'], babypicture_:  childData['picture'])):
-                              (role_ != 'Teacher')?Get.to(BiWeeklyReportPrincipalScreen(babyID_: snapshot.data!.docs[position].id, name_: childData['childFullName'], date_: reportDate_, class_: childData['class_'], babypicture_:  childData['picture'])):
-                                Get.to(BiWeeklyReportShapeScreen(babyID_: snapshot.data!.docs[position].id, name_: childData['childFullName'], reportdate_: reportDate_, class_: childData['class_'], babypicture_:  childData['picture']))
-                                // Get.to(ReportShapeScreen(babyID_:  snapshot.data!.docs[position].id ,name_:  childData['childFullName'], date_: getCurrentDate(), class_:  childData['class_'],babypicture_: childData['picture'],))
-                                    :Null;
-                                // collectionReference.doc(snapshot.data!.docs[position].id).update({"class_": selectedItem});
-                              },
                             ),
-                            Text(" ${childData['childFullName']} ",
-                            style: TextStyle(
-                                fontSize: 10,
-                                // fontFamily: 'Comic Sans MS',
-                                fontWeight: FontWeight.normal,
-                                color: Colors.blue)),
-                          ],
-                        ),),
-                      // )
+                          ),
+                        ),
                       );
                     },
                   ),

@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
+import 'package:kids_republik/controllers/bank_account_controller.dart';
 import 'package:kids_republik/firebase_options.dart';
 import 'package:kids_republik/postman_api/api_services.dart';
 import 'package:kids_republik/screens/splash.dart';
@@ -21,6 +22,7 @@ String Reports = 'Reports';
 String BabyData = 'BabyData';
 String invitation_codes = 'invitation_codes';
 String Consent = 'Consent';
+String bank_details = 'bank_details';
 String ClassRoom = 'ClassRoom';
 RxBool isloadingPage = true.obs;
 final ApiService apiService = ApiService(
@@ -48,6 +50,9 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Little Diary',
       debugShowCheckedModeBanner: false,
+      initialBinding: BindingsBuilder(() {
+        Get.put(BankAccountController());
+      }),
       // routes: {
       //   '/':(context) => SelectCampusScreen(),
       //   '/webViewContainer': (context) => WebVeiwContainer(),
@@ -73,5 +78,9 @@ setcollectionnames(String? table_){
   BabyData = '${table_}BabyData';
   invitation_codes = '${table_}invitation_codes';
   Consent = '${table_}Consent';
+  // bank_details remains 'bank_details' (no prefix)
+  if (Get.isRegistered<BankAccountController>()) {
+    Get.find<BankAccountController>().fetchDetails();
+  }
 }
 

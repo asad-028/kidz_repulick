@@ -32,15 +32,21 @@ class _ParentConsentScreenState extends State<ParentConsentScreen> {
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        iconTheme: IconThemeData(color: kWhite),
-        title: Text(
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
           'Consents',
-          style: TextStyle(fontSize: 14, color: kWhite),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: kprimary,
+        elevation: 0,
+        centerTitle: true,
       ),
-      backgroundColor: Colors.blue[50],
         floatingActionButton:
         (role_ == "Principal" || role_ == "Director")
             ?
@@ -55,73 +61,65 @@ class _ParentConsentScreenState extends State<ParentConsentScreen> {
           ImageSlideShowfunction(context),
           // List of Consents
           Container(
-            padding: EdgeInsets.only(right: 8, left: 8),
-            height: mQ.height * 0.03,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             color: Colors.white,
-            width: mQ.width,
-            // padding:mQ ,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Expanded(
+                const Icon(Icons.description_rounded, size: 20, color: Colors.blueGrey),
+                const SizedBox(width: 8),
+                const Expanded(
                   child: Text(
                     'Consents',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: Color(0xFF1E293B),
+                    ),
                   ),
                 ),
-                Expanded(
-                  child: Text(
-                    textAlign: TextAlign.right,
-                    ' ${getCurrentDateforattendance()}',
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontFamily: 'Comic Sans MS',
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey),
+                Text(
+                  getCurrentDateforattendance(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blueGrey.shade400,
                   ),
                 ),
               ],
-            ), // list of contains Container
+            ),
           ),
 (role_== "Parent")?
 displayConsents(mQ):Container(),
           SingleChildScrollView(
               child: Column(children: [
-                (role_ != 'Parent')?Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  // crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'View Results',
-                      style: TextStyle(
-                        // fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
+                if (role_ != 'Parent')
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Get.to(ViewConsentResults(results: 'Waiting'));
-                      },
-                      child: Text('Waiting',style: TextStyle(color: Colors.orange)),
-                      // child: Text('Waiting'),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        const Text(
+                          'Results:',
+                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF475569)),
+                        ),
+                        _buildFilterButton('Waiting', Colors.orange.shade700, Colors.orange.shade50),
+                        _buildFilterButton('Yes', Colors.green.shade700, Colors.green.shade50),
+                        _buildFilterButton('No', Colors.red.shade700, Colors.red.shade50),
+                      ],
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Get.to(ViewConsentResults(results: 'Yes'));
-                      },
-                      child: Text('Yes',style: TextStyle(color: Colors.green[900])),
-                      // child: Text('Yes'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Get.to(ViewConsentResults(results: 'No'));
-                      },
-                      child: Text('No',style: TextStyle(color: Colors.red)),
-                      // child: Text('No'),
-                    ),
-                  ],
-                ):Container(),
+                  ),
                 Padding(
               padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 4),
               child: StreamBuilder<QuerySnapshot>(
@@ -153,329 +151,27 @@ displayConsents(mQ):Container(),
                     // ); // No data
                   }
                   // Data is available, build the list
-                  return role_ != 'Parent'?
-                  ListView.separated(
-                    padding: EdgeInsets.all(10),
-                    separatorBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 0.0, top: 0),
-                        child: Divider(
-                          color: Colors.grey.withOpacity(0.1),
-                        ),
-                      );
-                    },
-                    primary: false,
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      final childData = snapshot.data!.docs[index].data()
-                      as Map<String, dynamic>;
-
-                      return InkWell(
-                        onTap: () {
-                          showEditingDialog(
-                              snapshot.data!.docs[index].id,
-                              childData['title_'],
-                              childData['description_'],
-                              childData['subject_'],
-                              childData['class_'],
-                              mQ,
-                              childData,
-                              snapshot,
-                              index);
-                          _isEnable = false;
-                        },
-                        child:
-                        Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          // (childData["result_"]== "Waiting")?MainAxisAlignment.start:MainAxisAlignment.end,
-                          children: [
-                            Container(
-                                padding: EdgeInsetsDirectional.symmetric(horizontal: mQ.width*0.02),
-                                height: mQ.height*0.1,width: mQ.width*0.95,
-                                decoration: BoxDecoration(
-                                  color:
-                                  Colors.white,
-                                  borderRadius: BorderRadius.circular(5), // Apply rounded corners if desired
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.6),
-                                      spreadRadius: 0.2,
-                                      blurRadius: 0.5,
-                                      offset: Offset(0, 3), // Add a shadow effect
-                                    ),
-                                  ],
-                                ),
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(height: mQ.height*0.05,
-                                      child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                                          children:[
-                                            Expanded(
-                                              child: Text(
-                                                " ${childData['date_']}",
-                                                textAlign: TextAlign.left,
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.normal,
-                                                    color: Colors.grey
-                                                        .withOpacity(0.4),
-                                                    fontSize: 10),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                "${childData['title_']} ",
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.indigo.withOpacity(0.9),
-                                                    fontSize: 12),
-                                              ),
-                                            ), // Title
-                                            Expanded(
-                                              child:
-                                              (role_ == 'Parent')
-                                                  ? Container()
-                                              // Text(
-                                              //       " ${childData['result_']}",
-                                              //       textAlign: TextAlign.right,
-                                              //       style: TextStyle(
-                                              //           fontWeight:
-                                              //           FontWeight.normal,
-                                              //           color: (childData["result_"]== "Waiting")?Colors.teal:(childData["result_"]== "Yes")?Colors.green[900]
-                                              //               :Colors.red[900],
-                                              //           fontSize: 12),
-                                              //     )
-                                                  : Row(
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                                  children: [
-                                                    Expanded(
-                                                      child: IconButton(
-                                                          icon:
-                                                          Icon(Icons.edit),
-                                                          alignment: Alignment.centerRight,                              iconSize: 16,
-                                                          color:
-                                                          Colors.blue[600],
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              showEditingDialog(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .docs[
-                                                                  index]
-                                                                      .id,
-                                                                  childData[
-                                                                  'title_'],
-                                                                  childData[
-                                                                  'description_'],
-                                                                  childData[
-                                                                  'subject_'],
-                                                                  childData[
-                                                                  'class_'],
-                                                                  mQ,
-                                                                  childData,
-                                                                  snapshot,
-                                                                  index);
-                                                              _isEnable = true;
-                                                            });
-                                                          }),
-                                                    ),
-                                                    Expanded(
-                                                      child: IconButton(
-                                                          onPressed: () async {
-                                                            await confirm(title: Text("Delete?",style: TextStyle(fontSize: 14,color: Colors.red[900])), content: Text("Do you want to delete?",style: TextStyle(fontSize: 12,color: Colors.black)), textOK: Text('Yes'),textCancel: Text('No'),context)?deleteDocumentFromFirestore(snapshot.data!.docs[index].id):Navigator.of(context).pop;
-
-                                                          },
-                                                          icon: Icon(Icons.delete_outline_sharp,
-                                                              size: 18, color: Colors.black)),
-                                                    ),
-
-                                                  ]),
-                                            ),
-                                          ]),
-                                    ),
-                                    Text(
-                                      "${childData['description_']}",
-                                      textAlign: TextAlign.justify,
-                                      maxLines: 1, // Set the maximum number of lines
-                                      overflow: TextOverflow.ellipsis, // Display ellipsis (...) when content overflows
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.black87.withOpacity(0.7),
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                          ],
-                        ),
-
-                      );
-                    },
-                  ):
-                  ListView.separated(
-                    padding: EdgeInsets.all(3),
-                    separatorBuilder: (context, index) {
-                      return Divider(
-                        color: Colors.grey.withOpacity(0.1),
-                      );
-                    },
-                    primary: false,
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      final childData = snapshot.data!.docs[index].data()
-                          as Map<String, dynamic>;
-
-                      return
-                         showconsentsummaryofyesnowaiting(mQ,childData['description_'],
-                      InkWell(
-                        onTap: () {
-                          showEditingDialog(
-                              snapshot.data!.docs[index].id,
-                              childData['title_'],
-                              childData['description_'],
-                              childData['subject_'],
-                              childData['class_'],
-                              mQ,
-                              childData,
-                              snapshot,
-                              index);
-                          _isEnable = false;
-                        },
-                        child:
-                        Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          // (childData["result_"]== "Waiting")?MainAxisAlignment.start:MainAxisAlignment.end,
-                          children: [
-                            Container(
-                                padding: EdgeInsetsDirectional.symmetric(horizontal: mQ.width*0.02),
-                                height: mQ.height*0.1,width: mQ.width*0.95,
-                                decoration: BoxDecoration(
-                                  color:
-                                  Colors.grey[50],
-                                  borderRadius: BorderRadius.circular(5), // Apply rounded corners if desired
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.6),
-                                      spreadRadius: 0.2,
-                                      blurRadius: 0.5,
-                                      offset: Offset(0, 3), // Add a shadow effect
-                                    ),
-                                  ],
-                                ),
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(height: mQ.height*0.05,
-                                      child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                                          children:[
-                                            Expanded(
-                                              child: Text(
-                                                " ${childData['date_']}",
-                                                textAlign: TextAlign.left,
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.normal,
-                                                    color: Colors.grey
-                                                        .withOpacity(0.4),
-                                                    fontSize: 10),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                "${childData['title_']} ",
-                                                overflow: TextOverflow.ellipsis, // Display ellipsis (...) when content overflows
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.indigo.withOpacity(0.9),
-                                                    fontSize: 12),
-                                              ),
-                                            ), // Title
-                                            Expanded(
-                                              child:
-                                              (role_ == 'Parent')
-                                                  ? Text(
-                                                "${childData['result_']}",
-                                                textAlign: TextAlign.right,
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                    FontWeight.normal,
-                                                    color: (childData["result_"]== "Waiting")?Colors.teal:(childData["result_"]== "Yes")?Colors.green[900]
-                                                        :Colors.red[900],
-                                                    fontSize: 12),
-                                              )
-                                                  : Row(
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                                  children: [
-                                                    Expanded(
-                                                      child: IconButton(
-                                                          icon:
-                                                          Icon(Icons.edit),
-                                                          alignment: Alignment.centerRight,                              iconSize: 16,
-                                                          color:
-                                                          Colors.blue[600],
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              showEditingDialog(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .docs[
-                                                                  index]
-                                                                      .id,
-                                                                  childData[
-                                                                  'title_'],
-                                                                  childData[
-                                                                  'description_'],
-                                                                  childData[
-                                                                  'subject_'],
-                                                                  childData[
-                                                                  'class_'],
-                                                                  mQ,
-                                                                  childData,
-                                                                  snapshot,
-                                                                  index);
-                                                              _isEnable = true;
-                                                            });
-                                                          }),
-                                                    ),
-                                                    Expanded(
-                                                      child:
-                                                      IconButton(
-                                                          onPressed: () async {
-                                                            await confirm(title: Text("Delete?",style: TextStyle(fontSize: 14, color: Colors.red[900])),content: Text("Do you want to delete?",style: TextStyle(fontSize: 12, color: Colors.black)), textOK: Text('Yes'),textCancel: Text('No'),context)?deleteDocumentFromFirestore(snapshot.data!.docs[index].id):Navigator.of(context).pop;
-                                                          },
-                                                          icon: Icon(Icons.delete_outline_sharp,
-                                                              size: 18, color: Colors.black)),
-                                                    ),
-
-                                                  ]),
-                                            ),
-                                          ]),
-                                    ),
-                                    Text(
-                                      "${childData['description_']}",
-                                      textAlign: TextAlign.justify,
-                                      maxLines: 1, // Set the maximum number of lines
-                                      overflow: TextOverflow.ellipsis, // Display ellipsis (...) when content overflows
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.black87.withOpacity(0.7),
-                                          fontSize: 10),
-                                    ),
-
-                                  ],
-                                )),
-                          ],
-                        ),
-                      ));
-                    },
-                  );
+                  return role_ != 'Parent'
+                      ? ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          primary: false,
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            final childData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                            return _buildStaffConsentCard(snapshot.data!.docs[index].id, childData, mQ, snapshot, index);
+                          },
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          primary: false,
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            final childData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                            return _buildParentConsentCard(snapshot.data!.docs[index].id, childData, mQ, snapshot, index);
+                          },
+                        );
                 },
               ),
             ),
@@ -484,114 +180,246 @@ displayConsents(mQ):Container(),
       ),
     );
   }
-  Widget showconsentsummaryofyesnowaiting(mQ,consent_text, Widget pppasa,)
-  {
-    double leftposn = 0;
-    // Initialize count variables
-    int consentsYes = 0;
-    int consentsNo = 0;
-    int consentsWaiting = 0;
+  Widget _buildFilterButton(String label, Color color, Color bgColor) {
+    return InkWell(
+      onTap: () => Get.to(ViewConsentResults(results: label)),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStaffConsentCard(String docId, Map<String, dynamic> data, Size mQ, dynamic snapshot, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _openEditDialog(docId, data, snapshot, index, mQ),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      data['date_'] ?? '',
+                      style: TextStyle(fontSize: 11, color: Colors.blueGrey.shade300, fontWeight: FontWeight.w500),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: Icon(Icons.edit_outlined, size: 18, color: Colors.blue.shade600),
+                          onPressed: () {
+                            setState(() => _isEnable = true);
+                            _openEditDialog(docId, data, snapshot, index, mQ);
+                          },
+                        ),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.black54),
+                          onPressed: () async {
+                            final confirmed = await confirm(
+                              context,
+                              title: const Text("Delete Consent"),
+                              content: const Text("Are you sure you want to delete this consent statement?"),
+                              textOK: const Text('Delete', style: TextStyle(color: Colors.red)),
+                              textCancel: const Text('Cancel'),
+                            );
+                            if (confirmed) deleteDocumentFromFirestore(docId);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  data['title_'] ?? 'No Title',
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF1E293B)),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  data['description_'] ?? '',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13, color: Colors.blueGrey.shade600, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+                showconsentsummaryofyesnowaiting(mQ, data['description_'], const SizedBox.shrink()),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParentConsentCard(String docId, Map<String, dynamic> data, Size mQ, dynamic snapshot, int index) {
+    final result = data['result_'] ?? 'Waiting';
+    Color resultColor = Colors.orange.shade700;
+    Color resultBg = Colors.orange.shade50;
+    if (result == 'Yes') {
+      resultColor = Colors.green.shade700;
+      resultBg = Colors.green.shade50;
+    } else if (result == 'No') {
+      resultColor = Colors.red.shade700;
+      resultBg = Colors.red.shade50;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _openEditDialog(docId, data, snapshot, index, mQ),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      data['date_'] ?? '',
+                      style: TextStyle(fontSize: 11, color: Colors.blueGrey.shade300, fontWeight: FontWeight.w500),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: resultBg,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        result,
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: resultColor),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  data['title_'] ?? 'No Title',
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF1E293B)),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  data['description_'] ?? '',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13, color: Colors.blueGrey.shade600, height: 1.4),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openEditDialog(String docId, Map<String, dynamic> data, dynamic snapshot, int index, Size mQ) {
+    showEditingDialog(
+      docId,
+      data['title_'],
+      data['description_'],
+      data['subject_'],
+      data['class_'],
+      mQ,
+      data,
+      snapshot,
+      index,
+    );
+  }
+
+  Widget showconsentsummaryofyesnowaiting(mQ, consent_text, Widget pppasa) {
     return StreamBuilder<QuerySnapshot>(
       stream: collectionReferenceActivity
           .where('category_', isEqualTo: 'Consent')
           .where('description_', isEqualTo: consent_text)
           .snapshots(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 2.0),
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
+        if (!snapshot.hasData) return const SizedBox.shrink();
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          // print('Data empty');
-          // You can add logic here if needed
-        }
-
-        // Loop through documents and count based on status, category_, and result_
+        int yes = 0, no = 0, waiting = 0;
         for (var doc in snapshot.data!.docs) {
-
-          // Count consents based on different result_ values
-            String result = doc['result_'];
-            if (result == 'Yes') {
-              consentsYes++;
-            } else if (result == 'No') {
-              consentsNo++;
-            } else if (result == 'Waiting') {
-              consentsWaiting++;
-            }
-
-          // Count based on other statuses
+          String result = doc['result_'];
+          if (result == 'Yes') yes++;
+          else if (result == 'No') no++;
+          else if (result == 'Waiting') waiting++;
         }
 
-        return Stack(
+        return Wrap(
+          spacing: 8,
           children: [
-            pppasa,
-            Positioned(
-              top: 0,
-              left: consentsYes > 0 ? leftposn += 14 : leftposn,
-              child:
-            (role_!="Parent")?
-              CircleAvatar(
-                radius: 8,
-                backgroundColor: consentsYes > 0 ? Colors.green : Colors.transparent,
-                child: Text(
-                  '${consentsYes}',
-                  style: TextStyle(
-                    color: consentsYes > 0 ? Colors.white : Colors.transparent,
-                    fontSize: 7,
-                  ),
-                ),
-              )
-                :Container(),
-            ),
-            Positioned(
-              top: 0,
-              left:  consentsNo > 0 ? leftposn += 14 : leftposn,
-              child:
-            (role_!="Parent")?
-            CircleAvatar(
-                radius: 8,
-                backgroundColor: consentsNo > 0 ? Colors.red : Colors.transparent,
-                child: Text(
-                  '${consentsNo}',
-                  style: TextStyle(
-                    color: consentsNo > 0 ? Colors.white : Colors.transparent,
-                    fontSize: 7,
-                  ),
-                ),
-              ):Container(),
-            )
-                ,
-
-            Positioned(
-              top: 0,
-              left: consentsWaiting > 0 ? leftposn += 14 : leftposn,
-              child:
-            (role_!="Parent")?
-              CircleAvatar(
-                radius: 8,
-                backgroundColor: consentsWaiting > 0 ? Colors.yellow : Colors.transparent,
-                child: Text(
-                  '${consentsWaiting}',
-                  style: TextStyle(
-                    color: consentsWaiting > 0 ? Colors.black : Colors.transparent,
-                    fontSize: 7,
-                  ),
-                ),
-              ):Container(),
-            )
-
+            if (yes > 0) _buildBadge(yes.toString(), Colors.green, Icons.check_circle_outline_rounded),
+            if (no > 0) _buildBadge(no.toString(), Colors.red, Icons.highlight_off_rounded),
+            if (waiting > 0) _buildBadge(waiting.toString(), Colors.orange, Icons.timer_outlined),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildBadge(String count, Color color, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(count, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+        ],
+      ),
     );
   }
 
@@ -895,89 +723,104 @@ backgroundColor: Colors.transparent,
     // Navigator.of(context).pop();
   }
 
-  displayConsents(mQ){
-    return  StreamBuilder<QuerySnapshot>(
-      stream:
-      collectionReferenceActivity
+  displayConsents(mQ) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: collectionReferenceActivity
           .where('child_', isEqualTo: widget.babyid)
           .where('category_', isEqualTo: 'Consent')
           .where('parentid_', isEqualTo: useremail)
           .where('result_', isEqualTo: 'Waiting')
-      // .orderBy('status_', descending: true)
           .snapshots(),
-
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 25.0),
-              child: CircularProgressIndicator(),
-            ),
-          ); // Show loading indicator
-        }
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          // return Text('Curently, No consent is required.',
-          // ); // No data
-        }
-        // Data is available, build the list
-        return ListView.builder(
-          padding: EdgeInsets.zero,
-          primary: false,
-          shrinkWrap: true,
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) {
-            final childData = snapshot.data!.docs[index].data()
-            as Map<String, dynamic>;
-            return
-              CupertinoAlertDialog(
-                title: Text(
-                  "${childData['title_']} ",
-                ),
-                content: Text(
-                  "${childData['description_']}",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
-                ),
-                actions: <Widget>[
-                  CupertinoDialogAction(
-                    child: Text('Yes',style: TextStyle(color: Colors.green)),
-                    onPressed: () async {
-                      await confirm(context,title: Text('${childData['title_']} ',style: TextStyle(fontSize: 12),),content: Text('${childData['description_']} ',style: TextStyle(fontSize: 12),),textOK: Text('Ok',style: TextStyle(fontSize: 12),) ,textCancel:Text('Cancel ',style: TextStyle(fontSize: 12),) )
-                          ?
-                      collectionReferenceActivity
-                          .doc(snapshot.data!
-                          .docs[index].id)
-                          .update({
-                        "result_": "Yes"
-                      })
-                      :null
-                          ;
-                    },
-                  ),
-                  CupertinoDialogAction(
-                    child: Text('No',style: TextStyle(color: Colors.red)),
-                    onPressed: () async {
-                      await confirm(context,title: Text('${childData['title_']} ',style: TextStyle(fontSize: 12),),content: Text('${childData['description_']} ',style: TextStyle(fontSize: 12),),textOK: Text('Ok',style: TextStyle(fontSize: 12),) ,textCancel:Text('Cancel ',style: TextStyle(fontSize: 12),) )
-                          ? collectionReferenceActivity
-                          .doc(snapshot.data!
-                          .docs[index].id)
-                          .update({
-                        "result_": "No"
-                      })
-                          :null
-                      ;
-                    },
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          children: snapshot.data!.docs.map((doc) {
+            final childData = doc.data() as Map<String, dynamic>;
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: kprimary.withOpacity(0.1),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
                 ],
-              );
-          },
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    childData['title_'] ?? 'Consent Required',
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E293B)),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    childData['description_'] ?? '',
+                    textAlign: TextAlign.center,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 13, color: Colors.blueGrey.shade600, height: 1.4),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () async {
+                            final confirmed = await confirm(
+                              context,
+                              title: const Text('Confirm'),
+                              content: const Text('Are you sure you want to decline this consent?'),
+                              textOK: const Text('Confirm'),
+                              textCancel: const Text('Cancel'),
+                            );
+                            if (confirmed) collectionReferenceActivity.doc(doc.id).update({"result_": "No"});
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            side: BorderSide(color: Colors.red.shade200),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text('Decline', style: TextStyle(fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final confirmed = await confirm(
+                              context,
+                              title: const Text('Confirm'),
+                              content: const Text('Do you agree and provide your consent?'),
+                              textOK: const Text('Agree'),
+                              textCancel: const Text('Cancel'),
+                            );
+                            if (confirmed) collectionReferenceActivity.doc(doc.id).update({"result_": "Yes"});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            elevation: 0,
+                          ),
+                          child: const Text('Agree', style: TextStyle(fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         );
       },
     );
-
   }
 
 }

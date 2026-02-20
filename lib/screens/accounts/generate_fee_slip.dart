@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart'
+    show CachedNetworkImage;
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:kids_republik/controllers/bank_account_controller.dart';
 import 'package:kids_republik/screens/accounts/fees/fees_form.dart';
 import 'package:kids_republik/screens/accounts/update_accounts_dashboard.dart';
 import 'package:kids_republik/utils/const.dart';
@@ -24,12 +27,14 @@ class GenerateFeesSlip extends StatefulWidget {
 }
 
 class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
+  final BankAccountController bankController =
+      Get.find<BankAccountController>();
   final CollectionReference feesCollection =
-  FirebaseFirestore.instance.collection(accounts);
+      FirebaseFirestore.instance.collection(accounts);
   final CollectionReference collectionReferenceClass =
-  FirebaseFirestore.instance.collection(ClassRoom);
+      FirebaseFirestore.instance.collection(ClassRoom);
   final CollectionReference babyCollection =
-  FirebaseFirestore.instance.collection(BabyData);
+      FirebaseFirestore.instance.collection(BabyData);
   DocumentSnapshot? _accountData; // Store fetched data
   DocumentSnapshot? _babyData; // Store fetched data
   String slipNumber = '';
@@ -51,9 +56,7 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
   Future<DateTime?> _showCalendar(BuildContext context,
       {DateTime? initialDate}) async {
     final picked = await showDatePicker(
-
       context: context,
-
       initialDate: initialDate ?? DateTime.now(),
       firstDate: DateTime(2024),
       lastDate: DateTime(2100),
@@ -61,7 +64,6 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
 
     return picked;
   }
-
 
   @override
   void initState() {
@@ -77,20 +79,20 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
         if (fees is Map<String, dynamic>) {
           _feesData = fees.entries
               .map((entry) => {
-            'name': entry.key,
-            'amount': entry.value,
-            'isSelected': false
-          })
+                    'name': entry.key,
+                    'amount': entry.value,
+                    'isSelected': false
+                  })
               .toList();
           DocumentSnapshot document2 =
-          await babyCollection.doc(widget.documentId).get();
+              await babyCollection.doc(widget.documentId).get();
           _babyData = document2;
           _accountData = doc;
           final docSnapshot = await feesCollection.doc('voucherID').get();
           if (docSnapshot.exists) {
             docSnapshot.get('voucherID');
             slipNumber =
-            "${table_== ''?'KR':'TSN'}-${docSnapshot.get('voucherID').toString().padLeft(6, '0')}"; // Format voucher number
+                "${table_ == '' ? 'KR' : 'TSN'}-${docSnapshot.get('voucherID').toString().padLeft(6, '0')}"; // Format voucher number
             setState(() {});
           } else {
             snack("No document found with ID 'voucherID'");
@@ -101,13 +103,13 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
         }
       } else {
         await confirm(context,
-            title: Text('Record not added'),
-            content: Text("Do you want to Add Fees Record?"),
-            textOK: Text('Yes'),
-            textCancel: Text("No"))
+                title: Text('Record not added'),
+                content: Text("Do you want to Add Fees Record?"),
+                textOK: Text('Yes'),
+                textCancel: Text("No"))
             ? Get.to(FeesEntryForm(
-          babyId: widget.documentId,
-        ))
+                babyId: widget.documentId,
+              ))
             : Get.back();
       }
     } catch (error) {
@@ -123,7 +125,15 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
       backgroundColor: Colors.blue[50],
       floatingActionButton: IconButton(
         onPressed: () async {
-          await confirm(context,title: Text('Confirm Fees Slip Generation for $fullName',style: TextStyle(fontSize: 14)),content: Text('Are you sure you want to finalize the fees slip for $fullName with a total amount of Rs. $amountPayable for the month of $month? \n\nThis action cannot be undone.',style: TextStyle(fontSize: 12),))?await _createAccountDocument():null;
+          await confirm(context,
+                  title: Text('Confirm Fees Slip Generation for $fullName',
+                      style: TextStyle(fontSize: 14)),
+                  content: Text(
+                    'Are you sure you want to finalize the fees slip for $fullName with a total amount of Rs. $amountPayable for the month of $month? \n\nThis action cannot be undone.',
+                    style: TextStyle(fontSize: 12),
+                  ))
+              ? await _createAccountDocument()
+              : null;
         },
         icon: Container(
             alignment: Alignment.center,
@@ -139,17 +149,17 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
 
       body: _accountData != null
           ? Container(
-        padding: EdgeInsets.only(left: 5, right: 5, top: 12, bottom: 5),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: _buildContent(),
-      )
+              padding: EdgeInsets.only(left: 5, right: 5, top: 12, bottom: 5),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: _buildContent(),
+            )
           : Center(
-          child:
-          CircularProgressIndicator()), // Show loading indicator while fetching data
+              child:
+                  CircularProgressIndicator()), // Show loading indicator while fetching data
     );
   }
 
@@ -190,18 +200,31 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
                 // Image on the left
                 Container(
                   width: 50,
-                  child: Image(
-                    image: AssetImage('assets/${table_}bank_icon.png'),
-                    fit: BoxFit
-                        .cover, // Adjust fit as needed (cover, contain, etc.)
-                  ),
+                  height: 50, // Added fixed height
+                  child: Obx(() {
+                    if (bankController.bankImage.value.isNotEmpty) {
+                      return CachedNetworkImage(
+                        imageUrl: bankController.bankImage.value,
+                        fit: BoxFit.contain,
+                        placeholder: (context, url) =>
+                            Image.asset('assets/bank_icon.png'),
+                        errorWidget: (context, url, error) =>
+                            Image.asset('assets/bank_icon.png'),
+                      );
+                    } else {
+                      return Image(
+                        image: AssetImage('assets/bank_icon.png'),
+                        fit: BoxFit.cover,
+                      );
+                    }
+                  }),
                 ),
                 // Text in the center
                 Expanded(
                   child: Column(
                     children: [
                       Text(
-                        bankName,
+                        bankController.bankName.value,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.bold),
                       ),
@@ -228,7 +251,7 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'AC No: $accountNumber',
+                  'AC No: ${bankController.accountNumber.value}',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: responsiveFontSize(12)),
@@ -244,7 +267,7 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
             ),
             Row(
               children: [
-                Text("Credit:              $creditTo",
+                Text("Credit:              ${bankController.creditTo.value}",
                     style: TextStyle(fontSize: responsiveFontSize(12))),
               ],
             ),
@@ -297,7 +320,7 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
                   itemBuilder: (BuildContext context, int index) {
                     DateTime monthDate = DateTime(selectedDate.year, index + 1);
                     String monthString =
-                    DateFormat('MMM yyyy').format(monthDate);
+                        DateFormat('MMM yyyy').format(monthDate);
 
                     return InkWell(
                       // Wrap each month text with InkWell
@@ -311,7 +334,7 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
                       child: Padding(
                         // Add padding for spacing
                         padding:
-                        EdgeInsets.symmetric(horizontal: 30, vertical: 2),
+                            EdgeInsets.symmetric(horizontal: 30, vertical: 2),
                         child: Text(
                           monthString,
                           style: TextStyle(fontSize: 12),
@@ -348,7 +371,7 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
                 child: ListView.builder(
                   padding: EdgeInsets.only(top: 5),
                   shrinkWrap:
-                  true, // Prevent the list from expanding unnecessarily
+                      true, // Prevent the list from expanding unnecessarily
                   itemCount: _feesData.length,
                   scrollDirection: Axis.vertical,
                   itemBuilder: (context, index) {
@@ -361,43 +384,43 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
                     return Column(
                       children: [
                         (fee['name'] == 'childFullName' ||
-                            fee['name'] == 'fathersEmail' ||
-                            fee['name'] == 'child_')
+                                fee['name'] == 'fathersEmail' ||
+                                fee['name'] == 'child_')
                             ? Container()
                             : Row(
-                          children: [
-                            Container(
-                              height: 12,
-                              child: Checkbox(
-                                value: fee['isSelected'],
-                                onChanged: (bool? value) {
-                                  fee['isSelected'] = value!;
-                                  if (fee['isSelected'] == true) {
-                                    amountPayable = amountPayable +
-                                        (fee['amount'] ?? 0);
-                                  } else
-                                    amountPayable =
-                                        amountPayable - fee['amount'] ??
-                                            0;
-                                  // Update isSelected in the list
-                                  setState(() {});
-                                },
+                                children: [
+                                  Container(
+                                    height: 12,
+                                    child: Checkbox(
+                                      value: fee['isSelected'],
+                                      onChanged: (bool? value) {
+                                        fee['isSelected'] = value!;
+                                        if (fee['isSelected'] == true) {
+                                          amountPayable = amountPayable +
+                                              (fee['amount'] ?? 0);
+                                        } else
+                                          amountPayable =
+                                              amountPayable - fee['amount'] ??
+                                                  0;
+                                        // Update isSelected in the list
+                                        setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                  Text(fee['name'],
+                                      style: TextStyle(
+                                          fontSize: responsiveFontSize(
+                                              12))), // Display fee type
+                                  Spacer(),
+                                  Text('${fee['amount']}.00'.toString(),
+                                      style: TextStyle(
+                                          fontSize: responsiveFontSize(12))),
+                                ],
                               ),
-                            ),
-                            Text(fee['name'],
-                                style: TextStyle(
-                                    fontSize: responsiveFontSize(
-                                        12))), // Display fee type
-                            Spacer(),
-                            Text('${fee['amount']}.00'.toString(),
-                                style: TextStyle(
-                                    fontSize: responsiveFontSize(12))),
-                          ],
-                        ),
                         const Divider(
                             height: 0.5,
                             color:
-                            Colors.grey), // Add divider after each ListTile
+                                Colors.grey), // Add divider after each ListTile
                       ],
                     );
                   },
@@ -441,14 +464,14 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
               children: [
                 Text("Issue Date: ${formatDate(issueDate)}",
                     style:
-                    TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                 SizedBox(
                   width: 5,
                 ),
                 InkWell(
                   onTap: () async {
                     final selectedDate =
-                    await _showCalendar(context, initialDate: issueDate);
+                        await _showCalendar(context, initialDate: issueDate);
                     if (selectedDate != null) {
                       setState(() {
                         issueDate = selectedDate;
@@ -456,16 +479,19 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
                       });
                     }
                   },
-                  child: Icon(Icons.edit,size: 18,),
+                  child: Icon(
+                    Icons.edit,
+                    size: 18,
+                  ),
                 ),
                 Spacer(),
                 Text("Last Date: ${formatDate(lastDate)}",
                     style:
-                    TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                 InkWell(
                   onTap: () async {
                     final selectedDate =
-                    await _showCalendar(context, initialDate: issueDate);
+                        await _showCalendar(context, initialDate: issueDate);
                     if (selectedDate != null) {
                       setState(() {
                         lastDate = selectedDate;
@@ -473,7 +499,10 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
                     }
                   },
                   // onTap: () => setState(() => _showCalendar(initialDate:  )),
-                  child: Icon(Icons.edit,size: 18,),
+                  child: Icon(
+                    Icons.edit,
+                    size: 18,
+                  ),
                   // child: Icon(Icons.calendar_today_outlined),
                 ),
               ],
@@ -497,7 +526,7 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
 
   Future<void> _createAccountDocument() async {
     final selectedFees =
-    _feesData.where((fee) => fee['isSelected'] == true).toList();
+        _feesData.where((fee) => fee['isSelected'] == true).toList();
     final Map<String, dynamic> accountData = {
       'childFullName': fullName,
       'fathersEmail': fathersemail,
@@ -523,11 +552,11 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
       UpdateAccountsDashboardScreen(studentClass, context);
 
       snack("Fee slip generated & forwarded to parents successfully!");
-    Get.back();
+      Get.back();
     } catch (error) {
       snack("Error generating slip: $error");
       // Handle errors appropriately (e.g., show a snackbar)
-    Get.back();
+      Get.back();
     }
     // Navigator.pop(context);
   }
@@ -541,9 +570,9 @@ class _GenerateFeesSlipState extends State<GenerateFeesSlip> {
     if (studentClass != null && amountPayable != null) {
       // Update ClassData collection
       final docRef2 =
-      FirebaseFirestore.instance.collection(ClassRoom).doc(studentClass);
+          FirebaseFirestore.instance.collection(ClassRoom).doc(studentClass);
       final transaction =
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
         final doc = await transaction.get(docRef2);
         if (doc.exists) {
           final existingNotPaid =

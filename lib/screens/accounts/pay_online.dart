@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:kids_republik/controllers/bank_account_controller.dart';
 import 'package:kids_republik/utils/const.dart';
 
 import 'manager_accounts_home.dart';
 import 'package:kids_republik/main.dart';
 
 class AddCashBankTransfer extends StatelessWidget {
-String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KARACHI":"HABIB BANK LIMITED \n 5-C PLAZA F-10 MARKAZ, ISLAMABAD"}"; // Replace with actual data fetching
+  final BankAccountController bankController = Get.find<BankAccountController>();
+
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
@@ -26,7 +29,7 @@ String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KAR
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 15),
-          child: Column(
+          child: Obx(() => Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
@@ -72,7 +75,7 @@ String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KAR
                                 number: '2',
                                 title: 'Add Beneficiary',
                                 icon: Icon(Icons.person_add_outlined)),
-                              Text('Add account number $accountNumber of $creditTo as beneficiary',
+                              Text('Add account number ${bankController.accountNumber.value} of ${bankController.creditTo.value} as beneficiary',
                                 style: TextStyle(fontSize: 12.0, color: Colors.black54),
                                 textAlign: TextAlign.center,
                               ),
@@ -87,7 +90,7 @@ String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KAR
                                 number: '3',
                                 title: 'Send Money',
                                 icon: Icon(Icons.attach_money_outlined)),
-                              Text('Send amount payable to $creditTo account instantly',
+                              Text('Send amount payable to ${bankController.creditTo.value} account instantly',
                                 style: TextStyle(fontSize: 12.0, color: Colors.grey),
                                 textAlign: TextAlign.center,
                               ),
@@ -105,7 +108,7 @@ String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KAR
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Bank Name:                      $bankName", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
+                  Text("Bank Name:                      ${bankController.bankName.value}", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
                 ],
               ),
               SizedBox(height: mQ.height *0.015),
@@ -113,7 +116,7 @@ String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KAR
                 children: [
                   Text("Benefeciary Name:", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
                   Text("               ", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
-                  Text("$creditTo", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
+                  Text("${bankController.creditTo.value}", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
                 ],
               ),
               SizedBox(height: mQ.height *0.015),
@@ -121,11 +124,11 @@ String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KAR
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Account Number:             $accountNumber", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
+                  Text("Account Number:             ${bankController.accountNumber.value}", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
                   IconButton(
                     onPressed: () async {
                       // Replace with your actual account number retrieval
-                      await Clipboard.setData(ClipboardData(text: accountNumber));
+                      await Clipboard.setData(ClipboardData(text: bankController.accountNumber.value));
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: Colors.green[50],
@@ -147,11 +150,11 @@ String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KAR
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("IBAN Number:                  $IBANNumber", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
+                  Text("IBAN Number:                  ${bankController.iban.value}", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12)),
                   IconButton(
                     onPressed: () async {
                       // Replace with your actual IBAN retrieval
-                      await Clipboard.setData(ClipboardData(text: IBANNumber));
+                      await Clipboard.setData(ClipboardData(text: bankController.iban.value));
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: Colors.green[50],
@@ -176,7 +179,7 @@ String bankName = "${table_ == '_tsn' ? "JS BANK LIMITED\n PAK TOWER BRANCH, KAR
               SizedBox(height: mQ.height*0.01,),
 
             ],
-          ),
+          )),
         ),
       ),
     );

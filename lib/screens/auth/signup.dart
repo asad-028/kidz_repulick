@@ -175,34 +175,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             },
                           ),
                           SizedBox(height: mQ.height * 0.035),
-                          Container(
-                            width: 150,
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButtonFormField(
-                                value: selectedCampus, // Replace with your initial selected currency
-                                decoration: InputDecoration(labelText: 'Select Campus',border: InputBorder.none),
-                                items: campuses.map((String campus) {
-                                  return DropdownMenuItem<String>(
-                                    value: campus,
-                                    child: Text(campus),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newCampus) async {
-                                    selectedCampus = newCampus!;
-                                    table_ = (newCampus == 'TSN')?'tsn_':'';
-                                    await setcollectionnames(table_);
-                                  setState(() {
-                                    signUpController.selectedCampus.text = selectedCampus;
-                                  });
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please select a Campus.';
-                                  }
-                                  return null;
-                                },
+                          DropdownButtonFormField<String>(
+                            value: selectedCampus,
+                            decoration: InputDecoration(
+                              labelText: 'Select Campus',
+                              hintText: 'Choose your campus',
+                              prefixIcon: Icon(Icons.location_on_outlined, color: kprimary),
+                              isDense: true,
+                              labelStyle: kLabelStyle,
+                              floatingLabelBehavior: FloatingLabelBehavior.always,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.grey[300]!),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.grey[300]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: kprimary, width: 1.5),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
+                            icon: Icon(Icons.keyboard_arrow_down_rounded, color: kprimary),
+                            items: campuses.map((String campus) {
+                              return DropdownMenuItem<String>(
+                                value: campus,
+                                child: Text(campus, style: const TextStyle(fontSize: 15)),
+                              );
+                            }).toList(),
+                            onChanged: (String? newCampus) async {
+                              if (newCampus != null) {
+                                selectedCampus = newCampus;
+                                table_ = (newCampus == 'TSN') ? 'tsn_' : '';
+                                await setcollectionnames(table_);
+                                setState(() {
+                                  signUpController.selectedCampus.text = selectedCampus;
+                                });
+                              }
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select a Campus.';
+                              }
+                              return null;
+                            },
                           ),
                           SizedBox(height: mQ.height * 0.035),
                           Obx(

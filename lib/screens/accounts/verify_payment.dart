@@ -13,6 +13,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:snackbar/snackbar.dart';
 import 'package:toast/toast.dart';
+import 'package:kids_republik/controllers/bank_account_controller.dart'; // Added import
 
 import 'manager_accounts_home.dart';
 
@@ -367,6 +368,7 @@ class PrepareBankCopyFromFirebasePDF extends StatefulWidget {
 
 class _PrepareBankCopyFromFirebasePDFState
     extends State<PrepareBankCopyFromFirebasePDF> {
+  final BankAccountController bankController = Get.find<BankAccountController>();
   final CollectionReference feesCollection =
       FirebaseFirestore.instance.collection(accounts);
   String slipNumber = '';
@@ -389,6 +391,10 @@ class _PrepareBankCopyFromFirebasePDFState
     _fetchData(); // Fetch data on widget initialization
 
   }
+// ... (lines 393-616 skipped in replacement for brevity, but I need to target the build method specifically or the whole class if I want to be safe. 
+// The file is large. I will target chunks.
+// First chunk: State class start and fields.
+
 
   Future<void> _fetchData() async {
     try {
@@ -615,7 +621,7 @@ class _PrepareBankCopyFromFirebasePDFState
                       child: Column(
                         children: [
                           Text(
-                            bankName,
+                            bankController.bankName.value,
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
@@ -640,7 +646,7 @@ class _PrepareBankCopyFromFirebasePDFState
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'AC No: $accountNumber',
+                      'AC No: ${bankController.accountNumber.value}',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
@@ -654,7 +660,7 @@ class _PrepareBankCopyFromFirebasePDFState
                 ),
                 Row(
                   children: [
-                    Text("Credit:              $creditTo"),
+                    Text("Credit:              ${bankController.creditTo.value}"),
                   ],
                 ),
                 Row(
@@ -827,7 +833,7 @@ class _PrepareBankCopyFromFirebasePDFState
                 child: pw.Column(
                   // Use pw.Column again for inner layout
                   children: [
-                    pw.Text(bankName,
+                    pw.Text(bankController.bankName.value,
                         style: pw.TextStyle(
                             fontSize: 12, fontWeight: pw.FontWeight.bold)),
                     pw.Text("Any Branch within Pakistan",
@@ -854,7 +860,7 @@ class _PrepareBankCopyFromFirebasePDFState
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.end,
             children: [
-              pw.Text('AC No: $accountNumber',
+              pw.Text('AC No: ${bankController.accountNumber.value}',
                   style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold, fontSize: 12)),
             ],
@@ -868,7 +874,7 @@ class _PrepareBankCopyFromFirebasePDFState
           ),
           pw.Row(
             children: [
-              pw.Text("Credit:              $creditTo",
+              pw.Text("Credit:              ${bankController.creditTo.value}",
                   style: pw.TextStyle(fontSize: 10)),
             ],
           ),

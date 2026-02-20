@@ -11,12 +11,13 @@ import 'package:http/http.dart' as http;
 class CampusSelectionScreen extends StatelessWidget {
   // Define asset paths for the logos
   static const String tsnLogoPath = 'assets/tsn_app_icon.png';
-  static const String kidzLogoPath = 'assets/logo.png'; // Replace with your actual logo path
-
+  static const String kidzLogoPath =
+      'assets/logo.png'; // Replace with your actual logo path
 
   Future<void> fetchStorageUsage() async {
     // Replace with your Firebase storage bucket URL
-    final bucketUrl = 'https://firebasestorage.googleapis.com/v0/b/your-bucket-name.appspot.com';
+    final bucketUrl =
+        'https://firebasestorage.googleapis.com/v0/b/your-bucket-name.appspot.com';
 
     try {
       final response = await http.get(Uri.parse(bucketUrl));
@@ -36,14 +37,14 @@ class CampusSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    fetchStorageUsage();
+    // fetchStorageUsage();
     return Scaffold(
       drawer: BaseDrawer(),
       appBar: AppBar(
         iconTheme: IconThemeData(color: kWhite),
         title: Text(
           'Home',
-          style: TextStyle(color: kWhite,fontSize: 14),
+          style: TextStyle(color: kWhite, fontSize: 14),
         ),
         backgroundColor: kprimary,
       ),
@@ -56,7 +57,8 @@ class CampusSelectionScreen extends StatelessWidget {
       // ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Center buttons vertically
+          mainAxisAlignment:
+              MainAxisAlignment.center, // Center buttons vertically
           children: [
             IconButton(
               onPressed: () {
@@ -68,14 +70,29 @@ class CampusSelectionScreen extends StatelessWidget {
                 // Set a fixed height and width for consistent button size
                 height: 100,
                 width: 350,
-                decoration: BoxDecoration(color: Colors.blue[100], borderRadius: BorderRadius.circular(20.0), ),
-                child: Row(mainAxisAlignment: MainAxisAlignment.start,
+                decoration: BoxDecoration(
+                  color: Colors.blue[100],
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    SizedBox(width: 10,),
-                    Image.asset(kidzLogoPath, height: 100) , // Adjust image height as needed
-                    SizedBox(width: 10,),
-                    Text('Kidz Republik',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),
-                    SizedBox(width: 10,),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Image.asset(kidzLogoPath,
+                        height: 100), // Adjust image height as needed
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Kidz Republik',
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
                   ],
                 ),
               ),
@@ -90,14 +107,29 @@ class CampusSelectionScreen extends StatelessWidget {
                 // Set a fixed height and width for consistent button size
                 height: 100,
                 width: 350,
-                decoration: BoxDecoration(color: Colors.blue[100], borderRadius: BorderRadius.circular(20.0), ),
-                child: Row(mainAxisAlignment: MainAxisAlignment.start,
+                decoration: BoxDecoration(
+                  color: Colors.blue[100],
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    SizedBox(width: 10,),
-                    Image.asset(tsnLogoPath, height: 100) , // Adjust image height as needed
-                    SizedBox(width: 10,),
-                    Text('The Second Nest',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),
-                    SizedBox(width: 10,),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Image.asset(tsnLogoPath,
+                        height: 100), // Adjust image height as needed
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'The Second Nest',
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
                   ],
                 ),
               ),
@@ -108,21 +140,38 @@ class CampusSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCampusButton({required VoidCallback onPressed, required String imagePath, required String text,}) {
+  Widget _buildCampusButton({
+    required VoidCallback onPressed,
+    required String imagePath,
+    required String text,
+  }) {
     return Container(
       // Set a fixed height and width for consistent button size
       height: 100,
       width: 350,
-      decoration: BoxDecoration(color: Colors.blue[100], borderRadius: BorderRadius.circular(20.0), ),
-      child: Row(mainAxisAlignment: MainAxisAlignment.start,
+      decoration: BoxDecoration(
+        color: Colors.blue[100],
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(width: 10,),
-          Image.asset(imagePath, height: 100) , // Adjust image height as needed
-          SizedBox(width: 10,),
-          Text(text,style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),),
-          SizedBox(width: 10,),
+          SizedBox(
+            width: 10,
+          ),
+          Image.asset(imagePath, height: 100), // Adjust image height as needed
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            text,
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            width: 10,
+          ),
         ],
       ),
     );
-   }
+  }
 }

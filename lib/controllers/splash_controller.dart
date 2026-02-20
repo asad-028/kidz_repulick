@@ -49,12 +49,14 @@ class SplashController extends GetxController {
               .get();
         }
         if (userSnapshot.exists) {
-          name.value = userSnapshot['full_name'] ?? '';
-          email.value = userSnapshot['email'] ?? '';
-          useremail = userSnapshot['email'] ?? '';
-         role_ = userSnapshot['role'];
-          userImage_ = userSnapshot['userImage']??'';
-          teachersClass_ = userSnapshot['class']??'';
+          final data = userSnapshot.data() as Map<String, dynamic>;
+          name.value = data['full_name'] ?? '';
+          email.value = data['email'] ?? '';
+          useremail = data['email'] ?? '';
+          role_ = data['role'] ?? '';
+          userImage_ = data['userImage'] ?? '';
+          // Safely read class from either "class" or "class_" or default to empty
+          teachersClass_ = (data['class'] ?? data['class_'] ?? '') as String;
         }
 
       } catch (e) {

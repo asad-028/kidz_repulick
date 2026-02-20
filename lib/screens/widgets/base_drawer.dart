@@ -11,7 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
@@ -117,7 +117,10 @@ class _BaseDrawerState extends State<BaseDrawer> {
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
-    final Uri toLaunch = Uri(scheme: 'https', host: 'sites.google.com\\view', path: 'kidzrepublikprivacy');
+    final Uri toLaunch = Uri(
+        scheme: 'https',
+        host: 'sites.google.com\\view',
+        path: 'kidzrepublikprivacy');
     return Drawer(
         child: ListView(
       children: [
@@ -163,7 +166,8 @@ class _BaseDrawerState extends State<BaseDrawer> {
               'Change Password',
               style: TextStyle(fontSize: 15),
             ),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             onTap: () {
               Get.to(ChangePasswordScreen());
             },
@@ -172,10 +176,13 @@ class _BaseDrawerState extends State<BaseDrawer> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: ListTile(
-              leading: const Icon(Iconsax.people, color: Colors.blueGrey, size: 20),
+              leading:
+                  const Icon(Iconsax.people, color: Colors.blueGrey, size: 20),
               minLeadingWidth: 16,
-              title: const Text('Privacy Policy', style: TextStyle(fontSize: 15)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              title:
+                  const Text('Privacy Policy', style: TextStyle(fontSize: 15)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               onTap: () {
                 // _launchAsInAppWebViewWithCustomHeaders(toLaunch);
                 _launchUrl();
@@ -184,12 +191,15 @@ class _BaseDrawerState extends State<BaseDrawer> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: ListTile(
-              leading: const Icon(Iconsax.share, color: Colors.blueGrey, size: 20),
+              leading:
+                  const Icon(Iconsax.share, color: Colors.blueGrey, size: 20),
               minLeadingWidth: 16,
               title: const Text('Share app', style: TextStyle(fontSize: 15)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               onTap: () {
-                _onShare(context, 'Website: https://kidzrepublik.com.pk/ \n\n ');
+                _onShare(
+                    context, 'Website: https://kidzrepublik.com.pk/ \n\n ');
               }),
         ),
         Padding(
@@ -203,10 +213,13 @@ class _BaseDrawerState extends State<BaseDrawer> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: ListTile(
-              leading: const Icon(Iconsax.profile_delete, color: Colors.red, size: 20),
+              leading: const Icon(Iconsax.profile_delete,
+                  color: Colors.red, size: 20),
               minLeadingWidth: 16,
-              title: const Text('Delete User Data', style: TextStyle(fontSize: 15)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              title: const Text('Delete User Data',
+                  style: TextStyle(fontSize: 15)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               onTap: () {
                 Get.to(DataDeletionPage());
               }),
@@ -222,10 +235,12 @@ class _BaseDrawerState extends State<BaseDrawer> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: ListTile(
-            leading: const Icon(Iconsax.logout, color: Colors.blueGrey, size: 20),
+            leading:
+                const Icon(Iconsax.logout, color: Colors.blueGrey, size: 20),
             minLeadingWidth: 16,
             title: const Text('Logout', style: TextStyle(fontSize: 15)),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             onTap: _onLogoutPressed,
           ),
         ),
@@ -237,7 +252,8 @@ class _BaseDrawerState extends State<BaseDrawer> {
     if (!await launchUrl(
       url,
       mode: LaunchMode.inAppWebView,
-      webViewConfiguration: const WebViewConfiguration(headers: <String, String>{'my_header_key': 'my_header_value'}),
+      webViewConfiguration: const WebViewConfiguration(
+          headers: <String, String>{'my_header_key': 'my_header_value'}),
     )) {
       throw Exception('Could not launch $url');
     }
@@ -253,7 +269,9 @@ class _BaseDrawerState extends State<BaseDrawer> {
       //gravity: Toast.top,
     );
 
-    if (!await launchUrl(Uri.parse('https://sites.google.com/view/kidzrepublikprivacy'))) throw 'Could not launch ';
+    if (!await launchUrl(
+        Uri.parse('https://sites.google.com/view/kidzrepublikprivacy')))
+      throw 'Could not launch ';
   }
 
   void _onShare(BuildContext context, String identifier) async {
@@ -289,7 +307,8 @@ class _BaseDrawerState extends State<BaseDrawer> {
     });
   }
 
-  Future<void> getProfileImageFromCameraAndUpdate(BuildContext context, {VoidCallback? onStart, VoidCallback? onSuccess}) async {
+  Future<void> getProfileImageFromCameraAndUpdate(BuildContext context,
+      {VoidCallback? onStart, VoidCallback? onSuccess}) async {
     final ImagePicker picker = ImagePicker();
 
     try {
@@ -314,7 +333,8 @@ class _BaseDrawerState extends State<BaseDrawer> {
     }
   }
 
-  Future<void> getProfileImageFromStorageAndUpdate(BuildContext context, {VoidCallback? onStart, VoidCallback? onSuccess}) async {
+  Future<void> getProfileImageFromStorageAndUpdate(BuildContext context,
+      {VoidCallback? onStart, VoidCallback? onSuccess}) async {
     final ImagePicker picker = ImagePicker();
 
     try {
@@ -344,7 +364,8 @@ class _BaseDrawerState extends State<BaseDrawer> {
       context: context,
       builder: (context) => CupertinoAlertDialog(
         title: Text('Permission required'),
-        content: Text('$permissionType permission is required. Please enable it in the app settings.'),
+        content: Text(
+            '$permissionType permission is required. Please enable it in the app settings.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -390,15 +411,19 @@ class _BaseDrawerState extends State<BaseDrawer> {
                       // height: mQ.height*0.45,
                       height: double.infinity,
                       // color: grey100,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Colors.transparent),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.transparent),
                       child: Column(children: [
                         FutureBuilder<void>(
                           future: _initializeControllerFuture,
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
                               return CameraPreview(_controller);
                             } else {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                           },
                         ),
@@ -436,42 +461,50 @@ class _BaseDrawerState extends State<BaseDrawer> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Column(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
-          Text("Take ${title} Picture"),
-          Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Expanded(
-              child: ListTile(
-                titleAlignment: ListTileTitleAlignment.center,
-                title: Text(
-                  'Camera',
-                  style: TextStyle(fontSize: 10),
-                ),
-                leading: Icon(
-                  Icons.camera_alt_outlined,
-                  color: Colors.purple,
-                  size: 20,
-                ),
-                onTap: () async {
-                  Navigator.pop(context);
-                  getProfileImageFromCameraAndUpdate(context);
-                },
-              ),
-            ),
-            Expanded(
-              child: ListTile(
-                title: Text(
-                  'Gallery',
-                  style: TextStyle(fontSize: 10),
-                ),
-                leading: Icon(Icons.image, color: Colors.cyan, size: 20),
-                onTap: () async {
-                  Navigator.pop(context);
-                  getProfileImageFromStorageAndUpdate(context);
-                },
-              ),
-            ),
-          ]),
-        ]);
+        return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Take ${title} Picture"),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: ListTile(
+                        titleAlignment: ListTileTitleAlignment.center,
+                        title: Text(
+                          'Camera',
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        leading: Icon(
+                          Icons.camera_alt_outlined,
+                          color: Colors.purple,
+                          size: 20,
+                        ),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          getProfileImageFromCameraAndUpdate(context);
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: ListTile(
+                        title: Text(
+                          'Gallery',
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        leading:
+                            Icon(Icons.image, color: Colors.cyan, size: 20),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          getProfileImageFromStorageAndUpdate(context);
+                        },
+                      ),
+                    ),
+                  ]),
+            ]);
       },
     );
   }
@@ -496,7 +529,8 @@ class _BaseDrawerState extends State<BaseDrawer> {
     uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) async {
       switch (taskSnapshot.state) {
         case TaskState.running:
-          progress = 100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
+          progress =
+              100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
           break;
         case TaskState.paused:
           print("Upload is paused.");
@@ -528,7 +562,9 @@ class _BaseDrawerState extends State<BaseDrawer> {
   saveuserimage(storageRef, filename, imageUrl) async {
     // print(imageUrl);
 
-    await collectionReference.doc(controller.email.value).update({"userImage": imageUrl});
+    await collectionReference
+        .doc(controller.email.value)
+        .update({"userImage": imageUrl});
     // print(imageUrl);
     ToastContext().init(context);
     Toast.show(
@@ -545,7 +581,8 @@ class _BaseDrawerState extends State<BaseDrawer> {
     await execute(InternetConnectionChecker());
 
     // Create customized instance which can be registered via dependency injection
-    final InternetConnectionChecker customInstance = InternetConnectionChecker.createInstance(
+    final InternetConnectionChecker customInstance =
+        InternetConnectionChecker.createInstance(
       checkTimeout: const Duration(seconds: 1),
       checkInterval: const Duration(seconds: 1),
     );
@@ -558,22 +595,36 @@ class _BaseDrawerState extends State<BaseDrawer> {
     InternetConnectionChecker internetConnectionChecker,
   ) async {
     ToastContext().init(context);
-    Toast.show('''Internet Connection is : ''', backgroundRadius: 5, gravity: Toast.center, backgroundColor: Colors.blue);
+    Toast.show('''Internet Connection is : ''',
+        backgroundRadius: 5,
+        gravity: Toast.center,
+        backgroundColor: Colors.blue);
     final bool isConnected = await InternetConnectionChecker().hasConnection;
     // ignore: avoid_print
     ToastContext().init(context);
-    Toast.show(isConnected ? 'device is connected with internet' : 'device is not connected', backgroundRadius: 5, gravity: Toast.center, backgroundColor: Colors.blue);
+    Toast.show(
+        isConnected
+            ? 'device is connected with internet'
+            : 'device is not connected',
+        backgroundRadius: 5,
+        gravity: Toast.center,
+        backgroundColor: Colors.blue);
     // returns a bool
 
     // We can also get an enum instead of a bool
     // ignore: avoid_print
     ToastContext().init(context);
-    Toast.show('Current status: ${await InternetConnectionChecker().connectionStatus}', backgroundRadius: 5, gravity: Toast.center, backgroundColor: Colors.blue);
+    Toast.show(
+        'Current status: ${await InternetConnectionChecker().connectionStatus}',
+        backgroundRadius: 5,
+        gravity: Toast.center,
+        backgroundColor: Colors.blue);
     // Prints either InternetConnectionStatus.connected
     // or InternetConnectionStatus.disconnected
 
     // actively listen for status updates
-    final StreamSubscription<InternetConnectionStatus> listener = InternetConnectionChecker().onStatusChange.listen(
+    final StreamSubscription<InternetConnectionStatus> listener =
+        InternetConnectionChecker().onStatusChange.listen(
       (InternetConnectionStatus status) {
         switch (status) {
           case InternetConnectionStatus.connected:
@@ -589,7 +640,10 @@ class _BaseDrawerState extends State<BaseDrawer> {
           case InternetConnectionStatus.disconnected:
             // ignore: avoid_print
             ToastContext().init(context);
-            Toast.show('You are disconnected from the internet.', backgroundRadius: 5, gravity: Toast.center, backgroundColor: Colors.red);
+            Toast.show('You are disconnected from the internet.',
+                backgroundRadius: 5,
+                gravity: Toast.center,
+                backgroundColor: Colors.red);
             break;
         }
       },

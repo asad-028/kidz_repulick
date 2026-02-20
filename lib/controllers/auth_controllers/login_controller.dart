@@ -87,10 +87,15 @@ class LoginController extends GetxController {
         DocumentSnapshot userSnapshot =
             await collectionReferenceUser.doc(res.user!.email).get();
         if (userSnapshot.exists) {
-          role_ = userSnapshot['role'] ;
-          (userSnapshot['role'] == 'Teacher') ? teachersClass_ = userSnapshot['class']: teachersClass_ = '' ;
-          controller.name.value = userSnapshot['full_name'] ?? '';
-          controller.email.value = userSnapshot['email'] ?? '';
+          final data = userSnapshot.data() as Map<String, dynamic>;
+          role_ = data['role'] ?? '';
+          if (role_ == 'Teacher') {
+            teachersClass_ = (data['class'] ?? data['class_'] ?? '') as String;
+          } else {
+            teachersClass_ = '';
+          }
+          controller.name.value = data['full_name'] ?? '';
+          controller.email.value = data['email'] ?? '';
           isLoading.value = false;
           isloadingPage.value = true;
         }

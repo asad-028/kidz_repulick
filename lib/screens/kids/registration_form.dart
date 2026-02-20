@@ -7,7 +7,7 @@ import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:get/get.dart';
 import 'package:kids_republik/controllers/kids_controller/registation_form_controller.dart';
 import 'package:kids_republik/screens/kids/widgets/custom_textfield.dart';
@@ -17,6 +17,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:toast/toast.dart';
 
 import '../../main.dart';
+
 var image;
 CameraDescription? firstCamera;
 bool imageloading = false;
@@ -27,7 +28,9 @@ PlatformFile? file;
 String imagefilepath = '';
 
 class RegistrationForm extends StatefulWidget {
-  const RegistrationForm({super.key,});
+  const RegistrationForm({
+    super.key,
+  });
 
   @override
   State<RegistrationForm> createState() => _RegistrationFormState();
@@ -43,7 +46,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
     firstCamera = cameras.first;
   }
 
-  RegistrationFormController registrationFormController = Get.put(RegistrationFormController());
+  RegistrationFormController registrationFormController =
+      Get.put(RegistrationFormController());
 
   @override
   void dispose() {
@@ -56,7 +60,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 
   @override
-  void initState()  {
+  void initState() {
     // TODO: implement initState
     super.initState();
 
@@ -78,106 +82,196 @@ class _RegistrationFormState extends State<RegistrationForm> {
         backgroundColor: kprimary,
       ),
       bottomNavigationBar: Obx(
-            () => registrationFormController.isLoading.value
-            ? Center(
-            child: const CircularProgressIndicator())
+        () => registrationFormController.isLoading.value
+            ? Center(child: const CircularProgressIndicator())
             : SizedBox(
-          width: mQ.width * 0.85,
-          height: mQ.height * 0.065,
-          child: PrimaryButton(
-            onPressed: () async {
-              await uploadimagetocloudstorage(image);
+                width: mQ.width * 0.85,
+                height: mQ.height * 0.065,
+                child: PrimaryButton(
+                  onPressed: () async {
+                    await uploadimagetocloudstorage(image);
 
-              registrationFormController
-                  .addChildFunction(context);
-            },
-            label: "Register",
-            elevation: 3,
-            bgColor: kprimary,
-            labelStyle: kTextPrimaryButton.copyWith(
-                fontWeight: FontWeight.w500),
-            borderRadius:
-            BorderRadius.circular(2.0),
+                    registrationFormController.addChildFunction(context);
+                  },
+                  label: "Register",
+                  elevation: 3,
+                  bgColor: kprimary,
+                  labelStyle:
+                      kTextPrimaryButton.copyWith(fontWeight: FontWeight.w500),
+                  borderRadius: BorderRadius.circular(2.0),
+                ),
+              ),
+      ),
+
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 15),
+          child: Form(
+            key: registrationFormController.formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: mQ.height * 0.03,
+                ),
+                imageloading
+                    ? Container(
+                        width: mQ.width * 0.4,
+                        height: mQ.height * 0.2,
+                        child: Center(child: CircularProgressIndicator()))
+                    : Container(
+                        width: mQ.width * 0.4,
+                        height: mQ.height * 0.2,
+                        child: Image.file(
+                          File(imagefilepath),
+                          fit: BoxFit.fill,
+                        )),
+                IconButton(
+                  icon: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Upload Image'),
+                        Icon(Icons.camera_alt_outlined, size: 30),
+                      ]),
+                  constraints: const BoxConstraints(),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 3, horizontal: 3),
+                  onPressed: () async {
+                    _imageActionSheet(context, 'Student', mQ);
+                    // _imageActionSheet(context, subject!);
+                  },
+                ),
+                Text(
+                  'Basic Information:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                CustomTextField(
+                  controller: registrationFormController.childFullName,
+                  inputType: TextInputType.text,
+                  labelText: "Full name of child",
+                  validators: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Required';
+                    }
+                    return null;
+                  },
+                ),
+                CustomTextField(
+                  controller: registrationFormController.nameUsuallyKnownBy,
+                  inputType: TextInputType.text,
+                  labelText: "Name usually known by",
+                  validators: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Required';
+                    }
+                    return null;
+                  },
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text(
+                      'Mother’s Details:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                  ],
+                ),
+                CustomTextField(
+                  controller: registrationFormController.mothersName,
+                  inputType: TextInputType.text,
+                  labelText: "Mother’s name",
+                  validators: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Required';
+                    }
+                    return null;
+                  },
+                ),
+                CustomTextField(
+                  controller: registrationFormController.mothersmobilePhoneNo,
+                  inputType: TextInputType.text,
+                  labelText: "Mobile Phone No",
+                  validators: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Required';
+                    }
+                    return null;
+                  },
+                ),
+                CustomTextField(
+                  controller: registrationFormController.mothersEmailAddress,
+                  inputType: TextInputType.text,
+                  labelText: "Email Address",
+                  validators: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Required';
+                    }
+                    return null;
+                  },
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text(
+                      'Father’s Details:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                  ],
+                ),
+                CustomTextField(
+                  controller: registrationFormController.fathersName,
+                  inputType: TextInputType.text,
+                  labelText: "Father’s name",
+                  validators: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Required';
+                    }
+                    return null;
+                  },
+                ),
+                CustomTextField(
+                  controller: registrationFormController.fathersMobileNo,
+                  inputType: TextInputType.text,
+                  labelText: "Mobile Phone No",
+                  validators: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Required';
+                    }
+                    return null;
+                  },
+                ),
+                CustomTextField(
+                  controller: registrationFormController.fathersEmail,
+                  inputType: TextInputType.text,
+                  labelText: "Email Address",
+                  validators: (String? value) {
+                    if (value!.isEmpty) {
+                      return 'Required';
+                    }
+                    return null;
+                  },
+                ),
+                Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      registrationFormController.selectDate(
+                          "Registration Date", context),
+                      (registrationFormController.datechanged)
+                          ? Text(
+                              '${registrationFormController.getCurrentDate()}')
+                          : Text('${registrationFormController.newdate}')
+                    ]),
+              ],
+            ),
           ),
         ),
       ),
-
-      body:
-        SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 14.0, horizontal: 15),
-                      child: Form(
-                        key: registrationFormController.formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              height: mQ.height * 0.03,
-                            ),
-                             imageloading
-                                ? Container(
-                                width: mQ.width * 0.4,
-                                height: mQ.height * 0.2,
-                                child: Center(
-                                    child:
-                                    CircularProgressIndicator()))
-                                : Container(
-                                width: mQ.width * 0.4,
-                                height: mQ.height * 0.2,
-                                child: Image.file(
-                                  File(imagefilepath),
-                                  fit: BoxFit.fill,
-                                )),
-                            IconButton(
-                              icon: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: [
-                                    Text('Upload Image'),
-                                    Icon(Icons.camera_alt_outlined,
-                                        size: 30),
-                                  ]),
-                              constraints: const BoxConstraints(),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 3, horizontal: 3),
-                              onPressed: () async {
-                                _imageActionSheet(context, 'Student',mQ);
-                                // _imageActionSheet(context, subject!);
-                              },
-                            )
-                          ,
-                            Text('Basic Information:', style: TextStyle(fontWeight: FontWeight.bold),),
-                            CustomTextField(controller: registrationFormController.childFullName, inputType: TextInputType.text, labelText: "Full name of child", validators: (String? value) {if (value!.isEmpty) {return 'Required';}return null;},),
-                            CustomTextField(controller: registrationFormController.nameUsuallyKnownBy, inputType: TextInputType.text, labelText: "Name usually known by", validators: (String? value) {if (value!.isEmpty) {return 'Required';}return null;},),
-                            Row(
-                              children: [
-                                Expanded(child: Text('Mother’s Details:', style: TextStyle(fontWeight: FontWeight.bold),)),
-                              ],
-                            ),
-                            CustomTextField(controller: registrationFormController.mothersName, inputType: TextInputType.text, labelText: "Mother’s name", validators: (String? value) {if (value!.isEmpty) {return 'Required';}return null;},),
-                            CustomTextField(controller: registrationFormController.mothersmobilePhoneNo, inputType: TextInputType.text, labelText: "Mobile Phone No", validators: (String? value) {if (value!.isEmpty) {return 'Required';}return null;},),
-                            CustomTextField(controller: registrationFormController.mothersEmailAddress, inputType: TextInputType.text, labelText: "Email Address", validators: (String? value) {if (value!.isEmpty) {return 'Required';}return null;},),
-                            Row(
-                              children: [
-                                Expanded(child: Text('Father’s Details:', style: TextStyle(fontWeight: FontWeight.bold),)),
-                              ],
-                            ),
-                            CustomTextField(controller: registrationFormController.fathersName, inputType: TextInputType.text, labelText: "Father’s name", validators: (String? value) {if (value!.isEmpty) {return 'Required';}return null;},),
-                            CustomTextField(controller: registrationFormController.fathersMobileNo, inputType: TextInputType.text, labelText: "Mobile Phone No", validators: (String? value) {if (value!.isEmpty) {return 'Required';}return null;},),
-                            CustomTextField(controller: registrationFormController.fathersEmail, inputType: TextInputType.text, labelText: "Email Address", validators: (String? value) {if (value!.isEmpty) {return 'Required';}return null;},),
-                          Row(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,children:[
-                            registrationFormController.selectDate("Registration Date",context),
-                            (registrationFormController.datechanged)? Text('${registrationFormController.getCurrentDate()}') : Text('${registrationFormController.newdate}') ]),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
       // ),
     );
   }
-bool isChecked = true;
+
+  bool isChecked = true;
 
   // void _pickFile() async {
   //   final result = await FilePicker.platform.pickFiles(allowMultiple: false);
@@ -244,7 +338,6 @@ bool isChecked = true;
     });
   }
 
-
   // Future<void> uploadImage(File imageFile) async {
   //   var request = http.MultipartRequest(
   //     'POST',
@@ -308,34 +401,42 @@ bool isChecked = true;
   //   // await apiService.uploadimage(file);
   //
   // }
-  Future<void> _imageActionSheet(BuildContext context, String title,mQ) async {
+  Future<void> _imageActionSheet(BuildContext context, String title, mQ) async {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return
-          Column(
-              mainAxisSize: MainAxisSize.min, children: [
-            Text("Take ${title} Picture"),
-            Row(children: [
-              // Image.asset('assets/staff.jpg',width: mQ.width*0.9,height: mQ.height*0.7,),
-              Expanded(
-                child: IconButton(
-                  // title:
-                  // Text('',style: TextStyle(fontSize: mQ.height*0.016),),
-                  icon:  Icon(Icons.camera_alt_outlined, color: Colors.purple,size: 28,),
-                  onPressed:  () async {_imageActionSheet2(context, title);Navigator.pop(context);},
-                  // contentPadding: EdgeInsets.symmetric(horizontal: 50)
+        return Column(mainAxisSize: MainAxisSize.min, children: [
+          Text("Take ${title} Picture"),
+          Row(children: [
+            // Image.asset('assets/staff.jpg',width: mQ.width*0.9,height: mQ.height*0.7,),
+            Expanded(
+              child: IconButton(
+                // title:
+                // Text('',style: TextStyle(fontSize: mQ.height*0.016),),
+                icon: Icon(
+                  Icons.camera_alt_outlined,
+                  color: Colors.purple,
+                  size: 28,
                 ),
+                onPressed: () async {
+                  _imageActionSheet2(context, title);
+                  Navigator.pop(context);
+                },
+                // contentPadding: EdgeInsets.symmetric(horizontal: 50)
               ),
-              Expanded(
-                child: IconButton(
-                  icon:  Icon(Icons.image, color: Colors.cyan, size: 28),
-                  onPressed: () async {_pickFile();Navigator.pop(context);},
-                  // contentPadding: EdgeInsets.symmetric(horizontal: 50)
-                ),
+            ),
+            Expanded(
+              child: IconButton(
+                icon: Icon(Icons.image, color: Colors.cyan, size: 28),
+                onPressed: () async {
+                  _pickFile();
+                  Navigator.pop(context);
+                },
+                // contentPadding: EdgeInsets.symmetric(horizontal: 50)
               ),
-            ]),
-          ]);
+            ),
+          ]),
+        ]);
       },
     );
   }
@@ -390,8 +491,10 @@ bool isChecked = true;
   //     },
   //   );
   // }
-  Future<void> _imageActionSheet2(BuildContext context,
-      String title,) async {
+  Future<void> _imageActionSheet2(
+    BuildContext context,
+    String title,
+  ) async {
     final status = await Permission.camera.request();
     if (status.isPermanentlyDenied) {
       openAppSettings();
@@ -406,32 +509,33 @@ bool isChecked = true;
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return WillPopScope( onWillPop:() async {
-            _controller.dispose();
-            return true;
-          },
-              child:
-              Dialog(
+          return WillPopScope(
+              onWillPop: () async {
+                _controller.dispose();
+                return true;
+              },
+              child: Dialog(
                   backgroundColor: Colors.transparent,
                   insetPadding: EdgeInsets.all(0),
-                  child:
-                  Container(padding: EdgeInsets.all(0),
+                  child: Container(
+                      padding: EdgeInsets.all(0),
                       width: double.infinity,
                       // height: mQ.height*0.45,
                       height: double.infinity,
                       // color: grey100,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
-                          color: Colors.transparent
-                      ),
-                      child:  Column(children: [
+                          color: Colors.transparent),
+                      child: Column(children: [
                         FutureBuilder<void>(
                           future: _initializeControllerFuture,
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
                               return CameraPreview(_controller);
                             } else {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                           },
                         ),
@@ -439,8 +543,7 @@ bool isChecked = true;
                           onPressed: () async {
                             try {
                               await _initializeControllerFuture;
-                              image =
-                              await _controller.takePicture();
+                              image = await _controller.takePicture();
                               if (!mounted) return;
                               imagefilepath = image.path;
                               imageloading = true;
@@ -451,14 +554,11 @@ bool isChecked = true;
                               _controller.dispose();
                               // savepicture = true;
                               Navigator.pop(context);
-                              setState(() {
-
-                              });
+                              setState(() {});
                             } catch (e) {
                               print(e);
                             }
                           },
-
                           child: Icon(
                             Icons.camera_alt_outlined,
                             color: Colors.purple,
@@ -490,9 +590,7 @@ bool isChecked = true;
                         //     size: 20,
                         //   ),
                         // ),
-                      ])
-                  ))
-          );
+                      ]))));
         },
       );
     }
@@ -511,7 +609,8 @@ bool isChecked = true;
         minHeight: 1080,
       );
       quality -= 10;
-    } while (result != null && result.length > targetSizeInBytes && quality > 0);
+    } while (
+        result != null && result.length > targetSizeInBytes && quality > 0);
 
     return result;
   }
@@ -529,7 +628,8 @@ bool isChecked = true;
         ),
       ),
     );
-    Uint8List? compressedImage = await compressImage(File(imagefile.path), 1 * 1024 * 1024);
+    Uint8List? compressedImage =
+        await compressImage(File(imagefile.path), 1 * 1024 * 1024);
     // Check if compression returned null, if so, use the original file bytes
     if (compressedImage == null) {
       print("Compression failed, using original image.");
@@ -545,9 +645,11 @@ bool isChecked = true;
 
     final file = File(imagefile.path);
     final metadata = SettableMetadata(contentType: "image/jpeg");
-    final filename = "${table_}images/studentsprofile/${registrationFormController.childFullName.text}${DateTime.now()}";
+    final filename =
+        "${table_}images/studentsprofile/${registrationFormController.childFullName.text}${DateTime.now()}";
 
-    final uploadTask = storageRef.child(filename).putFile(compressedFile, metadata);
+    final uploadTask =
+        storageRef.child(filename).putFile(compressedFile, metadata);
     // final uploadTask = storageRef.child(filename).putFile(file, metadata);
     uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
       switch (taskSnapshot.state) {
@@ -561,22 +663,22 @@ bool isChecked = true;
           print("Upload was canceled");
           break;
         case TaskState.error:
-        // Handle unsuccessful uploads
+          // Handle unsuccessful uploads
           break;
         case TaskState.success:
-        // Handle successful uploads on complete
+          // Handle successful uploads on complete
           setState(() async {
             imageUrl = await storageRef.child(filename).getDownloadURL();
             imageloading = false;
             imagedownloading = true;
           });
 
-      ToastContext().init(context);
-      Toast.show(
-        'Photo uploaded successfully',
-        duration: 10,
-        backgroundRadius: 5,
-      );
+          ToastContext().init(context);
+          Toast.show(
+            'Photo uploaded successfully',
+            duration: 10,
+            backgroundRadius: 5,
+          );
           break;
       }
     });
@@ -618,14 +720,16 @@ bool isChecked = true;
     );
 
     // Add the file to the request
-    request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+    request.files
+        .add(await http.MultipartFile.fromPath('file', imageFile.path));
 
     // Send the request to the server
     var response = await request.send();
 
     if (response.statusCode == 200) {
       // Construct the URL of the uploaded image
-      imageUrl = "https://app.kidzrepublik.com.pk/storage/uploads/${imageFile.path.split('/').last}";
+      imageUrl =
+          "https://app.kidzrepublik.com.pk/storage/uploads/${imageFile.path.split('/').last}";
       print('Image uploaded successfully to API. URL: $imageUrl');
       return imageUrl;
     } else {
@@ -646,5 +750,4 @@ bool isChecked = true;
   //
   //   print('Image URL saved to Firestore: $imageUrl');
   // }
-
 }

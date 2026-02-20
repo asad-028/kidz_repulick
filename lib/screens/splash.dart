@@ -22,7 +22,8 @@ class SplashScreen extends StatelessWidget {
         decoration: BoxDecoration(
           image: DecorationImage(
             alignment: Alignment.bottomCenter,
-            image: AssetImage('assets/splash_screen.png'), // Replace with your image path
+            image: AssetImage(
+                'assets/splash_screen.png'), // Replace with your image path
             fit: BoxFit.fitWidth, // Adjust the fit as needed
           ),
         ),
@@ -37,19 +38,17 @@ class SplashScreen extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(400),
-              child: Container(
-                height: 180,
-                width: 180,
-                //  height: mQ.height * 0.2,
-                // width: mQ.width * 0.4,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                child: Container(
+                  height: 180,
+                  width: 180,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/littlediary.jpg',
+                    fit: BoxFit.fill,
+                  ),
                 ),
-                child: Image.asset(
-                  'assets/little_logo.png',
-                  fit: BoxFit.fill,
-                ),
-              ),
             ),
           ),
           SizedBox(height: mQ.height * 0.2),

@@ -8,7 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -49,13 +49,16 @@ class CreateActivityForMultipleChildsScreen extends StatefulWidget {
   });
 
   @override
-  State<CreateActivityForMultipleChildsScreen> createState() => _CreateActivityForMultipleChildsScreenState();
+  State<CreateActivityForMultipleChildsScreen> createState() =>
+      _CreateActivityForMultipleChildsScreenState();
 }
 
-class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityForMultipleChildsScreen> {
+class _CreateActivityForMultipleChildsScreenState
+    extends State<CreateActivityForMultipleChildsScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  CreateActivityScreenController createActivityScreenController = Get.put(CreateActivityScreenController());
+  CreateActivityScreenController createActivityScreenController =
+      Get.put(CreateActivityScreenController());
   String? babyid;
   String? subject;
   String? class_variable;
@@ -74,7 +77,8 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
     descriptionplus = '';
     subject = widget.selectedsubject_;
     // babyid = widget.selectedbabyid_;
-    createActivityScreenController.currentDate.value = createActivityScreenController.getCurrentDate();
+    createActivityScreenController.currentDate.value =
+        createActivityScreenController.getCurrentDate();
     selectedTime = TimeOfDay.now();
     (subject != 'BiWeekly')
         ? (subject != 'Mood')
@@ -134,10 +138,12 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
               ? Center(child: const CircularProgressIndicator())
               : ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: kprimary, // Set the text color
+                    foregroundColor: Colors.white,
+                    backgroundColor: kprimary, // Set the text color
                     elevation: 3, // Set the elevation (shadow) of the button
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0), // Set the button's border radius
+                      borderRadius: BorderRadius.circular(
+                          18.0), // Set the button's border radius
                     ),
                     padding: EdgeInsets.all(16),
                   ),
@@ -148,19 +154,27 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                         await uploadimagetocloudstorage(image);
                       } else {
                         // After image upload is successful, call addActivityfunction
-                        await createActivityScreenController.addActivityfunction(
+                        await createActivityScreenController
+                            .addActivityfunction(
                           context,
                           widget.selectedBabies,
-                          (widget.selectedsubject_ != 'BiWeekly') ? widget.selectedsubject_ : createActivityScreenController.subject_.text,
-                          (widget.selectedsubject_ == 'BiWeekly' || widget.selectedsubject_ == 'Activity' || widget.selectedsubject_ == 'Notes')
+                          (widget.selectedsubject_ != 'BiWeekly')
+                              ? widget.selectedsubject_
+                              : createActivityScreenController.subject_.text,
+                          (widget.selectedsubject_ == 'BiWeekly' ||
+                                  widget.selectedsubject_ == 'Activity' ||
+                                  widget.selectedsubject_ == 'Notes')
                               ? createActivityScreenController.activity_.text
                               : dropdownValue,
                           (widget.selectedsubject_ != 'BiWeekly')
                               ? '${createActivityScreenController.description_.text} ${descriptionplus}'
                               : '${createActivityScreenController.description_.text}',
                           imageUrl ?? "",
-                          sleeptime_ ?? DateFormat('HH:mm').format(DateTime.now()),
-                          (widget.selectedsubject_ != 'BiWeekly') ? 'DailySheet' : 'BiWeekly',
+                          sleeptime_ ??
+                              DateFormat('HH:mm').format(DateTime.now()),
+                          (widget.selectedsubject_ != 'BiWeekly')
+                              ? 'DailySheet'
+                              : 'BiWeekly',
                         );
                       }
                     }
@@ -198,7 +212,11 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                       child: Text(
                         textAlign: TextAlign.right,
                         ' ${getCurrentDateforattendance()}',
-                        style: TextStyle(fontSize: 10, fontFamily: 'Comic Sans MS', fontWeight: FontWeight.normal, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 10,
+                            fontFamily: 'Comic Sans MS',
+                            fontWeight: FontWeight.normal,
+                            color: Colors.grey),
                       ),
                     ),
                   ],
@@ -214,7 +232,8 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                     : SingleChildScrollView(
                         padding: EdgeInsets.only(left: 18, right: 18),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 4),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -222,7 +241,10 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [],
                               ),
-                              (subject == 'Mood' || subject == 'Activity' || subject == 'Notes' || subject == 'BiWeekly')
+                              (subject == 'Mood' ||
+                                      subject == 'Activity' ||
+                                      subject == 'Notes' ||
+                                      subject == 'BiWeekly')
                                   ? Container()
                                   : Container(
                                       width: mQ.width * 0.9,
@@ -233,29 +255,50 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                           setState(() {
                                             timeupdated = true;
                                           });
-                                          final TimeOfDay? time = await showTimePicker(
-                                              context: context,
-                                              initialTime: selectedTime ?? TimeOfDay.now(),
-                                              initialEntryMode: TimePickerEntryMode.dial,
-                                              orientation: Orientation.portrait,
-                                              builder: (BuildContext context, Widget? child) {
-                                                return MediaQuery(
-                                                  data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-                                                  child: child!,
-                                                );
-                                              });
+                                          final TimeOfDay? time =
+                                              await showTimePicker(
+                                                  context: context,
+                                                  initialTime: selectedTime ??
+                                                      TimeOfDay.now(),
+                                                  initialEntryMode:
+                                                      TimePickerEntryMode.dial,
+                                                  orientation:
+                                                      Orientation.portrait,
+                                                  builder:
+                                                      (BuildContext context,
+                                                          Widget? child) {
+                                                    return MediaQuery(
+                                                      data: MediaQuery.of(
+                                                              context)
+                                                          .copyWith(
+                                                              alwaysUse24HourFormat:
+                                                                  true),
+                                                      child: child!,
+                                                    );
+                                                  });
                                           selectedTime = time!;
-                                          sleeptime_ = selectedTime.format(context);
+                                          sleeptime_ =
+                                              selectedTime.format(context);
                                         },
                                         child: (timeupdated)
                                             ? Text(
                                                 textAlign: TextAlign.left,
                                                 'Select Time ${selectedTime.format(context)}',
-                                                style: TextStyle(fontSize: 12, fontFamily: 'Comic Sans MS', fontWeight: FontWeight.normal, color: Colors.blue),
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: 'Comic Sans MS',
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    color: Colors.blue),
                                               )
                                             : Text(
                                                 'Select Time ${selectedTime.format(context)}',
-                                                style: TextStyle(fontSize: 12, fontFamily: 'Comic Sans MS', fontWeight: FontWeight.normal, color: Colors.blue),
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: 'Comic Sans MS',
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    color: Colors.blue),
                                               ),
                                       ),
                                     ),
@@ -263,9 +306,14 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                 height: mQ.height * 0.006,
                               ),
                               (widget.selectedsubject_ == 'BiWeekly')
-                                  ? Container(width: mQ.width * 0.9, child: BiWeeklyDropDown(mQ))
+                                  ? Container(
+                                      width: mQ.width * 0.9,
+                                      child: BiWeeklyDropDown(mQ))
                                   : (widget.selectedsubject_ != 'Mood')
-                                      ? (widget.selectedsubject_ == 'Activity' || widget.selectedsubject_ == 'Notes')
+                                      ? (widget.selectedsubject_ ==
+                                                  'Activity' ||
+                                              widget.selectedsubject_ ==
+                                                  'Notes')
                                           ?
                                           // Container()
                                           Container(
@@ -274,8 +322,11 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                               color: Colors.grey[50],
                                               child: CustomTextField(
                                                 enabled: true,
-                                                controller: createActivityScreenController.activity_,
-                                                inputType: TextInputType.multiline,
+                                                controller:
+                                                    createActivityScreenController
+                                                        .activity_,
+                                                inputType:
+                                                    TextInputType.multiline,
                                                 labelText: "Heading",
                                                 validators: (String? value) {
                                                   if (value!.isEmpty) {
@@ -292,11 +343,14 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                               child: DropdownSearch<String>(
                                                 popupProps: PopupProps.menu(
                                                   showSelectedItems: true,
-                                                  disabledItemFn: (String s) => s.startsWith('I'),
+                                                  disabledItemFn: (String s) =>
+                                                      s.startsWith('I'),
                                                 ),
                                                 items: list,
-                                                dropdownDecoratorProps: DropDownDecoratorProps(
-                                                  dropdownSearchDecoration: InputDecoration(
+                                                dropdownDecoratorProps:
+                                                    DropDownDecoratorProps(
+                                                  dropdownSearchDecoration:
+                                                      InputDecoration(
                                                     labelText:
                                                         'Select ${widget.selectedsubject_} ${widget.selectedsubject_ == 'Toilet' || widget.selectedsubject_ == 'Sleep' || widget.selectedsubject_ == 'Health' ? 'remarks' : ''}',
                                                     // teacherAssignments[index][i],
@@ -326,7 +380,8 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                 color: Colors.grey[50],
                                 child: CustomTextField(
                                   enabled: true,
-                                  controller: createActivityScreenController.description_,
+                                  controller: createActivityScreenController
+                                      .description_,
                                   inputType: TextInputType.multiline,
                                   labelText: "Type Remarks (optional)",
                                   validators: (String? value) {
@@ -338,9 +393,15 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                 ),
                               ),
                               (subject == 'Health')
-                                  ? checkboxfunction(context, 'Recommended to consult the Dr.')
-                                  : (subject == 'Toilet') && (teachersClass_ == 'Infant' || teachersClass_ == 'Toddler' || teachersClass_ == 'Play Group - I')
-                                      ? checkboxfunction(context, 'Diaper Changed.')
+                                  ? checkboxfunction(
+                                      context, 'Recommended to consult the Dr.')
+                                  : (subject == 'Toilet') &&
+                                          (teachersClass_ == 'Infant' ||
+                                              teachersClass_ == 'Toddler' ||
+                                              teachersClass_ ==
+                                                  'Play Group - I')
+                                      ? checkboxfunction(
+                                          context, 'Diaper Changed.')
                                       // : (subject == 'Sleep')
                                       // ? sleepFuntion(context)
                                       : (subject == 'Fluids')
@@ -358,7 +419,12 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                   )),
                               takepicture
                                   ? imageloading
-                                      ? Container(width: mQ.width * 0.4, height: mQ.height * 0.2, child: Center(child: CircularProgressIndicator()))
+                                      ? Container(
+                                          width: mQ.width * 0.4,
+                                          height: mQ.height * 0.2,
+                                          child: Center(
+                                              child:
+                                                  CircularProgressIndicator()))
                                       : Container(
                                           width: mQ.width * 0.4,
                                           height: mQ.height * 0.2,
@@ -373,16 +439,20 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                                   takepicture
                                       ? IconButton(
                                           icon: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               Text('Upload Image'),
-                                              Icon(Icons.camera_alt_outlined, size: 30),
+                                              Icon(Icons.camera_alt_outlined,
+                                                  size: 30),
                                             ],
                                           ),
                                           constraints: const BoxConstraints(),
-                                          padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 3),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 3, horizontal: 3),
                                           onPressed: () async {
-                                            await _imageActionSheet(context, subject!, mQ);
+                                            await _imageActionSheet(
+                                                context, subject!, mQ);
                                           },
                                         )
                                       : Container(),
@@ -430,15 +500,19 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                       // height: mQ.height*0.45,
                       height: double.infinity,
                       // color: grey100,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Colors.transparent),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.transparent),
                       child: Column(children: [
                         FutureBuilder<void>(
                           future: _initializeControllerFuture,
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
                               return CameraPreview(_controller);
                             } else {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                           },
                         ),
@@ -474,7 +548,8 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
     }
   }
 
-  Future<void> getProfileImageFromCameraAndUpdate(BuildContext context, {VoidCallback? onStart, VoidCallback? onSuccess}) async {
+  Future<void> getProfileImageFromCameraAndUpdate(BuildContext context,
+      {VoidCallback? onStart, VoidCallback? onSuccess}) async {
     final ImagePicker picker = ImagePicker();
 
     try {
@@ -499,7 +574,8 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
     }
   }
 
-  Future<void> getProfileImageFromStorageAndUpdate(BuildContext context, {VoidCallback? onStart, VoidCallback? onSuccess}) async {
+  Future<void> getProfileImageFromStorageAndUpdate(BuildContext context,
+      {VoidCallback? onStart, VoidCallback? onSuccess}) async {
     final ImagePicker picker = ImagePicker();
 
     try {
@@ -529,7 +605,8 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
       context: context,
       builder: (context) => CupertinoAlertDialog(
         title: Text('Permission required'),
-        content: Text('$permissionType permission is required. Please enable it in the app settings.'),
+        content: Text(
+            '$permissionType permission is required. Please enable it in the app settings.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -629,7 +706,8 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
     uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) async {
       switch (taskSnapshot.state) {
         case TaskState.running:
-          progress = 100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
+          progress =
+              100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
           ToastContext().init(context);
           Toast.show(
             'Photo is uploading,  ${progress?.toStringAsFixed(2)}%',
@@ -689,8 +767,12 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
           await createActivityScreenController.addActivityfunction(
             context,
             widget.selectedBabies,
-            (widget.selectedsubject_ != 'BiWeekly') ? widget.selectedsubject_ : createActivityScreenController.subject_.text,
-            (widget.selectedsubject_ == 'BiWeekly' || widget.selectedsubject_ == 'Activity' || widget.selectedsubject_ == 'Notes')
+            (widget.selectedsubject_ != 'BiWeekly')
+                ? widget.selectedsubject_
+                : createActivityScreenController.subject_.text,
+            (widget.selectedsubject_ == 'BiWeekly' ||
+                    widget.selectedsubject_ == 'Activity' ||
+                    widget.selectedsubject_ == 'Notes')
                 ? createActivityScreenController.activity_.text
                 : dropdownValue,
             (widget.selectedsubject_ != 'BiWeekly')
@@ -730,48 +812,53 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
   }
 
   sleepFuntion(context) {
-    return Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      SizedBox(
-        width: 20,
-      ),
-      InkWell(
-        onTap: () {
-          descriptionplus = createActivityScreenController.description_.text;
-          createActivityScreenController.description_.text = dropdownValue!;
-          dropdownValue = "Nap Start";
-        }, // Handle the click event
-        child: Wrap(
-          children: [
-            Text('Nap Start'),
-            Icon(
-              Icons.bedtime,
-              color: Colors.green[600],
-              size: 26,
-            )
-          ],
-        ),
-      ),
-      InkWell(
-        onTap: () {
-          descriptionplus = createActivityScreenController.description_.text;
-          createActivityScreenController.description_.text = dropdownValue!;
-          dropdownValue = "Wake up";
-        }, // Handle the click event
-        child: Wrap(
-          children: [
-            Text('Wake up'),
-            Icon(
-              Icons.sunny_snowing,
-              color: Colors.red[600],
-              size: 26,
-            )
-          ],
-        ),
-      ),
-      SizedBox(
-        width: 20,
-      ),
-    ]);
+    return Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: 20,
+          ),
+          InkWell(
+            onTap: () {
+              descriptionplus =
+                  createActivityScreenController.description_.text;
+              createActivityScreenController.description_.text = dropdownValue!;
+              dropdownValue = "Nap Start";
+            }, // Handle the click event
+            child: Wrap(
+              children: [
+                Text('Nap Start'),
+                Icon(
+                  Icons.bedtime,
+                  color: Colors.green[600],
+                  size: 26,
+                )
+              ],
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              descriptionplus =
+                  createActivityScreenController.description_.text;
+              createActivityScreenController.description_.text = dropdownValue!;
+              dropdownValue = "Wake up";
+            }, // Handle the click event
+            child: Wrap(
+              children: [
+                Text('Wake up'),
+                Icon(
+                  Icons.sunny_snowing,
+                  color: Colors.red[600],
+                  size: 26,
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 20,
+          ),
+        ]);
   }
 
   bool isChecked = false;
@@ -805,56 +892,72 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
   }
 
   fluidsfunction(context) {
-    return Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        '   Select Quantitity',
-        style: TextStyle(color: Colors.blue),
-      ),
-      Row(
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: _myRadioButton(
-              title: "All.",
-              value: 0,
-              onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Quantity: All")),
-            ),
+          Text(
+            '   Select Quantitity',
+            style: TextStyle(color: Colors.blue),
           ),
-          Expanded(
-            child: _myRadioButton(
-              title: "Most.",
-              value: 1,
-              onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Quantity: Most")),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: _myRadioButton(
+                  title: "All.",
+                  value: 0,
+                  onChanged: (newValue) => setState(() => (
+                        _groupValue = newValue,
+                        descriptionplus = "Quantity: All"
+                      )),
+                ),
+              ),
+              Expanded(
+                child: _myRadioButton(
+                  title: "Most.",
+                  value: 1,
+                  onChanged: (newValue) => setState(() => (
+                        _groupValue = newValue,
+                        descriptionplus = "Quantity: Most"
+                      )),
+                ),
+              ),
+              Expanded(
+                child: _myRadioButton(
+                  title: "Some.",
+                  value: 2,
+                  onChanged: (newValue) => setState(() => (
+                        _groupValue = newValue,
+                        descriptionplus = "Quantity: Some"
+                      )),
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: _myRadioButton(
-              title: "Some.",
-              value: 2,
-              onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Quantity: Some")),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: _myRadioButton(
+                  title: "None.",
+                  value: 3,
+                  onChanged: (newValue) => setState(() => (
+                        _groupValue = newValue,
+                        descriptionplus = "Quantity: None"
+                      )),
+                ),
+              ),
+              Expanded(
+                child: _myRadioButton(
+                  title: "NA.",
+                  value: 4,
+                  onChanged: (newValue) =>
+                      setState(() => (_groupValue = newValue)),
+                ),
+              ),
+              Expanded(child: Text('')),
+            ],
           ),
-        ],
-      ),
-      Row(
-        children: [
-          Expanded(
-            child: _myRadioButton(
-              title: "None.",
-              value: 3,
-              onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Quantity: None")),
-            ),
-          ),
-          Expanded(
-            child: _myRadioButton(
-              title: "NA.",
-              value: 4,
-              onChanged: (newValue) => setState(() => (_groupValue = newValue)),
-            ),
-          ),
-          Expanded(child: Text('')),
-        ],
-      ),
-    ]);
+        ]);
   }
 
   moodfunction(context) {
@@ -870,14 +973,16 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
               child: _myRadioButtonMood(
                 title: "Happy 😁",
                 value: 0,
-                onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Happy 😁")),
+                onChanged: (newValue) => setState(() =>
+                    (_groupValue = newValue, descriptionplus = "Happy 😁")),
               ),
             ),
             Expanded(
               child: _myRadioButtonMood(
                 title: "Sleep 😴",
                 value: 1,
-                onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Sleep 😴")),
+                onChanged: (newValue) => setState(() =>
+                    (_groupValue = newValue, descriptionplus = "Sleep 😴")),
               ),
             ),
           ]),
@@ -886,14 +991,16 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
               child: _myRadioButtonMood(
                 title: "Grupmy 😣",
                 value: 2,
-                onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Grupmy 😣")),
+                onChanged: (newValue) => setState(() =>
+                    (_groupValue = newValue, descriptionplus = "Grupmy 😣")),
               ),
             ),
             Expanded(
               child: _myRadioButtonMood(
                 title: "Sick 🤢",
                 value: 3,
-                onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Sick 🤢")),
+                onChanged: (newValue) => setState(() =>
+                    (_groupValue = newValue, descriptionplus = "Sick 🤢")),
               ),
             ),
           ]),
@@ -902,14 +1009,16 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
               child: _myRadioButtonMood(
                 title: "Sad 🥺",
                 value: 4,
-                onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Sad 🥺")),
+                onChanged: (newValue) => setState(
+                    () => (_groupValue = newValue, descriptionplus = "Sad 🥺")),
               ),
             ),
             Expanded(
               child: _myRadioButtonMood(
                 title: "Shy 😊",
                 value: 5,
-                onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Shy 😊")),
+                onChanged: (newValue) => setState(
+                    () => (_groupValue = newValue, descriptionplus = "Shy 😊")),
               ),
             ),
           ]),
@@ -919,7 +1028,10 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                 child: _myRadioButtonMood(
                   title: "Playful 😂",
                   value: 6,
-                  onChanged: (newValue) => setState(() => (_groupValue = newValue, descriptionplus = "Playfull 😂")),
+                  onChanged: (newValue) => setState(() => (
+                        _groupValue = newValue,
+                        descriptionplus = "Playfull 😂"
+                      )),
                 ),
               ),
             ],
@@ -1042,12 +1154,16 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
   }
 
   BiWeeklyDropDown(mQ) {
-    CollectionReference collectionReferenceBiweekly = FirebaseFirestore.instance.collection('Consent');
+    CollectionReference collectionReferenceBiweekly =
+        FirebaseFirestore.instance.collection('Consent');
     return Container(
       width: mQ.width * 0.9,
       color: Colors.white,
       child: StreamBuilder<QuerySnapshot>(
-          stream: collectionReferenceBiweekly.where('category_', isEqualTo: 'BiWeekly').where('class_', isEqualTo: teachersClass_).snapshots(),
+          stream: collectionReferenceBiweekly
+              .where('category_', isEqualTo: 'BiWeekly')
+              .where('class_', isEqualTo: teachersClass_)
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -1126,10 +1242,17 @@ class _CreateActivityForMultipleChildsScreenState extends State<CreateActivityFo
                   // hint: biweekltitems.first,
                   onChanged: (biWeeklyvalue) async {
                     isloadingBiweekly = false;
-                    final DocumentSnapshot _dataStream = await FirebaseFirestore.instance.collection('Consent').doc(biWeeklyvalue).get();
-                    createActivityScreenController.description_.text = _dataStream.get('description_');
-                    createActivityScreenController.subject_.text = _dataStream.get('subject_');
-                    createActivityScreenController.activity_.text = _dataStream.get('title_');
+                    final DocumentSnapshot _dataStream = await FirebaseFirestore
+                        .instance
+                        .collection('Consent')
+                        .doc(biWeeklyvalue)
+                        .get();
+                    createActivityScreenController.description_.text =
+                        _dataStream.get('description_');
+                    createActivityScreenController.subject_.text =
+                        _dataStream.get('subject_');
+                    createActivityScreenController.activity_.text =
+                        _dataStream.get('title_');
 
                     // showBiWeeklyDialog(biWeeklyvalue,context,selectedbabyid_);
                   }),

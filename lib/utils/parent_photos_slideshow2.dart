@@ -57,223 +57,257 @@ fetchChildrenForSchool().then((photos) {
     return
       (role_ == 'Parent')?
       Scaffold(
-        appBar: AppBar(title: Text('Activities',style: TextStyle(fontSize: 14,color: Colors.white),),backgroundColor: kprimary),
-body:
-(activityPhotos != null)?
-CarouselSlider(
-  items: activityPhotos!
-      .map((photo)
-  {   return Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.start,
-    children: [
-      SizedBox(height: mQ.height*0.003,),
-      Container(
-        width: mQ.width,
-        height: mQ.height*0.035,
-        decoration: BoxDecoration(
-          color: Colors.orange.shade100,
-          borderRadius: BorderRadius.circular(5), // Apply rounded corners if desired
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white,
-              spreadRadius: 0.7,
-              blurRadius: 0.9,
-              offset: Offset(0, 3), // Add a shadow effect
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(child: Text(photo['Activity'],style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold,color: Colors.indigo),)),
-            (role_ != 'Parent')
-                ?
-            Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Expanded(child:
-                photo['photostatus_']=='Approved'? Icon(Icons.done_all_sharp,color: Colors.blue[900],):photo['photostatus_']=='Forwarded'? Icon(Icons.done_all,color: Colors.grey,):Icon(Icons.done_outlined,color: Colors.grey,)
-              // Text(
-              //   "",style: TextStyle(
-              //   color:
-              //   (photo["photostatus_"]== "Approved")?Colors.green:(photo["photostatus_"]== "Forwarded")?Colors.blue[150]:Colors.blue[200],
-              // ),textAlign: TextAlign.right,)
-              ),
-            ):
-                // Text('asasa')
-            Expanded(child: Text(photo['date_'],textAlign: TextAlign.right,style: TextStyle(color: Colors.grey,fontSize: 10),)),
-          ],
-        ),
-      ),
-            Text(
-              "${photo['childFullName']}",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black87.withOpacity(0.7),
-                fontSize: 10,
-              ),
-            ),
-      SizedBox(height: mQ.height*0.003,),
-      InkWell(
-  onTap: () {
-  final index = activityPhotos!.indexWhere((element) => element['image_'] == photo['image_']);
-  if (index != -1) {
-  Get.to(ZoomableImageGallery(imageUrls: activityPhotos ?? [], initialIndex: index));
-  }
-        },
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: CachedNetworkImage(
-            imageUrl: photo['image_'],
-            height: mQ.height*0.55,
-            // width: mQ.width,
-            fit: BoxFit.fitWidth,
-            placeholder: (context, url) => Center(
-              child: CircularProgressIndicator(),
-            ),
-            errorWidget: (context, url, error) => Icon(Icons.error),
+        backgroundColor: const Color(0xFFF8FAFC),
+        appBar: AppBar(
+          title: const Text(
+            'Activities',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
           ),
+          backgroundColor: kprimary,
+          elevation: 0,
+          centerTitle: true,
         ),
-      ),
-      SizedBox(height: mQ.height*0.003,),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        width: mQ.width,
-        // height: mQ.height*0.15,
-        decoration: BoxDecoration(
-          color:
-          Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(5), // Apply rounded corners if desired
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.6),
-              spreadRadius: 0.2,
-              blurRadius: 0.5,
-              offset: Offset(0, 3), // Add a shadow effect
-            ),
-          ],
-        ),
-
-        child:
-      Text(photo['description'],textAlign: TextAlign.justify,style: TextStyle(color: Colors.grey,fontSize: 12)),
-      ),
-      SizedBox(height: mQ.height*0.003,),
-    ],
-  );}
-  )
-      .toList(),
-  options: CarouselOptions(
-    height:
-    (role_ == 'Parent')?
-    mQ.height*0.75:   mQ.height*0.3,
-    // aspectRatio: 16 / 9,
-    enlargeCenterPage: true,
-    enableInfiniteScroll: false,
-  ),
-)
-:Container(
-  alignment: Alignment.center,
-  height: mQ.height*0.4,
-  child: Text('No Photos'),
-    )
-
-
-      ):
-      (activityPhotos == null)?Container(alignment: Alignment.center,
-        height: mQ.height*0.3,
-          child: Text('No Photos')):
-      CarouselSlider(
-        items: activityPhotos!
-            .map((photo)
-        {   return Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            // SizedBox(height: mQ.height*0.003,),
-            Container(
-              width: mQ.width,
-              height: mQ.height*0.035,
-              decoration: BoxDecoration(
-                color: Colors.orange.shade100,
-                borderRadius: BorderRadius.circular(5), // Apply rounded corners if desired
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white,
-                    spreadRadius: 0.7,
-                    blurRadius: 0.9,
-                    offset: Offset(0, 3), // Add a shadow effect
-                  ),
-                ],
-              ),
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(child: Text(photo['Activity'],style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold,color: Colors.indigo),)),
-                  (role_ != 'Parent')?
-                  photo['photostatus_']=='Approved'? Icon(Icons.done_all_sharp,color: Colors.blue[900],):photo['photostatus_']=='Forwarded'? Icon(Icons.done_all,color: Colors.grey,):Icon(Icons.done_outlined,color: Colors.grey,)
-                      :Text(photo['date_'],textAlign: TextAlign.right,style: TextStyle(color: Colors.grey,fontSize: 10),),
-                ],
-              ),
-            ),
-            InkWell(
-            onTap: () {
-        final index = activityPhotos!.indexWhere((element) => element['image_'] == photo['image_']);
-        if (index != -1) {
-        Get.to(ZoomableImageGallery(imageUrls: activityPhotos ?? [], initialIndex: index));
-        }
-              },
-              child:
-              Container(
-                height: mQ.height*0.25,
-                width: mQ.width*0.8,
+        body: (activityPhotos != null)?
+          CarouselSlider(
+            items: activityPhotos!.map((photo) {
+              final String description = (photo['description'] ?? '').toString().trim();
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 20),
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade100,
-                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white,
-                      spreadRadius: 0.7,
-                      blurRadius: 0.9,
-                      offset: Offset(0, 3),
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: CachedNetworkImage(
-                    imageUrl: photo['image_'],
-                    width: mQ.width*0.7,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(
-                      child: CircularProgressIndicator(),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Slide Header
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      color: Colors.indigo.shade50.withOpacity(0.5),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  photo['Activity'] ?? 'Activity',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF1E1B4B),
+                                  ),
+                                ),
+                                if (((photo['childFullName'] ?? '').toString().trim()).isNotEmpty)
+                                  Text(
+                                    "${photo['childFullName']}",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.indigo.shade300,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            photo['date_'] ?? '',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blueGrey.shade400,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                  ),
+                    // Image Section
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          final index = activityPhotos!.indexWhere((element) => element['image_'] == photo['image_']);
+                          if (index != -1) {
+                            Get.to(ZoomableImageGallery(imageUrls: activityPhotos ?? [], initialIndex: index));
+                          }
+                        },
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            CachedNetworkImage(
+                              imageUrl: photo['image_'],
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Center(
+                                child: CircularProgressIndicator(color: Colors.indigo.shade200),
+                              ),
+                              errorWidget: (context, url, error) => const Icon(Icons.error_outline),
+                            ),
+                            Positioned(
+                              bottom: 16,
+                              right: 16,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.8),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.fullscreen_rounded, color: Colors.indigo),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Description Section
+                    if (description.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey.shade50,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            description,
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 1.5,
+                              color: Colors.blueGrey.shade700,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-              ),
+              );
+            }).toList(),
+            options: CarouselOptions(
+              height: mQ.height * 0.85,
+              enlargeCenterPage: true,
+              enableInfiniteScroll: true,
+              autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 4),
+              autoPlayAnimationDuration: const Duration(milliseconds: 800),
+              autoPlayCurve: Curves.fastOutSlowIn,
+              viewportFraction: 0.9,
             ),
-            Container(
-              width: mQ.width,
-              // height: mQ.height*0.04,
-              decoration: BoxDecoration(
-                color:
-                Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(5), // Apply rounded corners if desired
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.6),
-                    spreadRadius: 0.2,
-                    blurRadius: 0.5,
-                    offset: Offset(0, 3), // Add a shadow effect
+          )
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.photo_library_outlined, size: 64, color: Colors.blueGrey.shade200),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No Photos Available',
+                    style: TextStyle(fontSize: 16, color: Colors.blueGrey.shade400, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
-              child:
-              Text(photo['description'],textAlign: TextAlign.justify,style: TextStyle(color: Colors.grey,fontSize: 12)),
+            )
+      ) :
+      (activityPhotos == null)?
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Text(
+            'No Photos',
+            style: TextStyle(color: Colors.blueGrey.shade300, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ) :
+      CarouselSlider(
+        items: activityPhotos!.map((photo) {
+          final String description = (photo['description'] ?? '').toString().trim();
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ],
-        );}
-        )
-            .toList(),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Mini Header
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  color: Colors.indigo.shade50.withOpacity(0.3),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          photo['Activity'] ?? '',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1E1B4B),
+                          ),
+                        ),
+                      ),
+                      StatusIndicatorMini(status: photo['photostatus_']),
+                    ],
+                  ),
+                ),
+                // Image
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      final index = activityPhotos!.indexWhere((element) => element['image_'] == photo['image_']);
+                      if (index != -1) {
+                        Get.to(ZoomableImageGallery(imageUrls: activityPhotos ?? [], initialIndex: index));
+                      }
+                    },
+                    child: CachedNetworkImage(
+                      imageUrl: photo['image_'],
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (context, url, error) => const Icon(Icons.error_outline),
+                    ),
+                  ),
+                ),
+                // Description
+                if (description.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 11, color: Colors.blueGrey.shade600),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }).toList(),
         options: CarouselOptions(
-          height: mQ.height*0.4,
-          // aspectRatio: 16 / 9,
+          height: mQ.height * 0.45,
           enlargeCenterPage: true,
-          enableInfiniteScroll: false,
+          enableInfiniteScroll: true,
+          autoPlay: true,
+          autoPlayInterval: const Duration(seconds: 5),
+          autoPlayAnimationDuration: const Duration(milliseconds: 800),
+          autoPlayCurve: Curves.easeInOut,
+          viewportFraction: 0.85,
         ),
       );
 
@@ -333,6 +367,41 @@ CarouselSlider(
       print('Error fetching children: $e');
       return null;
     }
+  }
+}
+
+class StatusIndicatorMini extends StatelessWidget {
+  final String? status;
+
+  const StatusIndicatorMini({super.key, this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    Color color;
+    IconData icon;
+
+    switch (status) {
+      case 'Approved':
+        color = Colors.green.shade600;
+        icon = Icons.done_all_rounded;
+        break;
+      case 'Forwarded':
+        color = Colors.blue.shade600;
+        icon = Icons.forward_rounded;
+        break;
+      default:
+        color = Colors.blueGrey.shade300;
+        icon = Icons.edit_note_rounded;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, size: 14, color: color),
+    );
   }
 }
 

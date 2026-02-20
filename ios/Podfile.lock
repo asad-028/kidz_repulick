@@ -1313,7 +1313,9 @@ PODS:
     - Mantle
     - SDWebImage
     - SDWebImageWebPCoder
-  - gallery_saver (0.0.1):
+  - flutter_image_gallery_saver (0.0.1):
+    - Flutter
+  - gallery_saver_plus (0.0.1):
     - Flutter
   - GoogleUtilities/AppDelegateSwizzler (8.1.0):
     - GoogleUtilities/Environment
@@ -1429,8 +1431,6 @@ PODS:
   - gRPC-Core/Interface (1.69.0)
   - gRPC-Core/Privacy (1.69.0)
   - GTMSessionFetcher/Core (4.5.0)
-  - image_gallery_saver (2.0.2):
-    - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
   - leveldb-library (1.22.6)
@@ -1496,8 +1496,8 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_downloader (from `.symlinks/plugins/flutter_downloader/ios`)
   - flutter_image_compress_common (from `.symlinks/plugins/flutter_image_compress_common/ios`)
-  - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
-  - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
+  - flutter_image_gallery_saver (from `.symlinks/plugins/flutter_image_gallery_saver/ios`)
+  - gallery_saver_plus (from `.symlinks/plugins/gallery_saver_plus/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -1560,10 +1560,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_downloader/ios"
   flutter_image_compress_common:
     :path: ".symlinks/plugins/flutter_image_compress_common/ios"
-  gallery_saver:
-    :path: ".symlinks/plugins/gallery_saver/ios"
-  image_gallery_saver:
-    :path: ".symlinks/plugins/image_gallery_saver/ios"
+  flutter_image_gallery_saver:
+    :path: ".symlinks/plugins/flutter_image_gallery_saver/ios"
+  gallery_saver_plus:
+    :path: ".symlinks/plugins/gallery_saver_plus/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   package_info_plus:
@@ -1611,12 +1611,12 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_downloader: b7301ae057deadd4b1650dc7c05375f10ff12c39
   flutter_image_compress_common: ec1d45c362c9d30a3f6a0426c297f47c52007e3e
-  gallery_saver: 9fc173c9f4fcc48af53b2a9ebea1b643255be542
+  flutter_image_gallery_saver: f356b5f265ba4e36f38b2fe96d0468e0712a6b37
+  gallery_saver_plus: c4b59c605df1049a02d036ef81d82972b6dfd606
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   "gRPC-C++": cc207623316fb041a7a3e774c252cf68a058b9e8
   gRPC-Core: 860978b7db482de8b4f5e10677216309b5ff6330
   GTMSessionFetcher: fc75fc972958dceedee61cb662ae1da7a83a91cf
-  image_gallery_saver: cb43cc43141711190510e92c460eb1655cd343cb
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
