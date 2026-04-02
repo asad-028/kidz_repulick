@@ -160,337 +160,353 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Colors.white,
-        drawer: BaseDrawer(),
-        appBar: AppBar(
-          elevation: 0,
-          centerTitle: false,
-          backgroundColor: Colors.transparent,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [kprimary, kprimary.withOpacity(0.8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-          iconTheme: const IconThemeData(color: kWhite),
-          title: Text(
-            role_ == 'Director' ? 'Campus Dashboard' : 'Principal Home',
-            style: const TextStyle(
-              color: kWhite,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-          actions: [
-            if (role_ == 'Director')
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: IconButton(
-                  onPressed: () => Get.to(CampusSelectionScreen()),
-                  icon: const Icon(Icons.location_city_rounded, color: Colors.white),
-                  tooltip: 'Select Campus',
-                ),
-              ),
-          ],
-        ),
-        body: Container(
+      backgroundColor: Colors.white,
+      drawer: BaseDrawer(),
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            gradient: LinearGradient(
+              colors: [kprimary, kprimary.withOpacity(0.8)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-          child: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: ImageSlideShowfunction(context),
-                      ),
-                      SizedBox(height: mQ.height * 0.012),
-                      Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: Colors.grey.shade200),
-                        ),
-                        color: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: LinearGradient(
-                              colors: [Colors.white, Colors.blue.shade50.withOpacity(0.3)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: kprimary.withOpacity(0.1),
-                                    radius: 24,
-                                    child: Icon(Icons.person_rounded, color: kprimary, size: 28),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          role_ == 'Director' ? 'Campus Overview' : 'Principal Dashboard',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w800,
-                                            fontSize: 20,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${role_}  •  ${table_ == 'tsn_' ? "TSN" : 'KRDC'}",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey.shade600,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const Divider(height: 32),
-                              Row(
-                                children: [
-                                  Icon(Icons.calendar_today_rounded, size: 16, color: Colors.blue.shade700),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    "Today: ${getCurrentDate()}",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.blue.shade700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+        ),
+        iconTheme: const IconThemeData(color: kWhite),
+        title: Text(
+          role_ == 'Director' ? 'Campus Dashboard' : 'Principal Home',
+          style: const TextStyle(
+            color: kWhite,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        actions: [
+          if (role_ == 'Director')
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                onPressed: () => Get.to(CampusSelectionScreen()),
+                icon: const Icon(Icons.location_city_rounded,
+                    color: Colors.white),
+                tooltip: 'Select Campus',
+              ),
+            ),
+        ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: ImageSlideShowfunction(context),
+                  ),
+                  SizedBox(height: mQ.height * 0.012),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    color: Colors.white,
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white,
+                            Colors.blue.shade50.withOpacity(0.3)
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                       ),
-                      SizedBox(height: mQ.height * 0.014),
-                      Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: Colors.grey.shade200),
-                        ),
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.analytics_rounded, color: Colors.blue.shade700, size: 20),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'Attendance Snapshot',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 15,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ],
+                              CircleAvatar(
+                                backgroundColor: kprimary.withOpacity(0.1),
+                                radius: 24,
+                                child: Icon(Icons.person_rounded,
+                                    color: kprimary, size: 28),
                               ),
-                              const SizedBox(height: 16),
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
-                                child: Row(
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildAttendanceLegend(mQ),
-                                    const SizedBox(width: 12),
-                                    classSummary(mQ, "Infant", Colors.amber[50]),
-                                    const SizedBox(width: 8),
-                                    classSummary(mQ, "Toddler", Colors.green[50]),
-                                    const SizedBox(width: 8),
-                                    classSummary(mQ, "Play Group - I", Colors.pink[50]),
-                                    const SizedBox(width: 8),
-                                    classSummary(mQ, "Kinder Garten - I", Colors.blue[50]),
-                                    const SizedBox(width: 8),
-                                    classSummary(mQ, "Kinder Garten - II", Colors.indigo[50]),
+                                    Text(
+                                      role_ == 'Director'
+                                          ? 'Campus Overview'
+                                          : 'Principal Dashboard',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 20,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${role_}  •  ${table_ == 'tsn_' ? "TSN" : 'KRDC'}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                      SizedBox(height: mQ.height * 0.014),
-                      Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 1,
-                        color: Colors.white.withOpacity(0.96),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          const Divider(height: 32),
+                          Row(
                             children: [
-                              const Text(
-                                'Users Overview',
+                              Icon(Icons.calendar_today_rounded,
+                                  size: 16, color: Colors.blue.shade700),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Today: ${getCurrentDate()}",
                                 style: TextStyle(
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 13,
+                                  color: Colors.blue.shade700,
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                width: mQ.width,
-                                child: BadgeScreen(),
                               ),
                             ],
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Text(
-                          'Quick Actions',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            color: Colors.grey.shade800,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      GridView.count(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.85,
+                    ),
+                  ),
+                  SizedBox(height: mQ.height * 0.014),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildActionCard(
-                            context,
-                            'Users',
-                            'useraccountsprincipal.png',
-                            () => Get.to(UserManagementScreen()),
-                            badge: specialbadge(
-                              mQ,
-                              collectionReferenceUsers
-                                  .where('role', isEqualTo: '')
-                                  .where('status', isNotEqualTo: 'Activate'),
-                              Colors.red,
-                              const SizedBox.shrink(),
+                          Row(
+                            children: [
+                              Icon(Icons.analytics_rounded,
+                                  color: Colors.blue.shade700, size: 20),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Attendance Snapshot',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            child: Row(
+                              children: [
+                                _buildAttendanceLegend(mQ),
+                                const SizedBox(width: 12),
+                                classSummary(mQ, "Infant", Colors.amber[50]),
+                                const SizedBox(width: 8),
+                                classSummary(mQ, "Toddler", Colors.green[50]),
+                                const SizedBox(width: 8),
+                                classSummary(
+                                    mQ, "Play Group - I", Colors.pink[50]),
+                                const SizedBox(width: 8),
+                                classSummary(
+                                    mQ, "Kinder Garten - I", Colors.blue[50]),
+                                const SizedBox(width: 8),
+                                classSummary(mQ, "Kinder Garten - II",
+                                    Colors.indigo[50]),
+                              ],
                             ),
-                          ),
-                          _buildActionCard(
-                            context,
-                            'Teachers',
-                            'teacherprincipal.png',
-                            () => Get.to(TeacherManagementScreen()),
-                          ),
-                          _buildActionCard(
-                            context,
-                            'Reports',
-                            'reportprincipal.png',
-                            () => Get.to(ManagerReportSelectChild(reportstatus_: 'Approved')),
-                            badge: checkforwardedreportsandshowbadge(
-                              mQ,
-                              (role_ == "Principal") ? "Forwarded" : "Approved",
-                              (role_ == "Principal") ? Colors.blue : Colors.red,
-                              const SizedBox.shrink(),
-                            ),
-                          ),
-                          _buildActionCard(
-                            context,
-                            'Consent',
-                            'consentprincipal.png',
-                            () => Get.to(ParentConsentScreen(babyid: 'All Consents')),
-                          ),
-                          _buildActionCard(
-                            context,
-                            'Activities',
-                            'addactivity.png',
-                            () => Get.to(ViewBiweeklyActivities()),
-                          ),
-                          _buildActionCard(
-                            context,
-                            'Reminders',
-                            'reminderprincipal.png',
-                            () => Get.to(ParentReminderScreen(babyid_: "All Reminders")),
                           ),
                         ],
                       ),
-                      if (role_ == "Director") ...[
-                        const SizedBox(height: 24),
-                        Center(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.blue.shade200.withOpacity(0.4),
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton.icon(
-                              onPressed: () =>
-                                  Get.to(ManagerAccountsHomeScreen()),
-                              icon: const Icon(Icons.bar_chart_rounded,
-                                  size: 22, color: Colors.white),
-                              label: const Text(
-                                'Campus Accounts',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xff2962FF),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 32, vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                elevation: 0,
-                              ),
+                    ),
+                  ),
+                  SizedBox(height: mQ.height * 0.014),
+                  Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 1,
+                    color: Colors.white.withOpacity(0.96),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Users Overview',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: mQ.width,
+                            child: BadgeScreen(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      'Quick Actions',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.85,
+                    children: [
+                      _buildActionCard(
+                        context,
+                        'Users',
+                        'useraccountsprincipal.png',
+                        () => Get.to(UserManagementScreen()),
+                        badge: specialbadge(
+                          mQ,
+                          collectionReferenceUsers
+                              .where('role', isEqualTo: '')
+                              .where('status', isNotEqualTo: 'Activate'),
+                          Colors.red,
+                          const SizedBox.shrink(),
                         ),
-                      ],
-                      const SizedBox(height: 24),
+                      ),
+                      _buildActionCard(
+                        context,
+                        'Teachers',
+                        'teacherprincipal.png',
+                        () => Get.to(TeacherManagementScreen()),
+                      ),
+                      _buildActionCard(
+                        context,
+                        'Reports',
+                        'reportprincipal.png',
+                        () => Get.to(ManagerReportSelectChild(
+                            reportstatus_: 'Approved')),
+                        badge: checkforwardedreportsandshowbadge(
+                          mQ,
+                          (role_ == "Principal") ? "Forwarded" : "Approved",
+                          (role_ == "Principal") ? Colors.blue : Colors.red,
+                          const SizedBox.shrink(),
+                        ),
+                      ),
+                      _buildActionCard(
+                        context,
+                        'Consent',
+                        'consentprincipal.png',
+                        () =>
+                            Get.to(ParentConsentScreen(babyid: 'All Consents')),
+                      ),
+                      _buildActionCard(
+                        context,
+                        'Activities',
+                        'addactivity.png',
+                        () => Get.to(ViewBiweeklyActivities()),
+                      ),
+                      _buildActionCard(
+                        context,
+                        'Reminders',
+                        'reminderprincipal.png',
+                        () => Get.to(
+                            ParentReminderScreen(babyid_: "All Reminders")),
+                      ),
                     ],
                   ),
-                ),
+                  if (role_ == "Director") ...[
+                    const SizedBox(height: 24),
+                    Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.shade200.withOpacity(0.4),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton.icon(
+                          onPressed: () => Get.to(ManagerAccountsHomeScreen()),
+                          icon: const Icon(Icons.bar_chart_rounded,
+                              size: 22, color: Colors.white),
+                          label: const Text(
+                            'Campus Accounts',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff2962FF),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
           ),
-        );
+        ),
+      ),
+    );
   }
 
-  Widget _buildActionCard(BuildContext context, String title, String image, VoidCallback onTap, {Widget? badge}) {
+  Widget _buildActionCard(
+      BuildContext context, String title, String image, VoidCallback onTap,
+      {Widget? badge}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -703,7 +719,9 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
             );
           }
 
-          if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              !snapshot.data!.exists) {
             return Container(
               width: 80,
               padding: const EdgeInsets.all(8),
@@ -714,7 +732,8 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
               child: Center(
                 child: Text(
                   class_,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 10, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -760,9 +779,11 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
-                _dataRow(classData['strength_'].toString(), Colors.blue.shade700),
+                _dataRow(
+                    classData['strength_'].toString(), Colors.blue.shade700),
                 const SizedBox(height: 4),
-                _dataRow(classData['present_'].toString(), Colors.green.shade700),
+                _dataRow(
+                    classData['present_'].toString(), Colors.green.shade700),
                 const SizedBox(height: 4),
                 _dataRow(classData['absent_'].toString(), Colors.red.shade700),
               ],
@@ -774,11 +795,10 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
           return PopupMenuButton<String>(
             tooltip: 'Class Actions',
             offset: const Offset(0, 40),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             itemBuilder: (context) => subject_
-                .map((item) =>
-                    PopupMenuItem(value: item, child: Text(item)))
+                .map((item) => PopupMenuItem(value: item, child: Text(item)))
                 .toList(),
             onSelected: (selectedItem) async {
               if (await confirm(
@@ -788,13 +808,11 @@ class _PrincipalHomeScreenState extends State<PrincipalHomeScreen> {
                 textOK: const Text('Yes'),
                 textCancel: const Text('No'),
               )) {
-                if (selectedItem == 'Check In' ||
-                    selectedItem == 'Check Out') {
+                if (selectedItem == 'Check In' || selectedItem == 'Check Out') {
                   Get.to(CheckinCheckoutScreen(activityclass_: class_));
                 } else {
                   Get.to(SelectChildsForActivity(
-                      activityclass_: class_,
-                      selectedsubject_: selectedItem));
+                      activityclass_: class_, selectedsubject_: selectedItem));
                 }
               }
             },

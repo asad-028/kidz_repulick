@@ -62,9 +62,9 @@ class SplashController extends GetxController {
       } catch (e) {
         print('Error fetching user data: $e');
       }
-      role_ == 'Director'? Get.to(CampusSelectionScreen()):
+      role_ == 'Director'? Get.offAll(CampusSelectionScreen()):
 
-      Get.off(MainTabs());
+      Get.offAll(MainTabs());
     }
   }
 

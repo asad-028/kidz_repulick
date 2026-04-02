@@ -10,7 +10,7 @@ import 'package:snackbar/snackbar.dart';
 
 import '../../main.dart';
 
-bool ApprovedOnly = false;
+// bool ApprovedOnly = false; // Moved to state class
 
 enum PhotoDateFilter { all, today, threeDays, week, month }
 
@@ -46,6 +46,7 @@ class _GalleryScreenStaffState extends State<GalleryScreenStaff> {
   bool deleteionLoading = false;
   final ScrollController scrollController = ScrollController();
 
+  bool ApprovedOnly = false;
   PhotoDateFilter _selectedFilter = PhotoDateFilter.all;
   bool _selectionMode = false;
   final Set<String> _selectedPhotoIds = {};

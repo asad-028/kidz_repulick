@@ -74,258 +74,291 @@ class _RegistrationFormState extends State<RegistrationForm> {
     return Scaffold(
       backgroundColor: kWhite,
       appBar: AppBar(
-        iconTheme: IconThemeData(color: kWhite),
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: kprimary),
         title: Text(
           'Registration Form',
-          style: TextStyle(color: kWhite),
+          style: k16bold.copyWith(color: kprimary),
         ),
-        backgroundColor: kprimary,
+        backgroundColor: kWhite,
       ),
       bottomNavigationBar: Obx(
         () => registrationFormController.isLoading.value
-            ? Center(child: const CircularProgressIndicator())
-            : SizedBox(
-                width: mQ.width * 0.85,
-                height: mQ.height * 0.065,
+            ? const SizedBox(
+                height: 100, child: Center(child: CircularProgressIndicator()))
+            : Container(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
                 child: PrimaryButton(
                   onPressed: () async {
-                    await uploadimagetocloudstorage(image);
-
-                    registrationFormController.addChildFunction(context);
+                    if (registrationFormController.formKey.currentState!.validate()) {
+                      if (image != null) {
+                        await uploadimagetocloudstorage(image);
+                      }
+                      registrationFormController.addChildFunction(context);
+                    }
                   },
-                  label: "Register",
-                  elevation: 3,
+                  label: "Register Student",
+                  elevation: 5,
                   bgColor: kprimary,
-                  labelStyle:
-                      kTextPrimaryButton.copyWith(fontWeight: FontWeight.w500),
-                  borderRadius: BorderRadius.circular(2.0),
+                  labelStyle: kTextPrimaryButton.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                  ),
+                  borderRadius: BorderRadius.circular(16.0),
                 ),
               ),
       ),
-
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 15),
-          child: Form(
-            key: registrationFormController.formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: mQ.height * 0.03,
-                ),
-                imageloading
-                    ? Container(
-                        width: mQ.width * 0.4,
-                        height: mQ.height * 0.2,
-                        child: Center(child: CircularProgressIndicator()))
-                    : Container(
-                        width: mQ.width * 0.4,
-                        height: mQ.height * 0.2,
-                        child: Image.file(
-                          File(imagefilepath),
-                          fit: BoxFit.fill,
-                        )),
-                IconButton(
-                  icon: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Upload Image'),
-                        Icon(Icons.camera_alt_outlined, size: 30),
-                      ]),
-                  constraints: const BoxConstraints(),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 3, horizontal: 3),
-                  onPressed: () async {
-                    _imageActionSheet(context, 'Student', mQ);
-                    // _imageActionSheet(context, subject!);
-                  },
-                ),
-                Text(
-                  'Basic Information:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                CustomTextField(
-                  controller: registrationFormController.childFullName,
-                  inputType: TextInputType.text,
-                  labelText: "Full name of child",
-                  validators: (String? value) {
-                    if (value!.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
-                ),
-                CustomTextField(
-                  controller: registrationFormController.nameUsuallyKnownBy,
-                  inputType: TextInputType.text,
-                  labelText: "Name usually known by",
-                  validators: (String? value) {
-                    if (value!.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
-                ),
-                Row(
+        child: Column(
+          children: [
+            _buildHeader(mQ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              child: Form(
+                key: registrationFormController.formKey,
+                child: Column(
                   children: [
-                    Expanded(
-                        child: Text(
-                      'Mother’s Details:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                  ],
-                ),
-                CustomTextField(
-                  controller: registrationFormController.mothersName,
-                  inputType: TextInputType.text,
-                  labelText: "Mother’s name",
-                  validators: (String? value) {
-                    if (value!.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
-                ),
-                CustomTextField(
-                  controller: registrationFormController.mothersmobilePhoneNo,
-                  inputType: TextInputType.text,
-                  labelText: "Mobile Phone No",
-                  validators: (String? value) {
-                    if (value!.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
-                ),
-                CustomTextField(
-                  controller: registrationFormController.mothersEmailAddress,
-                  inputType: TextInputType.text,
-                  labelText: "Email Address",
-                  validators: (String? value) {
-                    if (value!.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      'Father’s Details:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                  ],
-                ),
-                CustomTextField(
-                  controller: registrationFormController.fathersName,
-                  inputType: TextInputType.text,
-                  labelText: "Father’s name",
-                  validators: (String? value) {
-                    if (value!.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
-                ),
-                CustomTextField(
-                  controller: registrationFormController.fathersMobileNo,
-                  inputType: TextInputType.text,
-                  labelText: "Mobile Phone No",
-                  validators: (String? value) {
-                    if (value!.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
-                ),
-                CustomTextField(
-                  controller: registrationFormController.fathersEmail,
-                  inputType: TextInputType.text,
-                  labelText: "Email Address",
-                  validators: (String? value) {
-                    if (value!.isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  },
-                ),
-                Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      registrationFormController.selectDate(
-                          "Registration Date", context),
-                      (registrationFormController.datechanged)
-                          ? Text(
-                              '${registrationFormController.getCurrentDate()}')
-                          : Text('${registrationFormController.newdate}')
+                    _buildImagePicker(context),
+                    const SizedBox(height: 24),
+                    _buildSectionHeader("Basic Information"),
+                    _buildSectionCard([
+                      CustomTextField(
+                        controller: registrationFormController.childFullName,
+                        inputType: TextInputType.text,
+                        labelText: "Full name of child",
+                        validators: (String? value) {
+                          if (value!.isEmpty) return 'Required';
+                          return null;
+                        },
+                      ),
+                      CustomTextField(
+                        controller:
+                            registrationFormController.nameUsuallyKnownBy,
+                        inputType: TextInputType.text,
+                        labelText: "Name usually known by",
+                        validators: (String? value) {
+                          return null;
+                        },
+                      ),
                     ]),
-              ],
+                    const SizedBox(height: 16),
+                    _buildSectionHeader("Mother's Details"),
+                    _buildSectionCard([
+                      CustomTextField(
+                        controller: registrationFormController.mothersName,
+                        inputType: TextInputType.text,
+                        labelText: "Mother's name",
+                        validators: (String? value) {
+                          return null;
+                        },
+                      ),
+                      CustomTextField(
+                        controller:
+                            registrationFormController.mothersmobilePhoneNo,
+                        inputType: TextInputType.text,
+                        labelText: "Mobile Phone No",
+                        validators: (String? value) {
+                          return null;
+                        },
+                      ),
+                      CustomTextField(
+                        controller:
+                            registrationFormController.mothersEmailAddress,
+                        inputType: TextInputType.text,
+                        labelText: "Email Address",
+                        validators: (String? value) {
+                          if (value!.isEmpty) return 'Required';
+                          return null;
+                        },
+                      ),
+                    ]),
+                    const SizedBox(height: 16),
+                    _buildSectionHeader("Father's Details"),
+                    _buildSectionCard([
+                      CustomTextField(
+                        controller: registrationFormController.fathersName,
+                        inputType: TextInputType.text,
+                        labelText: "Father's name",
+                        validators: (String? value) {
+                          return null;
+                        },
+                      ),
+                      CustomTextField(
+                        controller: registrationFormController.fathersMobileNo,
+                        inputType: TextInputType.text,
+                        labelText: "Mobile Phone No",
+                        validators: (String? value) {
+                          return null;
+                        },
+                      ),
+                      CustomTextField(
+                        controller: registrationFormController.fathersEmail,
+                        inputType: TextInputType.text,
+                        labelText: "Email Address",
+                        validators: (String? value) {
+                          if (value!.isEmpty) return 'Required';
+                          return null;
+                        },
+                      ),
+                    ]),
+                    const SizedBox(height: 16),
+                    _buildRegistrationDateSection(context),
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
-      // ),
     );
   }
 
-  bool isChecked = true;
+  Widget _buildHeader(Size mQ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      decoration: BoxDecoration(
+        color: kprimary.withOpacity(0.05),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            "Student Registration",
+            style: kMediumTitle.copyWith(color: kprimary),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Please fill in the details below to register a new student",
+            style: kSubTitle.copyWith(fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
 
-  // void _pickFile() async {
-  //   final result = await FilePicker.platform.pickFiles(allowMultiple: false);
-  //   setState(() {
-  //     imageloading = true;
-  //   });
-  //   pickAndUploadImage(result);
-  //   if (result == null) return;
-  //
-  //   final file = result.files.first;
-  //   imagefilepath = result.files.first.path!;
-  //
-  //   uploadimagetocloudstorage(file);
-  //   // Upload to API
-  //   File imageFile = File(file.path!);
-  //   await uploadImageToApi(imageFile);
-  //   // _openFile(file);
-  //   setState(() {
-  //     imageloading = false;
-  //   });
-  // }
-  // Future<void> uploadImageToApi(File imageFile) async {
-  //   var request = http.MultipartRequest(
-  //     'POST',
-  //     Uri.parse('https://app.kidzrepublik.com.pk/api/publik/api/upload'),
-  //   );
-  //
-  //   // Add the file to the request
-  //   request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
-  //
-  //   // Send the request to the server
-  //   var response = await request.send();
-  //
-  //   // Get the response from the server
-  //   if (response.statusCode == 200) {
-  //     // Handle success
-  //     print('Image uploaded successfully to API.');
-  //   } else {
-  //     // Handle error
-  //     print('Image upload to API failed.');
-  //   }
-  // }
+  Widget _buildImagePicker(BuildContext context) {
+    return Center(
+      child: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: grey100,
+              border: Border.all(color: kprimary.withOpacity(0.2), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                )
+              ],
+            ),
+            child: ClipOval(
+              child: imagefilepath.isEmpty
+                  ? Icon(Icons.person, size: 60, color: kGreyColor)
+                  : imageloading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Image.file(
+                          File(imagefilepath),
+                          fit: BoxFit.cover,
+                        ),
+            ),
+          ),
+          InkWell(
+            onTap: () => _imageActionSheet(
+                context, 'Student', MediaQuery.of(context).size),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: kprimary,
+                shape: BoxShape.circle,
+                border: Border.all(color: kWhite, width: 2),
+              ),
+              child: const Icon(Icons.camera_alt, color: kWhite, size: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  // Future<void> pickAndUploadImage(pickedFile) async {
-  //   // final picker = ImagePicker();
-  //   // final pickedFile = await picker.getImage(source: ImageSource.camera);
-  //
-  //   if (pickedFile != null) {
-  //     File imageFile = File(pickedFile.path);
-  //     await uploadImageToApi(imageFile);
-  //   } else {
-  //     print('No image selected.');
-  //   }
-  // }
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 18,
+            decoration: BoxDecoration(
+              color: kprimary,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: k16bold.copyWith(color: kprimary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard(List<Widget> children) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+      ),
+      color: kWhite,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(children: children),
+      ),
+    );
+  }
+
+  Widget _buildRegistrationDateSection(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: kprimary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.calendar_today, color: kprimary, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Registration Date", style: k12500.copyWith(color: kGrey)),
+                Text(
+                  '${registrationFormController.datechanged ? registrationFormController.getCurrentDate() : registrationFormController.newdate}',
+                  style: k14500.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          registrationFormController.selectDate("Change", context),
+        ],
+      ),
+    );
+  }
 
   loadimagefunction(result) async {
     setState(() {
@@ -338,69 +371,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
     });
   }
 
-  // Future<void> uploadImage(File imageFile) async {
-  //   var request = http.MultipartRequest(
-  //     'POST',
-  //     Uri.parse('https://app.kidzrepublik.com.pk/api/publik/api/upload'),
-  //   );
-  //
-  //   // Add the file to the request
-  //   request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
-  //
-  //   // Send the request to the server
-  //   var response = await request.send();
-  //
-  //   // Get the response from the server
-  //   if (response.statusCode == 200) {
-  //     // Handle success
-  //     print('Image uploaded successfully.');
-  //   } else {
-  //     // Handle error
-  //     print('Image upload failed.');
-  //   }
-  // }
-  // uploadimagetocloudstorage(imagefile) async {
-  //   final storageRef = FirebaseStorage.instance.ref();
-  //   final file = File(imagefile.path);
-  //   final metadata = SettableMetadata(contentType: "image/jpeg");
-  //   final filename = "images/${table_ == 'tsn_' ? 'tsn_' : 'krdc'}/${registrationFormController.childFullName.text}${DateTime.now()}";
-  //   final uploadTask = storageRef.child(filename).putFile(file, metadata);
-  //   uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
-  //     switch (taskSnapshot.state) {
-  //       case TaskState.running:
-  //             100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
-  //         break;
-  //       case TaskState.paused:
-  //         print("Upload is paused.");
-  //         break;
-  //       case TaskState.canceled:
-  //         print("Upload was canceled");
-  //         break;
-  //       case TaskState.error:
-  //       // Handle unsuccessful uploads
-  //         break;
-  //       case TaskState.success:
-  //       // Handle successful uploads on complete
-  //       // ...
-  //         setState(() async {
-  //           imageUrl = await storageRef.child(filename).getDownloadURL();
-  //           imageloading = false;
-  //           imagedownloading = true;
-  //         });
-  //
-  //         break;
-  //     }
-  //     ToastContext().init(context);
-  //     Toast.show(
-  //       'Photo uploaded successfully',
-  //       // Get.context,
-  //       duration: 10,  backgroundRadius: 5,
-  //       //gravity: Toast.top,
-  //     );
-  //   });
-  //   // await apiService.uploadimage(file);
-  //
-  // }
   Future<void> _imageActionSheet(BuildContext context, String title, mQ) async {
     showModalBottomSheet(
       context: context,
@@ -460,37 +430,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
     });
   }
 
-  // Future<void> _imageActionSheet(BuildContext context, String title,mQ) async {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return
-  //         Column(
-  //             mainAxisSize: MainAxisSize.min,      children: [
-  //           Text("Take ${title} Picture"),
-  //           Row(crossAxisAlignment: CrossAxisAlignment.center,children: [
-  //             // Image.asset('assets/staff.jpg',width: mQ.width*0.9,height: mQ.height*0.7,),
-  //             Expanded(
-  //               child: ListTile(titleAlignment: ListTileTitleAlignment.center,
-  //                 title:
-  //                 Text('Camera',style: TextStyle(fontSize: 10),textAlign: TextAlign.center),
-  //                 leading:  Icon(Icons.camera_alt_outlined, color: Colors.purple,size: 20,),
-  //                 onTap: () async {_imageActionSheet2(context, title);Navigator.pop(context);},
-  //               ),
-  //             ),
-  //             Expanded(
-  //               child: ListTile(titleAlignment: ListTileTitleAlignment.center,
-  //                 title:
-  //                 Text('Gallery',style: TextStyle(fontSize: 10),),
-  //                 leading:  Icon(Icons.image, color: Colors.cyan, size: 20),
-  //                 onTap: () async {_pickFile();Navigator.pop(context);},
-  //               ),
-  //             ),
-  //           ]),
-  //         ]);
-  //     },
-  //   );
-  // }
   Future<void> _imageActionSheet2(
     BuildContext context,
     String title,
@@ -499,7 +438,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
     if (status.isPermanentlyDenied) {
       openAppSettings();
     } else if (status.isGranted) {
-      camerainitialize();
+      await camerainitialize();
 
       _controller = CameraController(
         firstCamera!,
@@ -565,31 +504,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
                             size: 20,
                           ),
                         ),
-
-                        // FloatingActionButton(
-                        //   onPressed: () async {
-                        //     try {
-                        //       await _initializeControllerFuture;
-                        //       final image =
-                        //       await _controller.takePicture();
-                        //       if (!mounted) return;
-                        //       imagefilepath = image.path;
-                        //       imageloading = true;
-                        //       await GallerySaver.saveImage(imagefilepath);
-                        //       await loadimagefunction(imagefilepath);
-                        //       _controller.dispose();
-                        //       Navigator.pop(context);
-                        //     } catch (e) {
-                        //       print(e);
-                        //     }
-                        //   },
-                        //
-                        //   child: Icon(
-                        //     Icons.camera_alt_outlined,
-                        //     color: Colors.purple,
-                        //     size: 20,
-                        //   ),
-                        // ),
                       ]))));
         },
       );
@@ -616,6 +530,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 
   uploadimagetocloudstorage(imagefile) async {
+    // Guard against null or invalid image before starting upload
+    if (imagefile == null || imagefile.path == null) {
+      ToastContext().init(context);
+      Toast.show(
+        'Please select a valid image before uploading',
+        duration: 3,
+      );
+      return;
+    }
+
     final storageRef = FirebaseStorage.instance.ref();
     showDialog(
       context: context,
@@ -684,35 +608,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
     });
   }
 
-  // void _pickFile() async {
-  //   final result = await FilePicker.platform.pickFiles(allowMultiple: false);
-  //   setState(() {
-  //     imageloading = true;
-  //   });
-  //   if (result == null) return;
-  //
-  //   file = result.files.first;
-  //   imagefilepath = result.files.first.path!;
-  //
-  //
-  //   // Upload to API and get the uploaded image URL
-  //   // File imageFile = File(file.path!);
-  //   await uploadimagetocloudstorage(file);
-  //   // String? imageUrl = await uploadImageToApi(imageFile);
-  //
-  //   // Save the image URL in Firebase Firestore
-  //   // if (imageUrl != null) {
-  //   //   await saveImageLinkToFirestore(imageUrl);
-  //   // }
-  //
-  //   // Optionally, upload to Firebase Storage as well
-  //   // uploadimagetocloudstorage(file);
-  //
-  //   setState(() {
-  //     imageloading = false;
-  //   });
-  // }
-
   Future<String?> uploadImageToApi(File imageFile) async {
     var request = http.MultipartRequest(
       'POST',
@@ -737,17 +632,4 @@ class _RegistrationFormState extends State<RegistrationForm> {
       return null;
     }
   }
-
-  // Future<void> saveImageLinkToFirestore(String imageUrl) async {
-  //   // Replace 'your-collection' with your actual collection name
-  //   CollectionReference collectionRef = FirebaseFirestore.instance.collection('your-collection');
-  //
-  //   // Add the image URL to the Firestore document
-  //   await collectionRef.add({
-  //     'imageUrl': imageUrl,
-  //     'timestamp': Timestamp.now(),
-  //   });
-  //
-  //   print('Image URL saved to Firestore: $imageUrl');
-  // }
 }

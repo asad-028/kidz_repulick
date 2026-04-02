@@ -133,16 +133,19 @@ class _ParentPhotoSlideshowState extends State<ParentPhotoSlideshow> {
                                       height: mQ.height * 0.45,
                                       fit: BoxFit.fill,
                                     )
-                                  : CachedNetworkImage(
-                                      imageUrl: photo['image_'],
-                                      height: mQ.height * 0.45,
-                                      fit: BoxFit.fill,
-                                      placeholder: (context, url) => Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(Icons.error),
-                                    ),
+                                  : (photo['image_'] != null &&
+                                          photo['image_'].isNotEmpty)
+                                      ? CachedNetworkImage(
+                                          imageUrl: photo['image_'],
+                                          height: mQ.height * 0.45,
+                                          fit: BoxFit.fill,
+                                          placeholder: (context, url) => Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
+                                        )
+                                      : const Icon(Icons.error),
                         ),
                       ),
                       Spacer(),

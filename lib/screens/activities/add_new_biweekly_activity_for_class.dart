@@ -35,14 +35,16 @@ class _AddNewBiweeklyActivityForClassState extends State<AddNewBiweeklyActivityF
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.blue[50],
+      backgroundColor: grey100,
       appBar: AppBar(
-        iconTheme: IconThemeData(color: kWhite),
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: kprimary),
         title: Text(
           'BiWeekly Activity',
-          style: TextStyle(color: kWhite,fontSize: 14),
+          style: k16bold.copyWith(color: kprimary),
         ),
-        backgroundColor: kprimary,
+        backgroundColor: kWhite,
       ),
       bottomNavigationBar:
       Obx(
@@ -84,138 +86,161 @@ addNewConsentController.isLoading.value = false;
           children: [
             ImageSlideShowfunction(context),
             SizedBox(height: 3,),
-            Container(padding: EdgeInsets.symmetric(horizontal: mQ.width*0.02),
-              height: mQ.height * 0.03,
-              color: Colors.grey[50],
-              width: mQ.width * 0.98,
-              // padding:mQ ,
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: kWhite,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
+              ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(
-                      'New Activity',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.left,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "New Activity",
+                          style: k16bold.copyWith(color: kprimary),
+                        ),
+                        Text(
+                          "Create a bi-weekly summary for your class",
+                          style: k12500.copyWith(color: kGrey),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
-                  Expanded(
-                    child: Text(textAlign: TextAlign.right,
-                      ' ${getCurrentDateforattendance()}',
-                      style: TextStyle(
-                          fontSize: 10,
-                          fontFamily: 'Comic Sans MS',
-                          fontWeight: FontWeight.normal,
-                          color: Colors.grey),
-                    ),
+                  const SizedBox(width: 8),
+                  Text(
+                    getCurrentDateforattendance(),
+                    style: k12500.copyWith(color: kGrey),
                   ),
                 ],
               ),
             ),
             Obx(
-                  () => addNewConsentController.isLoadingInitial.value
-                  ? Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 4.0, horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      DropdownSearch<String>(
-                        popupProps: PopupProps.menu(
-                          showSelectedItems: true,
-                          disabledItemFn: (String s) => s.startsWith('I'),
+              () => addNewConsentController.isLoadingInitial.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(color: Colors.grey.withOpacity(0.1)),
                         ),
-                        items: list,
-                        dropdownDecoratorProps: DropDownDecoratorProps(
-                          dropdownSearchDecoration: InputDecoration(
-                  // elevation: 16,
-                            labelText:
-                            'select Activity',
-                            // teacherAssignments[index][i],
-                            hintText:
-                            'select Activity',
-                  hintStyle: const TextStyle(color: Colors.deepPurple),
-                  // icon: const Icon(Icons.arrow_downward),
-                            // teacherAssignments[index][i],
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Activity Details",
+                                  style: k14500.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: kBlackColor)),
+                              const SizedBox(height: 16),
+                              DropdownSearch<String>(
+                                popupProps: PopupProps.menu(
+                                  showSelectedItems: true,
+                                ),
+                                items: list,
+                                dropdownDecoratorProps: DropDownDecoratorProps(
+                                  dropdownSearchDecoration: InputDecoration(
+                                    labelText: 'Select ActivityType',
+                                    hintText: 'Select Activity',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.withOpacity(0.3)),
+                                    ),
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    dropdownValue = value!;
+                                  });
+                                },
+                                selectedItem: dropdownValue,
+                              ),
+                              const SizedBox(height: 16),
+                              if (role_ == "Teacher")
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: kprimary.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    'Class: $teachersClass_',
+                                    style: k14500.copyWith(color: kprimary),
+                                  ),
+                                )
+                              else
+                                DropdownButtonFormField(
+                                  value: dropdownValueClasses,
+                                  decoration: InputDecoration(
+                                    labelText: 'Select Class',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.arrow_drop_down),
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      dropdownValueClasses = value!;
+                                    });
+                                  },
+                                  items: classes_
+                                      .map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                ),
+                              const SizedBox(height: 16),
+                              CustomTextField(
+                                controller: addNewConsentController.title_,
+                                inputType: TextInputType.text,
+                                labelText: "Title",
+                                validators: (String? value) {
+                                  if (value!.isEmpty) return 'Required';
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                              CustomTextField(
+                                controller: addNewConsentController.description_,
+                                inputType: TextInputType.multiline,
+                                maxLines: 3,
+                                labelText: "Description",
+                                validators: (String? value) {
+                                  if (value!.isEmpty) return 'Required';
+                                  return null;
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                        onChanged: (value) {
-                          setState(() {
-                            dropdownValue = value!;
-                          });
-                        },
-                        selectedItem:
-                        dropdownValue,
-                        // teacherAssignments[index][i],
                       ),
-
-
-                      SizedBox(
-                        height: mQ.height * 0.02,
-                      ),
-                      (role_ == "Teacher") ?
-                        Text('${teachersClass_}')
-                       :
-                      DropdownButtonFormField(
-                  value: dropdownValueClasses,
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  onChanged: (String? value) {
-                    // This is called when the user selects an item.
-                    setState(() {
-                    dropdownValueClasses = value!;
-                    });
-                  },
-                  items: classes_.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                      SizedBox(
-                        height: mQ.height * 0.02,
-                      ),
-                      CustomTextField(
-                        enabled: true,
-                        controller: addNewConsentController.title_,
-                        inputType: TextInputType.text,
-                        labelText: "Title",
-                        validators: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'Required';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(
-                        height: mQ.height * 0.02,
-                      ),
-                      CustomTextField(
-                        enabled: true,
-                        controller: addNewConsentController.description_,
-                        inputType: TextInputType.multiline,
-                        maxLines: 2,
-                        labelText: "Description",
-                        validators: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'Required';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(
-                        height: mQ.height * 0.005,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
             ),
-            SizedBox(height: mQ.height*0.5,),
-            ],
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );

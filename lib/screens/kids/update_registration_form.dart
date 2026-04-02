@@ -118,7 +118,9 @@ class _UpdateRegistrationFormState extends State<UpdateRegistrationForm> {
                     : Container(
                         width: mQ.width * 0.4,
                         height: mQ.height * 0.2,
-                        child: Image.network(imageUrl!)),
+                        child: (imageUrl != null && imageUrl!.isNotEmpty) 
+                            ? Image.network(imageUrl!) 
+                            : Icon(Icons.person, size: 80, color: Colors.grey)),
                 IconButton(
                   icon: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -482,7 +484,7 @@ class _UpdateRegistrationFormState extends State<UpdateRegistrationForm> {
           updateRegistrationFormController.nameUsuallyKnownBy.text =
               snapshot.get('nameusuallyknownby');
           updateRegistrationFormController.dateofBirth.value =
-              snapshot.get("dateofBirth");
+              snapshot.data().toString().contains('dateofBirth') ? snapshot.get("dateofBirth") : '';
           // updateRegistrationFormController.   gender.text=snapshot.get("gender");
           // updateRegistrationFormController.  address.text=snapshot.get("address");
           // updateRegistrationFormController.  postCode.text=snapshot.get("postCode");

@@ -89,6 +89,7 @@ class _ViewBiweeklyActivitiesState extends State<ViewBiweeklyActivities> {
           ),
           child: SafeArea(
             child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(), // Add this
               padding:
                   const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
               child: Column(
@@ -449,170 +450,222 @@ class _ViewBiweeklyActivitiesState extends State<ViewBiweeklyActivities> {
         TextEditingController(text: activity_);
     TextEditingController description_text_controller =
         TextEditingController(text: description);
+
+    // Add these focus nodes to manage keyboard better
+    FocusNode activityFocusNode = FocusNode();
+    FocusNode descriptionFocusNode = FocusNode();
+
     return showDialog(
       context: context,
+      barrierDismissible: true, // Allow tapping outside to close
       builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: EdgeInsets.all(10),
-
-          // title:
-          child: Container(
-            padding: EdgeInsets.all(18),
-            width: double.infinity,
-            height: mQ.height * 0.45,
-            // color: grey100,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.grey.shade100),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "Assign Activity",
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                          alignment: Alignment.topRight,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon:
-                              Icon(Icons.close, size: 14, color: Colors.black)),
-                    ),
-                  ],
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: EdgeInsets.all(10),
+              child: Container(
+                padding: EdgeInsets.all(18),
+                width: double.infinity,
+                height: mQ.height *
+                    0.55, // Increased height to accommodate keyboard
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.grey.shade100,
                 ),
-                // content:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(
-                    'Subject',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-                  ),
-                  TextField(
-                    maxLines: 2,
-                    controller: activity_text_controller,
-                    enabled: _isEnable,
-                  ),
-                ]),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Description',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.normal),
-                    ),
-                    TextField(
-                      controller: description_text_controller,
-                      maxLines: 4,
-                      enabled: _isEnable,
-                    ),
-                  ],
-                ),
-                // actions: [
-                (_isEnable)
-                    ? Expanded(
-                        child: IconButton(
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Assign Activity",
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: IconButton(
+                            alignment: Alignment.topRight,
                             onPressed: () {
-                              collectionReferenceBiweekly
-                                  .doc(documentId)
-                                  .update({
-                                "title_": activity_text_controller.text,
-                                "description_":
-                                    description_text_controller.text,
-                              });
-                              Navigator.of(context).pop();
+                              Navigator.pop(context);
                             },
-                            icon: Icon(
-                              Icons.save,
-                              color: Colors.green,
-                            )),
-                      )
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                            Expanded(child: Text('Send to: ')),
-                            Expanded(
-                              child: PopupMenuButton<String>(
-                                child: Text('Class',
-                                    style: TextStyle(color: Colors.blue[900])),
-                                itemBuilder: (BuildContext context) {
-                                  return classes_.map((String item) {
-                                    return PopupMenuItem<String>(
-                                      value: item,
-                                      child: Text(item),
-                                    );
-                                  }).toList();
-                                },
-                                onSelected: (String selectedItem) async {
-                                  // Handle the selected item
-                                  await confirm(
+                            icon: Icon(Icons.close,
+                                size: 14, color: Colors.black),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        // Wrap in SingleChildScrollView
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 10),
+                            Text(
+                              'Subject',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.normal),
+                            ),
+                            TextField(
+                              controller: activity_text_controller,
+                              focusNode: activityFocusNode,
+                              enabled: _isEnable,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              'Description',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.normal),
+                            ),
+                            TextField(
+                              controller: description_text_controller,
+                              focusNode: descriptionFocusNode,
+                              maxLines: 4,
+                              enabled: _isEnable,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            if (!_isEnable) ...[
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Send to: ',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: PopupMenuButton<String>(
+                                      child: Text(
+                                        'Class',
+                                        style:
+                                            TextStyle(color: Colors.blue[900]),
+                                      ),
+                                      itemBuilder: (BuildContext context) {
+                                        return classes_.map((String item) {
+                                          return PopupMenuItem<String>(
+                                            value: item,
+                                            child: Text(item),
+                                          );
+                                        }).toList();
+                                      },
+                                      onSelected: (String selectedItem) async {
+                                        Navigator.pop(
+                                            context); // Close dialog first
+                                        bool confirmed = await confirm(
                                           title: Text("Activity"),
                                           textOK: Text('Yes'),
                                           textCancel: Text('No'),
-                                          context)
-                                      ? addConsentStatementToClass(
-                                          selectedItem,
-                                          childData['title_'],
-                                          childData['description_'])
-                                      : null;
-                                  // Toast.show('Record added successfully',backgroundColor: Colors.black12,duration: 10 );
-                                },
+                                          context,
+                                        );
+                                        if (confirmed) {
+                                          addConsentStatementToClass(
+                                              selectedItem,
+                                              childData['title_'],
+                                              childData['description_']);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: TextButton(
+                                      child: Text('All Students'),
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                        bool confirmed = await confirm(
+                                          title: Text("Activity"),
+                                          textOK: Text('Yes'),
+                                          textCancel: Text('No'),
+                                          context,
+                                        );
+                                        if (confirmed) {
+                                          addConsentStatementToClass(
+                                              'All Students',
+                                              childData['title_'],
+                                              childData['description_']);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: TextButton(
+                                      child: Text('All Present'),
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                        bool confirmed = await confirm(
+                                          title: Text("Activity"),
+                                          textOK: Text('Yes'),
+                                          textCancel: Text('No'),
+                                          context,
+                                        );
+                                        if (confirmed) {
+                                          addConsentStatementToClass(
+                                              'All Present',
+                                              childData['title_'],
+                                              childData['description_']);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Expanded(
-                              child: TextButton(
-                                  child: Text('All Students'),
-                                  onPressed: () async {
-                                    await confirm(
-                                            title: Text("Activity"),
-                                            textOK: Text('Yes'),
-                                            textCancel: Text('No'),
-                                            context)
-                                        ? addConsentStatementToClass(
-                                            'All Students',
-                                            childData['title_'],
-                                            childData['description_'])
-                                        : Null;
-                                    print(childData['title_']);
-                                    // Get.to(RequireConsentOfParent(childData['title_'], childData['description_'],));
-                                  }),
-                            ),
-                            Expanded(
-                              child: TextButton(
-                                  child: Text('All Present'),
-                                  onPressed: () async {
-                                    await confirm(
-                                            title: Text("Activity"),
-                                            textOK: Text('Yes'),
-                                            textCancel: Text('No'),
-                                            context)
-                                        ? addConsentStatementToClass(
-                                            'All Present',
-                                            childData['title_'],
-                                            childData['description_'])
-                                        : Null;
-                                    print(childData['title_']);
-                                    // Get.to(RequireConsentOfParent(childData['title_'], childData['description_'],));
-                                  }),
-                            ),
-                          ]),
-              ],
-            ),
-          ),
-          // ],
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_isEnable)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            collectionReferenceBiweekly.doc(documentId).update({
+                              "title_": activity_text_controller.text,
+                              "description_": description_text_controller.text,
+                            });
+                            Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            minimumSize: Size(double.infinity, 40),
+                          ),
+                          child: Text(
+                            'Save',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
-    );
+    ).then((_) {
+      // Clean up focus nodes when dialog closes
+      activityFocusNode.dispose();
+      descriptionFocusNode.dispose();
+    });
   }
 
   showEditingDialog11(documentId, activity_, description, subject, class_) {

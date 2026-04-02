@@ -214,8 +214,12 @@ class _SelectChildForGenerateSlipState extends State<SelectChildForGenerateSlip>
                               shape: BoxShape.circle,
                               image: DecorationImage(
                                   alignment: FractionalOffset.topCenter,
-                                  image: CachedNetworkImageProvider(
-                                      childData['picture']),
+                                  image: (childData['picture'] != null &&
+                                          childData['picture'].isNotEmpty)
+                                      ? CachedNetworkImageProvider(
+                                          childData['picture'])
+                                      : const AssetImage('assets/staff.jpg')
+                                          as ImageProvider,
                                   fit: BoxFit.fitHeight),
                             ),
                           ),

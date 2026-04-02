@@ -17,7 +17,7 @@ class CustomTextField extends StatelessWidget {
   final String labelText;
   final TextEditingController controller;
   final TextInputType inputType;
-  final Function(String)? validators;
+  final String? Function(String?)? validators;
   // final ValueChanged<String>? onChanged;
   final int maxLines; // New property for maxLines
 
@@ -53,7 +53,7 @@ class CustomTextField extends StatelessWidget {
               borderSide: BorderSide(color: Colors.grey[400]!, width: 0.8),
             ),
           ),
-          validator: validators as String? Function(String?)?,
+          validator: validators,
         ),
         SizedBox(height: MediaQuery.of(context).size.height * 0.004,)
        ],

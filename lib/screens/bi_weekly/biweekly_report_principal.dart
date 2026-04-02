@@ -8,6 +8,8 @@ import 'package:kids_republik/main.dart';
 import 'package:kids_republik/utils/const.dart';
 import 'package:snackbar/snackbar.dart';
 
+import '../widgets/primary_button.dart';
+
 bool isLoading = true;
 bool showRecord = false;
 List<String> dateRanges = []; // List to store date ranges
@@ -63,644 +65,26 @@ class _BiWeeklyReportPrincipalScreenState
   }
 
   bool deleteionLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
 
     return Scaffold(
-      bottomNavigationBar: (role_ == "Principal")
-          ? Container(
-              color: kprimary,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Approve', style: TextStyle(color: Colors.white)),
-                  IconButton(
-                    icon: Icon(
-                      Icons.done_all,
-                      size: 24,
-                      color: Colors.white,
-                    ),
-                    onPressed: () async => {
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (BuildContext context) => Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              ),
-                      await confirm(title: Text('Approve Report', style: TextStyle(fontSize: 12)), content: Text('Do you want to Aapprove?', style: TextStyle(fontSize: 12)), textOK: Text('Yes'), textCancel: Text('No'), context) ? updateDocumentsWithStatusForwarded(widget.babyID_, "Forwarded", "Approved", context) : Get.back(),
-                    },
-                  ),
-                ],
-              ),
-            )
-          : (role_ == "Parent")
-              ? Container(
-                  color: kprimary,
-                  child: TextButton(
-                    onPressed: () async {
-                      await collectionReferenceReports.doc(widget.babyID_).update(
-                          {"BiWeekly_Approved": 0});
-                      await FirebaseFirestore.instance
-                          .collection(Activity)
-                          .doc(selectedItemDocumentId)
-                          .update({'parentfeedback_': "Seen"})
-                          .then((_) => print(
-                              'Status updated to Approved $selectedItemDocumentId'))
-                          .catchError((error) =>
-                              print('Failed to update status: $error '));
-                      Get.back();
-                    },
-                    child: Text('Close',
-                        style: TextStyle(fontSize: 12, color: Colors.white)),
-                  ),
-                )
-              : (role_ == "Director")
-                  ? Container(
-                      color: kprimary,
-                      child: TextButton(
-                        onPressed: () async {
-                          await collectionReferencebabydata
-                              .doc(widget.babyID_)
-                              .update({'directorremarks_': "Seen"});
-                          Navigator.pop(context);
-                        },
-                        child: Text('Close',
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.white)),
-                      ))
-                  : Container(),
+      backgroundColor: grey100,
+      bottomNavigationBar: _buildBottomActions(context),
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
+          children: [
+            _buildHeader(mQ),
             Padding(
-              padding: EdgeInsets.only(
-                  left: 8.0, bottom: 2.0, right: 8.0, top: 28.0),
-              child: Container(
-                color: Colors.brown[50],
-                child: Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding:
-                              EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
-                          child: SizedBox(
-                            width: mQ.width * 0.1,
-                            height: mQ.height * 0.05,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: CachedNetworkImageProvider(
-                                    widget.babypicture_,
-                                  ),
-                                  fit: BoxFit.fitWidth,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          width: mQ.width * 0.45,
-                          height: mQ.height * 0.05,
-                          child: Column(
-                            children: [
-                              Text('BI-WEEKLY ACTIVITIES',
-                                  style: TextStyle(
-                                      fontSize: mQ.height * 0.018,
-                                      fontWeight: FontWeight.bold)),
-                              Text('(Academic Session 2024-2025)',
-                                  style: TextStyle(
-                                      fontSize: mQ.height * 0.013,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.centerRight,
-                          width: mQ.width * 0.1,
-                          height: mQ.height * 0.05,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: AssetImage(
-                                'assets/logo.png',
-                              ),
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(" ${(widget.name_)}",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: mQ.height * 0.02,
-                                fontFamily: 'Comic Sans MS',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue)),
-                      ],
-                    ),
-                    StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection(Activity)
-                          .where('child', isEqualTo: widget.babyID_)
-                          .where('category_', isEqualTo: 'BiWeeklyReport')
-                          .where("biweeklystatus_",
-                              isEqualTo: (role_ == 'Principal')
-                                  ? "Forwarded"
-                                  : "Approved")
-                          .orderBy('forwardDate', descending: true)
-                          .limit((role_ == 'Principal') ? 1 : 2)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        var docs = snapshot.data!.docs;
-                        if (docs.isEmpty) {
-                          return Text('No new BiWeekly activities.');
-                        }
-                        dateRanges.clear();
-                        dateRangeData.clear();
-                        for (var activity in docs) {
-                          print(
-                              '${activity['dateRange']} ${activity['forwardDate']}');
-                          var dateRange = activity['dateRange'];
-                          var documentId = activity.id;
-                          var checkedInCount = activity['checkedin'];
-                          var absentCount = activity['absent'];
-                          if (!dateRanges.contains(dateRange)) {
-                            dateRanges.add(dateRange);
-                            if (dateRanges.isNotEmpty) {
-                              dateRangeData.add({
-                                'dateRange': dateRange,
-                                'checkedInCount': checkedInCount,
-                                'absentCount': absentCount,
-                                'documentId': documentId,
-                              });
-                            }
-                          }
-                        }
-                        selectedDateRange =
-                            selectedDateRange ?? dateRanges.first;
-                        final selectedData2 = dateRangeData.firstWhere(
-                          (element) =>
-                              element['dateRange'] == selectedDateRange,
-                          orElse: () =>
-                              {}, // Return an empty map instead of null
-                        );
-                        checkedInCount = selectedData2[
-                            'checkedInCount']; // Handle potential missing value
-                        absentCount = selectedData2[
-                            'absentCount']; // Handle potential missing value
-                        selectedItemDocumentId = selectedData2['documentId'];
-                        return StreamBuilder<QuerySnapshot>(
-                          stream:
-                              // condition
-                              (showRecord)
-                                  ? collectionReference
-                                      .where('id', isEqualTo: widget.babyID_)
-                                      .where('category_', isEqualTo: 'BiWeekly')
-                                      .where('BiWeeklyReport',
-                                          isEqualTo: selectedDateRange)
-                                      .snapshots()
-                                  : collectionReference
-                                      .where('id', isEqualTo: widget.babyID_)
-                                      .where('BiWeeklyReport',
-                                          isEqualTo: selectedDateRange)
-                                      .where('category_', isEqualTo: 'BiWeekly')
-                                      // .where('biweeklystatus_', isEqualTo: role_ == 'Principal' ? 'Forwarded' :'Approved')
-                                      // .where(condition)
-                                      .snapshots(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: Padding(
-                                  padding:
-                                      EdgeInsets.only(top: mQ.height * 0.3),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            }
-                            if (snapshot.hasError) {
-                              return Center(
-                                  child: Text('Error: ${snapshot.error}'));
-                            }
-                            if (!snapshot.hasData ||
-                                snapshot.data!.docs.isEmpty) {
-                              return Center(
-                                child: Padding(
-                                    padding:
-                                        EdgeInsets.only(top: mQ.height * 0.3),
-                                    child: Text('No Data')),
-                              );
-                            }
-
-                            Map<String, List<Map<String, dynamic>>>
-                                groupedActivities = {};
-                            snapshot.data!.docs.forEach((activity) {
-                              String subject = activity['Subject'];
-                              if (groupedActivities.containsKey(subject)) {
-                                groupedActivities[subject]!.add({
-                                  'id': activity.id,
-                                  'Activity': activity['Activity'],
-                                  'description': activity['description'],
-                                  'date_': activity['date_'],
-                                  'time_': activity['time_'],
-                                  'biweeklystatus_':
-                                      activity['biweeklystatus_'],
-                                  'isChecked':
-                                      false, // Initialize isChecked field for checkboxes
-                                });
-                              } else {
-                                groupedActivities[subject] = [
-                                  {
-                                    'id': activity.id,
-                                    'Activity': activity['Activity'],
-                                    'description': activity['description'],
-                                    'date_': activity['date_'],
-                                    'time_': activity['time_'],
-                                    'biweeklystatus_':
-                                        activity['biweeklystatus_'],
-                                    'isChecked':
-                                        false, // Initialize isChecked field for checkboxes
-                                  }
-                                ];
-                              }
-                            });
-
-                            return Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(
-                                          left: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.02),
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.035,
-                                      child: DropdownButton<String>(
-                                        value: selectedDateRange,
-                                        onChanged: (newValue) {
-                                          if (newValue != null &&
-                                              newValue != 'Select Date Range') {
-                                            setState(() {
-                                              selectedDateRange = newValue;
-                                              final selectedData =
-                                                  dateRangeData.firstWhere(
-                                                (element) =>
-                                                    element['dateRange'] ==
-                                                    newValue,
-                                                orElse: () =>
-                                                    {}, // Return an empty map instead of null
-                                              );
-                                              checkedInCount = selectedData[
-                                                  'checkedInCount']; // Handle potential missing value
-                                              absentCount = selectedData[
-                                                  'absentCount']; // Handle potential missing value
-                                              selectedItemDocumentId =
-                                                  selectedData['documentId'];
-                                              showRecord =
-                                                  role_ != 'Principal';
-                                            });
-                                          }
-                                        },
-                                        items: [
-                                          DropdownMenuItem<String>(
-                                            value: 'Select Date Range',
-                                            child: Text(
-                                              'Select Date Range',
-                                              style:
-                                                  TextStyle(color: Colors.grey),
-                                            ),
-                                            enabled: false,
-                                          ),
-                                          ...dateRanges
-                                              .map<DropdownMenuItem<String>>(
-                                                  (String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(
-                                                value,
-                                                textAlign: TextAlign.left,
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.013),
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Text('Days Present: $checkedInCount',
-                                              textAlign: TextAlign.right,
-                                              style: TextStyle(
-                                                  color: Colors.blue[900],
-                                                  fontSize: mQ.height * 0.013)),
-                                          Spacer(),
-                                          Text('Absent: $absentCount',
-                                              textAlign: TextAlign.right,
-                                              style: TextStyle(
-                                                  color: Colors.red[900],
-                                                  fontSize: mQ.height * 0.013)),
-                                        ],
-                                      ),
-                                    ),
-                                    role_ == "Principal"
-                                        ? IconButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: Text(
-                                                        'Update Attendance'),
-                                                    content: StatefulBuilder(
-                                                      builder:
-                                                          (BuildContext context,
-                                                              StateSetter
-                                                                  setState) {
-                                                        return Form(
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              DropdownButtonFormField<
-                                                                  String>(
-                                                                value:
-                                                                    selectedDateRange,
-                                                                onChanged:
-                                                                    (newValue) {
-                                                                  setState(() {
-                                                                    selectedDateRange =
-                                                                        newValue!;
-                                                                    final selectedData =
-                                                                        dateRangeData
-                                                                            .firstWhere(
-                                                                      (element) =>
-                                                                          element[
-                                                                              'dateRange'] ==
-                                                                          newValue,
-                                                                    );
-                                                                    checkedInCount =
-                                                                        selectedData[
-                                                                            'checkedInCount'];
-                                                                    absentCount =
-                                                                        selectedData[
-                                                                            'absentCount'];
-                                                                  });
-                                                                },
-                                                                items: dateRanges
-                                                                    .map((String
-                                                                        value) {
-                                                                  return DropdownMenuItem<
-                                                                      String>(
-                                                                    value:
-                                                                        value,
-                                                                    child: Text(
-                                                                        value),
-                                                                  );
-                                                                }).toList(),
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  labelText:
-                                                                      'Select Date Range',
-                                                                ),
-                                                              ),
-                                                              TextFormField(
-                                                                initialValue:
-                                                                    checkedInCount
-                                                                        .toString(),
-                                                                onChanged:
-                                                                    (value) {
-                                                                  checkedInCount =
-                                                                      int.parse(
-                                                                          value);
-                                                                },
-                                                                keyboardType:
-                                                                    TextInputType
-                                                                        .number,
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  labelText:
-                                                                      'Present days',
-                                                                ),
-                                                              ),
-                                                              TextFormField(
-                                                                initialValue:
-                                                                    absentCount
-                                                                        .toString(),
-                                                                onChanged:
-                                                                    (value) {
-                                                                  absentCount =
-                                                                      int.parse(
-                                                                          value);
-                                                                },
-                                                                keyboardType:
-                                                                    TextInputType
-                                                                        .number,
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  labelText:
-                                                                      'Absent days',
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                    actions: <Widget>[
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Get.back();
-                                                        },
-                                                        child: Text('Cancel'),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          // Implement logic to update Firestore data
-                                                          updateFirestoreData(
-                                                              selectedDateRange,
-                                                              checkedInCount,
-                                                              absentCount);
-                                                          Get.back();
-                                                        },
-                                                        child: Text('Update'),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                            icon: Icon(Icons.edit, size: 16),
-                                          )
-                                        : Container(),
-                                  ],
-                                ),
-                                Container(
-                                  color: Colors.blue[50],
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children:
-                                        groupedActivities.entries.map((entry) {
-                                      return Column(
-                                        children: [
-                                          Container(
-                                            width: mQ.width * 0.96,
-                                            color: Colors.grey[50],
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 8.0),
-                                              child: Text(
-                                                '${entry.key}',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.blue,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            width: mQ.width * 0.94,
-                                            color: Colors.pinkAccent[50],
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children:
-                                                  entry.value.map((activity) {
-                                                return (activity[
-                                                                'biweeklystatus_'] !=
-                                                            'Approved' &&
-                                                        role_ == 'Parent')
-                                                    ? Container()
-                                                    : Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Expanded(
-                                                                child: Text(
-                                                                  '${activity['Activity']}',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Spacer(),
-                                                              (role_ ==
-                                                                      "Parent")
-                                                                  ? Container()
-                                                                  : InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        showEditingDialog(
-                                                                          activity[
-                                                                              'id'],
-                                                                          activity[
-                                                                              'Activity'],
-                                                                          activity[
-                                                                              'description'],
-                                                                          entry
-                                                                              .key,
-                                                                          activity[
-                                                                              'biweeklystatus_'],
-                                                                        );
-                                                                      },
-                                                                      child: Icon(
-                                                                          Icons
-                                                                              .edit),
-                                                                    ),
-                                                              (role_ ==
-                                                                      "Parent")
-                                                                  ? Container()
-                                                                  : activity['biweeklystatus_'] ==
-                                                                          'Approved'
-                                                                      ? Icon(
-                                                                          Icons
-                                                                              .done_all_sharp,
-                                                                          color:
-                                                                              Colors.blue[900],
-                                                                        )
-                                                                      : activity['biweeklystatus_'] ==
-                                                                              'Forwarded'
-                                                                          ? Icon(
-                                                                              Icons.done_all,
-                                                                              color: Colors.grey,
-                                                                            )
-                                                                          : Icon(
-                                                                              Icons.done_outlined,
-                                                                              color: Colors.grey,
-                                                                            ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        4.0),
-                                                            child: Text(
-                                                              '${activity['description']}',
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w300,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      );
-                                              }).toList(),
-                                            ),
-                                          ),
-                                          SizedBox(height: 8),
-                                        ],
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  _buildAttendanceSummary(mQ),
+                  const SizedBox(height: 16),
+                  _buildReportContent(mQ),
+                ],
               ),
             ),
           ],
@@ -709,221 +93,680 @@ class _BiWeeklyReportPrincipalScreenState
     );
   }
 
+  Widget _buildHeader(Size mQ) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(
+          top: mQ.height * 0.06, bottom: 24, left: 16, right: 16),
+      decoration: BoxDecoration(
+        color: kprimary,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: kWhite, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                )
+              ],
+            ),
+            child: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: widget.babypicture_,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(
+                  color: kWhite,
+                  strokeWidth: 2,
+                )),
+                errorWidget: (context, url, error) =>
+                    const Icon(Icons.person, size: 40, color: kWhite),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            widget.name_,
+            style: kMediumTitle.copyWith(color: kWhite),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Bi-Weekly Report',
+            style: k14500.copyWith(color: kWhite.withOpacity(0.9)),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '(Academic Session 2024-2025)',
+            style: kGrey15500.copyWith(color: kWhite.withOpacity(0.7)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAttendanceSummary(Size mQ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildAttendanceItem(
+                  Icons.check_circle_outline,
+                  "Days Present",
+                  checkedInCount.toString(),
+                  kSuccessColor,
+                ),
+              ),
+              Container(width: 1, height: 40, color: grey100),
+              Expanded(
+                child: _buildAttendanceItem(
+                  Icons.cancel_outlined,
+                  "Absent",
+                  absentCount.toString(),
+                  kRedColor,
+                ),
+              ),
+              if (role_ == "Principal")
+                IconButton(
+                  onPressed: _showAttendanceUpdateDialog,
+                  icon: Icon(Icons.edit_note, color: kprimary, size: 28),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAttendanceItem(
+      IconData icon, String label, String value, Color color) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 16),
+            const SizedBox(width: 4),
+            Text(label, style: k12500.copyWith(color: kGrey)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(value, style: k16bold.copyWith(color: color)),
+      ],
+    );
+  }
+
+  Widget _buildReportContent(Size mQ) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection(Activity)
+          .where('child', isEqualTo: widget.babyID_)
+          .where('category_', isEqualTo: 'BiWeeklyReport')
+          .where("biweeklystatus_",
+              isEqualTo: (role_ == 'Principal') ? "Forwarded" : "Approved")
+          .orderBy('forwardDate', descending: true)
+          .limit((role_ == 'Principal') ? 1 : 10)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return _buildEmptyState();
+        }
+
+        var docs = snapshot.data!.docs;
+        _updateDateRanges(docs);
+
+        return Column(
+          children: [
+            _buildDateRangeSelector(mQ),
+            const SizedBox(height: 16),
+            _buildActivityStreams(mQ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _updateDateRanges(List<QueryDocumentSnapshot> docs) {
+    dateRanges.clear();
+    dateRangeData.clear();
+    for (var activity in docs) {
+      var dateRange = activity['dateRange'];
+      if (!dateRanges.contains(dateRange)) {
+        dateRanges.add(dateRange);
+        dateRangeData.add({
+          'dateRange': dateRange,
+          'checkedInCount': activity['checkedin'],
+          'absentCount': activity['absent'],
+          'documentId': activity.id,
+        });
+      }
+    }
+    selectedDateRange ??= dateRanges.first;
+    final selectedData = dateRangeData.firstWhere(
+      (element) => element['dateRange'] == selectedDateRange,
+      orElse: () => {},
+    );
+    if (selectedData.isNotEmpty) {
+      checkedInCount = selectedData['checkedInCount'];
+      absentCount = selectedData['absentCount'];
+      selectedItemDocumentId = selectedData['documentId'];
+    }
+  }
+
+  Widget _buildDateRangeSelector(Size mQ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: selectedDateRange,
+          isExpanded: true,
+          icon: Icon(Icons.keyboard_arrow_down, color: kprimary),
+          onChanged: (newValue) {
+            if (newValue != null) {
+              setState(() {
+                selectedDateRange = newValue;
+                final selectedData = dateRangeData.firstWhere(
+                  (element) => element['dateRange'] == newValue,
+                  orElse: () => {},
+                );
+                if (selectedData.isNotEmpty) {
+                  checkedInCount = selectedData['checkedInCount'];
+                  absentCount = selectedData['absentCount'];
+                  selectedItemDocumentId = selectedData['documentId'];
+                }
+              });
+            }
+          },
+          items: dateRanges.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value, style: k14500),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActivityStreams(Size mQ) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: collectionReference
+          .where('id', isEqualTo: widget.babyID_)
+          .where('BiWeeklyReport', isEqualTo: selectedDateRange)
+          .where('category_', isEqualTo: 'BiWeekly')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(
+              child: Text('No activities found for this period.'));
+        }
+
+        Map<String, List<Map<String, dynamic>>> groupedActivities = {};
+        for (var activity in snapshot.data!.docs) {
+          String subject = activity['Subject'];
+          groupedActivities.putIfAbsent(subject, () => []);
+          groupedActivities[subject]!.add({
+            'id': activity.id,
+            'Activity': activity['Activity'],
+            'description': activity['description'],
+            'biweeklystatus_': activity['biweeklystatus_'],
+          });
+        }
+
+        return Column(
+          children: groupedActivities.entries.map((entry) {
+            return _buildActivityCard(entry.key, entry.value, mQ);
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildActivityCard(
+      String subject, List<Map<String, dynamic>> activities, Size mQ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: kprimary.withOpacity(0.1),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Text(
+              subject,
+              style:
+                  k14500.copyWith(fontWeight: FontWeight.bold, color: kprimary),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: activities.map((activity) {
+                if (activity['biweeklystatus_'] != 'Approved' &&
+                    role_ == 'Parent') {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              activity['Activity'],
+                              style:
+                                  k12500.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          if (role_ != "Parent")
+                            IconButton(
+                              constraints: const BoxConstraints(),
+                              padding: EdgeInsets.zero,
+                              icon: Icon(Icons.edit_outlined,
+                                  size: 18, color: kGrey),
+                              onPressed: () => showEditingDialog(
+                                activity['id'],
+                                activity['Activity'],
+                                activity['description'],
+                                subject,
+                                activity['biweeklystatus_'],
+                              ),
+                            ),
+                          _buildStatusIcon(activity['biweeklystatus_']),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        activity['description'],
+                        style: k12500.copyWith(color: kGrey),
+                      ),
+                      if (activities.indexOf(activity) != activities.length - 1)
+                        const Divider(height: 24, thickness: 0.5),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusIcon(String status) {
+    if (role_ == "Parent") return const SizedBox.shrink();
+
+    switch (status) {
+      case 'Approved':
+        return const Icon(Icons.check_circle, color: kSuccessColor, size: 18);
+      case 'Forwarded':
+        return Icon(Icons.check_circle_outline, color: kprimary, size: 18);
+      default:
+        return Icon(Icons.radio_button_unchecked, color: grey100, size: 18);
+    }
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 100),
+        child: Column(
+          children: [
+            Icon(Icons.assignment_outlined, size: 64, color: grey100),
+            const SizedBox(height: 16),
+            Text('No Bi-Weekly activities found.',
+                style: k14500.copyWith(color: kGrey)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomActions(BuildContext context) {
+    if (role_ == "Principal") {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kWhite,
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5))
+          ],
+        ),
+        child: PrimaryButton(
+          label: 'Approve Report',
+          onPressed: () async {
+            if (await confirm(context,
+                title: const Text('Approve Report'),
+                content: const Text('Do you want to approve this report?'))) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) =>
+                    const Center(child: CircularProgressIndicator()),
+              );
+              updateDocumentsWithStatusForwarded(
+                  widget.babyID_, "Forwarded", "Approved", context);
+            }
+          },
+        ),
+      );
+    }
+
+    if (role_ == "Parent") {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kWhite,
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5))
+          ],
+        ),
+        child: PrimaryButton(
+          label: 'Close',
+          onPressed: () async {
+            await collectionReferenceReports
+                .doc(widget.babyID_)
+                .update({"BiWeekly_Approved": 0});
+            await FirebaseFirestore.instance
+                .collection(Activity)
+                .doc(selectedItemDocumentId)
+                .update({'parentfeedback_': "Seen"});
+            Get.back();
+          },
+        ),
+      );
+    }
+
+    if (role_ == "Director") {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kWhite,
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5))
+          ],
+        ),
+        child: PrimaryButton(
+          label: 'Close',
+          onPressed: () async {
+            await collectionReferencebabydata
+                .doc(widget.babyID_)
+                .update({'directorremarks_': "Seen"});
+            Get.back();
+          },
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  void _showAttendanceUpdateDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Update Attendance'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    initialValue: checkedInCount.toString(),
+                    onChanged: (value) =>
+                        checkedInCount = int.tryParse(value) ?? checkedInCount,
+                    keyboardType: TextInputType.number,
+                    decoration:
+                        const InputDecoration(labelText: 'Present days'),
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    initialValue: absentCount.toString(),
+                    onChanged: (value) =>
+                        absentCount = int.tryParse(value) ?? absentCount,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Absent days'),
+                  ),
+                ],
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Get.back(), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                updateFirestoreData(
+                    selectedDateRange, checkedInCount, absentCount);
+                Get.back();
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<QuerySnapshot> fetchData() async {
-    if (showRecord) {
-      return await collectionReference
-          .where('id', isEqualTo: widget.babyID_)
-          .where('category_', isEqualTo: 'BiWeekly')
-          .where('BiWeeklyReport', isEqualTo: selectedDateRange)
-          .get();
-    } else {
-      return await collectionReference
-          .where('id', isEqualTo: widget.babyID_)
-          .where('BiWeeklyReport', isEqualTo: selectedDateRange)
-          .where('category_', isEqualTo: 'BiWeekly')
-          .get();
-    }
-  }
-
-// Inside FutureBuilder
-
-  void updateDocumentsWithStatusForwarded(
-      babyid_, existingstatus_, update_, context) async {
-    final CollectionReference collection =
-        FirebaseFirestore.instance.collection(Activity);
-    final QuerySnapshot snapshot = await collection
-        .where('biweeklystatus_', isEqualTo: existingstatus_)
-        .where('id', isEqualTo: babyid_)
+    return await collectionReference
+        .where('id', isEqualTo: widget.babyID_)
+        .where('BiWeeklyReport', isEqualTo: selectedDateRange)
+        .where('category_', isEqualTo: 'BiWeekly')
         .get();
-
-    for (QueryDocumentSnapshot doc in snapshot.docs) {
-      // Update the status to a new value, e.g., 'UpdatedStatus'
-      await collection.doc(doc.id).update({
-        'biweeklystatus_': update_,
-      });
-
-      await collectionReferenceReports.doc(widget.babyID_).update({
-        'BiWeekly_$update_': FieldValue.increment(1),
-        'BiWeekly_$existingstatus_': FieldValue.increment(-1)
-      });
-    }
-    // (role_ == 'Principal')
-    //   ?
-    await updateFirestore(update_, existingstatus_);
-    // : Null;
-    snack('Report ${update_} successfully',);
   }
 
-  Future<void> updateFirestore(String update_, existingstatus_) async {
+  void updateDocumentsWithStatusForwarded(String babyid_,
+      String existingstatus_, String update_, BuildContext context) async {
     try {
-      // Get Firestore instance
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      final QuerySnapshot snapshot = await collectionReference
+          .where('biweeklystatus_', isEqualTo: existingstatus_)
+          .where('id', isEqualTo: babyid_)
+          .get();
 
-      // Query the documents to update
-      QuerySnapshot querySnapshot = await firestore
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        await doc.reference.update({'biweeklystatus_': update_});
+
+        await collectionReferenceReports.doc(widget.babyID_).update({
+          'BiWeekly_$update_': FieldValue.increment(1),
+          'BiWeekly_$existingstatus_': FieldValue.increment(-1)
+        });
+      }
+
+      await _updateReportStatus(update_);
+      Get.back(); // Remove loading dialog
+      snack('Report updated successfully');
+    } catch (e) {
+      Get.back(); // Remove loading dialog
+      snack('Failed to update report: $e');
+    }
+  }
+
+  Future<void> _updateReportStatus(String update_) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection(Activity)
           .where('dateRange', isEqualTo: selectedDateRange)
           .where('category_', isEqualTo: 'BiWeeklyReport')
           .where('child', isEqualTo: widget.babyID_)
           .get();
 
-      // Update each document found in the query
-      querySnapshot.docs.forEach((doc) async {
-        // Update the biweeklystatus_ field
+      for (var doc in querySnapshot.docs) {
         await doc.reference.update({'biweeklystatus_': update_});
-      });
-   Get.back();
+      }
     } catch (error) {
-      print('Error updating documents in Firestore: $error');
-    Get.back();
+      print('Error updating report status: $error');
     }
-    Get.back();
   }
 
-  showEditingDialog(documentId, activity_, description, subject, biweeklystatus_) {
-    bool _isEnable = false;
-    TextEditingController description_text_controller =
+  void showEditingDialog(String documentId, String activity_,
+      String description, String subject, String biweeklystatus_) {
+    TextEditingController descriptionController =
         TextEditingController(text: description);
-    TextEditingController subject_text_controller =
-        TextEditingController(text: subject);
-    TextEditingController activity_text_controller =
+    TextEditingController activityController =
         TextEditingController(text: activity_);
-    return showDialog(
-        barrierDismissible: true,
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return Material(
-                child: CupertinoAlertDialog(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      InkWell(
-                          onTap: () {
-                            Get.back();
-                          },
-                          child: Icon(Icons.cancel,
-                              size: 12, color: Colors.black)),
-                    ],
-                  ),
-                  TextField(
-                    controller: subject_text_controller,
-                    enabled: _isEnable,
-                  ),
-                ],
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text('Edit $subject', style: k16bold),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: activityController,
+                decoration: const InputDecoration(labelText: 'Activity'),
               ),
-              content: Column(
-                children: [
-                  TextField(
-                    controller: activity_text_controller,
-                    enabled: _isEnable,
-                  ),
-                  TextField(
-                    controller: description_text_controller,
-                    maxLines: 5,
-                    enabled: _isEnable,
-                  ),
-                  (_isEnable)
-                      ? IconButton(
-                          onPressed: () {
-                            collectionReference.doc(documentId).update({
-                              "Subject": subject_text_controller.text,
-                              "Activity": activity_text_controller.text,
-                              "description": description_text_controller.text,
-                            });
-                            Navigator.of(context).pop();
-                          },
-                          icon: Icon(
-                            Icons.save,
-                            color: Colors.blue,
-                          ))
-                      : Container(),
-                ],
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: descriptionController,
+                maxLines: 3,
+                decoration: const InputDecoration(labelText: 'Description'),
               ),
-              actions: [
-                deleteionLoading
-                    ? Center(
-                        child: Padding(
-                        padding: const EdgeInsets.only(top: 3.0),
-                        child: CircularProgressIndicator(),
-                      ))
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                            IconButton(
-                                icon: Icon(Icons.edit),
-                                iconSize: 18,
-                                color: Colors.blue[600],
-                                onPressed: () {
-                                  setState(() {
-                                    _isEnable = true;
-                                  });
-                                }),
-                            IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    deleteionLoading = true;
-                                  });
-                                  deleteDocumentFromFirestore(documentId,biweeklystatus_);
-                                },
-                                icon: Icon(Icons.delete_outline_sharp,
-                                    size: 18, color: Colors.black)),
-                          ]),
-              ],
-            ));
-          });
-        });
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                if (await confirm(context,
+                    title: const Text("Delete Activity"),
+                    content: const Text(
+                        "Are you sure you want to delete this activity?"))) {
+                  deleteDocumentFromFirestore(documentId, biweeklystatus_);
+                }
+              },
+              child: Text('Delete', style: TextStyle(color: kRedColor)),
+            ),
+            TextButton(
+                onPressed: () => Get.back(), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () async {
+                if (await confirm(context,
+                    title: const Text("Update Activity"))) {
+                  await collectionReference.doc(documentId).update({
+                    "Activity": activityController.text,
+                    "description": descriptionController.text,
+                  });
+                  Get.back();
+                  snack('Activity updated');
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  Future<void> deleteDocumentFromFirestore(String documentId, biweeklystatus_) async {
-    // Reference to the Firestore collection and document
-
+  Future<void> deleteDocumentFromFirestore(
+      String documentId, String biweeklystatus_) async {
     try {
-      // Delete the document with the specified document ID
-      setState(() {
-        deleteionLoading = false;
-      });
       await collectionReference.doc(documentId).delete();
-      await collectionReferenceReports.doc(widget.babyID_).update({
-        'BiWeekly_$biweeklystatus_': FieldValue.increment(-1)
-      });
+      await collectionReferenceReports
+          .doc(widget.babyID_)
+          .update({'BiWeekly_$biweeklystatus_': FieldValue.increment(-1)});
+      Get.back(); // Close dialog
+      snack('Activity deleted');
     } catch (e) {
       print('Error deleting document: $e');
+      snack('Failed to delete activity');
     }
-    Get.back();
   }
 
   Future<void> updateFirestoreData(
-      String selectedDateRange, int checkedInCount, int absentCount) async {
+      String dateRange, int present, int absent) async {
     try {
-      // Get Firestore instance
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-      // Query the documents to update
-      QuerySnapshot querySnapshot = await firestore
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection(Activity)
-          .where('dateRange', isEqualTo: selectedDateRange)
+          .where('dateRange', isEqualTo: dateRange)
           .where('category_', isEqualTo: 'BiWeeklyReport')
           .where('child', isEqualTo: widget.babyID_)
           .get();
 
-      // Update each document found in the query
-      querySnapshot.docs.forEach((doc) async {
-        // Update the checkedInCount and absentCount fields
+      for (var doc in querySnapshot.docs) {
         await doc.reference.update({
-          'checkedin': checkedInCount,
-          'absent': absentCount,
+          'checkedin': present,
+          'absent': absent,
         });
-        print('Document updated successfully!');
+      }
+      setState(() {
+        checkedInCount = present;
+        absentCount = absent;
       });
+      snack('Attendance updated');
     } catch (error) {
-      print('Error updating documents in Firestore: $error');
+      print('Error updating attendance: $error');
+      snack('Failed to update attendance');
     }
   }
 }

@@ -23,164 +23,169 @@ class CheckinCheckoutScreen extends StatefulWidget {
 
 class _CheckinCheckoutScreenState extends State<CheckinCheckoutScreen> {
   final collectionReference = FirebaseFirestore.instance.collection(BabyData);
-  Widget setattendance(mQ, attendanceclass_) {
-    return
-      Padding(
-        padding:EdgeInsets.all(mQ.width*0.018),
-        child: StreamBuilder<QuerySnapshot>(
-          stream: collectionReferenceClass
-              .where("class_", isEqualTo: attendanceclass_)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top:mQ.height*0.02),
-                  child: CircularProgressIndicator(),
-                ),
-              ); // Show loading indicator
-            }
-
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return EmptyBackground(
-                title: 'Curently, No student is admitted in class ${widget.activityclass_}. Student(s) assigned ${widget.activityclass_} wil be visible here. ',
-              ); // No data
-            }
-
-            // Data is available, build the list
-            return Container(
-              height: mQ.height * 0.025,
-              width: mQ.width*0.99,
-              color: Colors.grey[50],
-              child: ListView.builder(
-                physics: AlwaysScrollableScrollPhysics(),
-                itemCount: snapshot.data!.docs.length,
-                // controller: scrollController,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, position) {
-                  final attendanceData = snapshot.data!.docs[position].data()
-                  as Map<String, dynamic>;
-                  UpdateClassRoomStrength(teachersClass_!,context);
-
-                  return GestureDetector(
-                    onTap: () {
-                      Get.to (CheckinCheckoutScreen(activityclass_: attendanceData['class_']));
-                    },
-                    child:
-                    Container(
-                        padding: EdgeInsets.only(left: mQ.width*0.01, right: mQ.width*0.04),
-                        height: mQ.height * 0.025,
-                        width: mQ.width*0.99,
-                        color: Colors.grey[50],
-                        alignment: Alignment.center,
-                        child:
-                        Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                child: Wrap(
-                                  children: [
-                                    Text('Babies ', //${attendanceData['strength_']}
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontFamily: 'Comic Sans MS',
-                                            fontWeight: FontWeight.normal,
-                                            color: Colors.blue[900])),
-                                    Wrap(children: [
-                                      Icon(Icons.person,
-                                          color: Colors.green[900], size: 18),
-                                      Text('${attendanceData['present_']} ',
-                                          style: TextStyle(
-                                              fontSize: 13,
-                                              fontFamily: 'Comic Sans MS',
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.green[900])),
-                                    ]),
-                                    SizedBox(
-                                      width: mQ.width * 0.01,
-                                    ),
-                                    Wrap(children: [
-                                      Icon(Icons.person, color: Colors.red, size: 18),
-                                      Text('${attendanceData['absent_']} ',
-                                          style: TextStyle(
-                                              fontSize: 13,
-                                              fontFamily: 'Comic Sans MS',
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.red)),
-                                    ]),
-                                    ])),
-                                    Expanded(
-                                      child: Text(getCurrentDateforattendance(),textAlign: TextAlign.right,
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontFamily: 'Comic Sans MS',
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.blue[900])),
-                                    ),
-                                  ],
-                                ),
-                              ), //class attendance Summery
-                  );
-                },
-              ),
-            );
-          },
-        ),
-      );
-  }
-  final collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
-  final collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
-
+  final collectionReferenceActivity =
+      FirebaseFirestore.instance.collection(Activity);
+  final collectionReferenceReports =
+      FirebaseFirestore.instance.collection(Reports);
   final collectionReferenceClass =
       FirebaseFirestore.instance.collection(ClassRoom);
 
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    (role_=="Director"||role_=="Principal"||role_=="Manager")? teachersClass_=widget.activityclass_:null;
+    (role_ == "Director" || role_ == "Principal" || role_ == "Manager")
+        ? teachersClass_ = widget.activityclass_
+        : null;
+  }
+
+  Widget _buildAttendanceSummary(Size mQ, String attendanceclass_) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: collectionReferenceClass
+          .where("class_", isEqualTo: attendanceclass_)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+              height: 80, child: Center(child: CircularProgressIndicator()));
+        }
+
+        if (snapshot.hasError ||
+            !snapshot.hasData ||
+            snapshot.data!.docs.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final attendanceData =
+            snapshot.data!.docs.first.data() as Map<String, dynamic>;
+        UpdateClassRoomStrength(teachersClass_!, context);
+
+        return Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: kWhite,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Class Statistics",
+                    style: k16bold.copyWith(color: kprimary),
+                  ),
+                  Text(
+                    getCurrentDateforattendance(),
+                    style: k12500.copyWith(color: kGrey),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildSummaryItem(
+                    Icons.people_alt,
+                    "Total",
+                    "${(attendanceData['present_'] ?? 0) + (attendanceData['absent_'] ?? 0)}",
+                    kprimary,
+                  ),
+                  _buildSummaryItem(
+                    Icons.check_circle,
+                    "Present",
+                    "${attendanceData['present_'] ?? 0}",
+                    kSuccessColor,
+                  ),
+                  _buildSummaryItem(
+                    Icons.cancel,
+                    "Absent",
+                    "${attendanceData['absent_'] ?? 0}",
+                    kRedColor,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSummaryItem(
+      IconData icon, String label, String value, Color color) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 24),
+        const SizedBox(height: 4),
+        Text(value, style: k16bold.copyWith(color: color)),
+        Text(label, style: k12500.copyWith(color: kGrey)),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: kWhite),
-          title: Text(
-            'Class ${teachersClass_}',
-            style: TextStyle(color: kWhite,fontSize: 14),
-          ),
-          backgroundColor: kprimary,
+      backgroundColor: grey100,
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: kprimary),
+        title: Text(
+          'Class ${teachersClass_}',
+          style: k16bold.copyWith(color: kprimary),
         ),
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child: Column(children: [
-        ImageSlideShowfunction(context),
-        setattendance(mQ,widget.activityclass_),
-            SingleChildScrollView(
-                child: Column(children: [
-              Padding(
-                padding: EdgeInsets.symmetric(vertical:mQ.height*0.01, horizontal: mQ.width*0.01),
-                child: StreamBuilder<QuerySnapshot>(
+        backgroundColor: kWhite,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              children: [
+                ImageSlideShowfunction(context),
+                _buildAttendanceSummary(mQ, widget.activityclass_),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: kprimary,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Student List",
+                        style: k16bold.copyWith(color: kprimary),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                StreamBuilder<QuerySnapshot>(
                   stream: collectionReference
                       .where('class_', isEqualTo: widget.activityclass_)
-                      // 'Todlers' )
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
+                      return const Center(
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 25.0),
+                          padding: EdgeInsets.only(top: 50.0),
                           child: CircularProgressIndicator(),
                         ),
-                      ); // Show loading indicator
+                      );
                     }
 
                     if (snapshot.hasError) {
@@ -188,245 +193,296 @@ class _CheckinCheckoutScreenState extends State<CheckinCheckoutScreen> {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      // return EmptyBackground(
-                      //   title: 'Curently, No student is assigned this class',
-                      // ); // No data
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 100),
+                        child: EmptyBackground(
+                          title:
+                              'No students assigned to ${widget.activityclass_}',
+                        ),
+                      );
                     }
 
-                    // Data is available, build the list
-                    return ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.only(left:mQ.width*0.01, right: mQ.width*0.01),
-                          // padding: const EdgeInsets.only(left: 1.0, right: 1),
-                          child: Divider(
-                            color: Colors.grey.withOpacity(0.2),
-                          ),
-                        );
-                      },
+                    return ListView.builder(
                       primary: false,
                       shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
                         final childData = snapshot.data!.docs[index].data()
                             as Map<String, dynamic>;
-
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(left:mQ.width*0.01),
-                                  width: mQ.width * 0.30,
-                                  child: Text(
-                                      "${childData['childFullName']}  ${childData['fathersName']}",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontFamily: 'Comic Sans MS',
-                                        fontWeight: FontWeight.normal,
-                                        color:Colors.blue[900],
-                                      )),
-                                ),
-                                Container(
-                                  width: mQ.width * 0.10,
-                                  height: mQ.height * 0.05,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                        childData['picture'],
-                                      ),
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Expanded(
-                              child:
-                              // saveCheckIn?Center(child: CircularProgressIndicator(),):
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(width: mQ.width * 0.05),
-                                  Container(
-                                    width: mQ.width * 0.2,
-                                    alignment: FractionalOffset.centerLeft,
-                                    child: Text("${childData['checkin']}",
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontFamily: 'Comic Sans MS',
-                                          fontWeight: FontWeight.normal,
-                                          color: (childData['checkin'] ==
-                                                  "Checked In")
-                                              ? Colors.green
-                                              : Colors.red,
-                                        )),
-                                  ),
-                                  SizedBox(width: mQ.width * 0.05),
-                                  (childData['checkin'] != 'Checked In')
-                                      ? IconButton(
-                                          onPressed: () async {
-                                            _showConfirmationDialog(snapshot,index,childData,"Checked In",context);
-                                        },
-                                          icon: Icon(Icons.output,
-                                              size: 22,
-                                              color: Colors.green[900]))
-                                      : (childData['checkin'] == 'Checked In')
-                                      ? IconButton(
-                                          onPressed: () {
-                                            _showConfirmationDialog(snapshot,index,childData,"Checked Out",context);
-                                          },
-                                          icon: Icon(Icons.output,
-                                              size: 22, color: Colors.red))
-                                      : Container(),
-                                  (childData['checkin'] != 'Checked In')
-                                      ? IconButton(
-                                          onPressed: () async {
-                                            _showConfirmationDialog(snapshot,index,childData,"Absent",context);
-
-                                          },
-                                          icon: Icon(Icons.person_off,
-                                              size: 22, color: Colors.red))
-                                      : SizedBox(
-                                          width: mQ.width * 0.001,
-                                        ),
-                                ],
-                              ),
-
-                              // ],
-                              // ),
-                            ),
-                          ],
-                        );
+                        return _buildStudentCard(snapshot, index, childData);
                       },
                     );
                   },
                 ),
-              ),
-            ]))
-          ]),
-        ));
-  }
-  void _showConfirmationDialog(snapshot, index, childData,status_,BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return
-          AlertDialog(
-          title: Text('Confirmation'),
-          content: Text('Do you want to proceed with this action?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Get.back();
-              },
+              ],
             ),
-            TextButton(
-              child: Text('Proceed'),
-              onPressed: () async {
-                Get.back();
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) => Center(
-                    child: CircularProgressIndicator(),
-
-                  ),
-                );
-
-                await checkinsavefunction(snapshot,index,childData,status_);
-
-                Get.back();
-              },
-            ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
     );
   }
-  checkinsavefunction(snapshot, index, childData,attendancestatus_) async {
-var date_ = getCurrentDate();
-    await collectionReferenceActivity.add({
-      "id": snapshot
-          .data!.docs[index].id,
-      "Subject": "Attendance",
-      "Activity": attendancestatus_,
-      "date_": date_,
-      "time_":
-    DateFormat('HH:mm:a').format(DateTime.now()),
-      "image_": imageUrl,
-      "description":
 
-      (attendancestatus_ == 'Absent') ?
-      "${childData['childFullName']} is absent today"
-          : "${childData['childFullName']} has ${attendancestatus_}",
-      "status_": "Approved",
-      "category_": "DailySheet"
-    });
-    await collectionReference
-        .doc(snapshot
-        .data!.docs[index].id)
-        .update({
-      "checkin": attendancestatus_
-    });
-    (attendancestatus_ == 'Checked In') ?
-    await collectionReferenceClass.doc(childData['class_']).update({
+  Widget _buildStudentCard(AsyncSnapshot<QuerySnapshot> snapshot, int index,
+      Map<String, dynamic> childData) {
+    final status = childData['checkin'] ?? "Not Reported";
+    final isCheckedIn = status == 'Checked In';
+    final isAbsent = status == 'Absent';
+
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+      ),
+      color: kWhite,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: grey100,
+                border: Border.all(color: kprimary.withOpacity(0.1), width: 1),
+              ),
+              child: ClipOval(
+                child: (childData['picture'] != null &&
+                        childData['picture'].isNotEmpty)
+                    ? CachedNetworkImage(
+                        imageUrl: childData['picture'],
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2)),
+                        errorWidget: (context, url, error) =>
+                            Icon(Icons.person, color: kGreyColor),
+                      )
+                    : Icon(Icons.person, color: kGreyColor),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    childData['childFullName'] ?? "Unknown",
+                    style: k14500.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "Father: ${childData['fathersName'] ?? "N/A"}",
+                    style: k12500.copyWith(color: kGrey),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isCheckedIn
+                          ? kSuccessLightColor
+                          : isAbsent
+                              ? kWarningLightColor
+                              : kInfoLightColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      status,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: isCheckedIn
+                            ? kSuccessColor
+                            : isAbsent
+                                ? kWarningColor
+                                : kInfoColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                _buildActionButton(
+                  icon: Icons.login,
+                  color: kSuccessColor,
+                  onTap: () => _showConfirmationDialog(
+                      snapshot, index, childData, "Checked In", context),
+                  isActive: !isCheckedIn,
+                  tooltip: "Check In",
+                ),
+                _buildActionButton(
+                  icon: Icons.logout,
+                  color: kRedColor,
+                  onTap: () => _showConfirmationDialog(
+                      snapshot, index, childData, "Checked Out", context),
+                  isActive: isCheckedIn,
+                  tooltip: "Check Out",
+                ),
+                _buildActionButton(
+                  icon: Icons.person_off,
+                  color: kWarningColor,
+                  onTap: () => _showConfirmationDialog(
+                      snapshot, index, childData, "Absent", context),
+                  isActive: !isCheckedIn && !isAbsent,
+                  tooltip: "Absent",
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+    required bool isActive,
+    required String tooltip,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: IconButton(
+        onPressed: isActive ? onTap : null,
+        icon: Icon(icon, size: 22),
+        color: color,
+        disabledColor: kGreyColor.withOpacity(0.3),
+        tooltip: tooltip,
+        constraints: const BoxConstraints(),
+        padding: const EdgeInsets.all(8),
+      ),
+    );
+  }
+
+void _showConfirmationDialog(
+    snapshot, index, childData, status_, BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Confirmation'),
+        content: Text('Do you want to proceed with this action?'),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+          TextButton(
+            child: Text('Proceed'),
+            onPressed: () async {
+              Get.back();
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) => Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+
+              await checkinsavefunction(snapshot, index, childData, status_);
+
+              Get.back();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+checkinsavefunction(snapshot, index, childData, attendancestatus_) async {
+  var date_ = getCurrentDate();
+
+  // Optimized: Use batch operations to reduce Firebase writes
+  final batch = FirebaseFirestore.instance.batch();
+
+  // Add activity document
+  final activityRef = collectionReferenceActivity.doc();
+  batch.set(activityRef, {
+    "id": snapshot.data!.docs[index].id,
+    "Subject": "Attendance",
+    "Activity": attendancestatus_,
+    "date_": date_,
+    "time_": DateFormat('HH:mm:a').format(DateTime.now()),
+    "image_": imageUrl,
+    "description": (attendancestatus_ == 'Absent')
+        ? "${childData['childFullName']} is absent today"
+        : "${childData['childFullName']} has ${attendancestatus_}",
+    "status_": "Approved",
+    "category_": "DailySheet"
+  });
+
+  // Update child checkin status
+  batch.update(collectionReference.doc(snapshot.data!.docs[index].id),
+      {"checkin": attendancestatus_});
+
+  // Update class attendance counts
+  final classRef = collectionReferenceClass.doc(childData['class_']);
+  if (attendancestatus_ == 'Checked In') {
+    batch.update(classRef, {
       'present_': FieldValue.increment(1),
       'absent_': FieldValue.increment(-1)
-    }) :
-    await collectionReferenceClass.doc(childData['class_']).update({
+    });
+  } else {
+    batch.update(classRef, {
       'present_': FieldValue.increment(-1),
       'absent_': FieldValue.increment(1)
     });
-try {
+  }
 
-  String? docDate;
-  await collectionReferenceReports.doc(snapshot.data!.docs[index].id).get().then((doc) {docDate = doc.data()?['date_']??'No Record';});
-  if (docDate == date_)
-  {
-    await collectionReferenceReports.doc(snapshot.data!.docs[index].id).set({"DailySheet_Approved": FieldValue.increment(1)}, SetOptions(merge: true));
+  // 4. Update reports document (optimized: single read, then batch write)
+  try {
+    final reportDocRef =
+        collectionReferenceReports.doc(snapshot.data!.docs[index].id);
+    final reportDoc = await reportDocRef.get();
+    final docDate = reportDoc.data()?['date_'] ?? 'No Record';
+
+    if (docDate == date_) {
+      // Update existing document
+      batch.update(
+          reportDocRef, {"DailySheet_Approved": FieldValue.increment(1)});
+    } else {
+      // Set new document with all fields at once
+      batch.set(reportDocRef, {
+        "id": snapshot.data!.docs[index].id,
+        "date_": date_,
+        "DailySheet_New": 0,
+        "DailySheet_Forwarded": 0,
+        "DailySheet_Approved": 1,
+        "BiWeekly_New": 0,
+        "BiWeekly_Forwarded": 0,
+        "Photos_New": 0,
+        "Photos_Forwarded": 0,
+        "Photos_Approved": 0,
+      });
+    }
+
+    // Commit all operations atomically (reduces from 4-5 separate writes to 1 batch write)
+    await batch.commit();
+  } catch (error) {
+    print('Error in batch operation: $error');
+    // Consider showing error to user
   }
-  else
-  {
-    await collectionReferenceReports.doc(snapshot.data!.docs[index].id).set({
-      "id": snapshot.data!.docs[index].id,
-      "date_": date_,
-      "DailySheet_New": 0,  // Set DailySheet_New to 0
-      "DailySheet_Forwarded": 0,
-      "DailySheet_Approved": 1,  // Set DailySheet_Approved to 0
-      "BiWeekly_New": 0  ,
-      "BiWeekly_Forwarded": 0  ,
-      // "BiWeekly_Approved": 0  ,
-      "Photos_New": 0  ,
-      "Photos_Forwarded": 0  ,
-      "Photos_Approved": 0  ,
-    });
-  }
-} catch (error) {
-  print('Error fetching data: $error');
-}
 // launchWhatsApp(childData['fathersMobileNo'],
 //     (attendancestatus_ == "Absent") ?
 //     "${childData['childFullName']} is absent today" :
 //     "${childData['childFullName']} has ${attendancestatus_}"
 // );
-  }
-  // launchWhatsApp(to, message) async {
-  //   final link = WhatsAppUnilink(
-  //     phoneNumber: to, // Replace with the recipient's phone number
-  //     text: message,
-  //
-  //   );
-  //   // await launchUrl(link.asUri());
-  // }
-
-  }
-
-
+}
+// launchWhatsApp(to, message) async {
+//   final link = WhatsAppUnilink(
+//     phoneNumber: to, // Replace with the recipient's phone number
+//     text: message,
+//
+//   );
+//   // await launchUrl(link.asUri());
+// }
+}

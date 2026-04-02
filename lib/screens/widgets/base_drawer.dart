@@ -16,6 +16,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:intl/intl.dart';
 import 'package:kids_republik/controllers/splash_controller.dart';
 import 'package:kids_republik/main.dart';
 import 'package:kids_republik/screens/auth/change_password.dart';
@@ -149,7 +150,9 @@ class _BaseDrawerState extends State<BaseDrawer> {
               icon: CircleAvatar(
                 radius: 63,
                 backgroundColor: kprimary,
-                backgroundImage: NetworkImage(userImage_!),
+                backgroundImage: (userImage_ != null && userImage_!.isNotEmpty)
+                    ? NetworkImage(userImage_!)
+                    : const AssetImage('assets/staff.jpg') as ImageProvider,
               ),
               constraints: const BoxConstraints(),
               padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 3),
@@ -232,6 +235,58 @@ class _BaseDrawerState extends State<BaseDrawer> {
             thickness: 0.3,
           ),
         ),
+        role_ == 'Director'
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: ListTile(
+                    leading: const Icon(Iconsax.trash,
+                        color: Colors.orange, size: 20),
+                    minLeadingWidth: 16,
+                    title: const Text('Cleanup Daily Activities',
+                        style: TextStyle(fontSize: 15)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    onTap: () {
+                      _showCleanupOptions('Cleanup Daily Activities', 'DailySheet');
+                    }),
+              )
+            : SizedBox(),
+        role_ == 'Director'
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                child: const Divider(
+                  height: 15,
+                  color: Colors.blueGrey,
+                  thickness: 0.3,
+                ),
+              )
+            : SizedBox(),
+        role_ == 'Director'
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: ListTile(
+                    leading: const Icon(Iconsax.trash,
+                        color: Colors.orange, size: 20),
+                    minLeadingWidth: 16,
+                    title: const Text('Cleanup Biweekly Activities',
+                        style: TextStyle(fontSize: 15)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    onTap: () {
+                      _showCleanupOptions('Cleanup Biweekly Activities', 'BiWeekly');
+                    }),
+              )
+            : SizedBox(),
+        role_ == 'Director'
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                child: const Divider(
+                  height: 15,
+                  color: Colors.blueGrey,
+                  thickness: 0.3,
+                ),
+              )
+            : SizedBox(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: ListTile(
@@ -652,5 +707,314 @@ class _BaseDrawerState extends State<BaseDrawer> {
     // close listener after 30 seconds, so the program doesn't run forever
     await Future<void>.delayed(const Duration(seconds: 30));
     await listener.cancel();
+  }
+
+  // ========================================
+  // CLEANUP FUNCTIONS (FAST + RETRY)
+  // ========================================
+
+  Future<void> _performCleanup(String category, int days) async {
+    ValueNotifier<int> deletedCountNotifier = ValueNotifier<int>(0);
+    ValueNotifier<int> totalCountNotifier = ValueNotifier<int>(-1);
+
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return CupertinoAlertDialog(
+          title: const Text("Cleaning up..."),
+          content: ValueListenableBuilder<int>(
+            valueListenable: totalCountNotifier,
+            builder: (context, totalItems, child) {
+              if (totalItems == -1) {
+                return const Padding(
+                  padding: EdgeInsets.only(top: 15.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 10),
+                        Text("Fetching activities..."),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return ValueListenableBuilder<int>(
+                valueListenable: deletedCountNotifier,
+                builder: (context, deletedCount, child) {
+                  double progress = totalItems == 0 ? 0 : deletedCount / totalItems;
+                  int remaining = totalItems - deletedCount;
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        LinearProgressIndicator(
+                          value: progress,
+                          backgroundColor: Colors.grey[200],
+                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                        ),
+                        const SizedBox(height: 15),
+                        Text("Total: $totalItems", style: const TextStyle(fontSize: 14)),
+                        Text("Deleted: $deletedCount", style: const TextStyle(fontSize: 14)),
+                        Text("Remaining: $remaining", style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+
+    try {
+      final now = DateTime.now();
+      final thresholdDate = now.subtract(Duration(days: days));
+      final collectionRef = FirebaseFirestore.instance.collection(Activity);
+
+      final snapshot = await collectionRef.get();
+      
+      var itemsToDelete = [];
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>? ?? {};
+        DateTime? activityDate;
+
+        if (data['date_'] is Timestamp) {
+          activityDate = (data['date_'] as Timestamp).toDate();
+        } else if (data['date_'] is String) {
+          try {
+            activityDate = DateFormat('d-M-yyyy').parse(data['date_']);
+          } catch (_) {
+            try {
+              activityDate = DateTime.parse(data['date_']);
+            } catch (_) {}
+          }
+        }
+
+        if (data['category_'] == category &&
+            activityDate != null &&
+            activityDate.isBefore(thresholdDate)) {
+          itemsToDelete.add(doc);
+        }
+      }
+
+      int totalItems = itemsToDelete.length;
+      totalCountNotifier.value = totalItems;
+
+      if (totalItems == 0) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        Navigator.of(context, rootNavigator: true).pop();
+        ToastContext().init(context);
+        Toast.show(
+          'No activities found to clean up.',
+          backgroundRadius: 5,
+          duration: Toast.lengthLong,
+        );
+        return;
+      }
+
+      for (var doc in itemsToDelete) {
+        final data = doc.data() as Map<String, dynamic>? ?? {};
+        String? imageUrl =
+              data['image_'] as String? ?? data['picture'] as String?;
+
+        bool success = false;
+        int retryCount = 0;
+
+        while (!success && retryCount < 3) {
+          try {
+            if (imageUrl != null && imageUrl.isNotEmpty) {
+              try {
+                await FirebaseStorage.instance.refFromURL(imageUrl).delete();
+              } catch (e) {
+                if (e.toString().contains('object-not-found')) {
+                  print("File already deleted: $imageUrl");
+                } else {
+                  throw e;
+                }
+              }
+            }
+
+            await collectionRef.doc(doc.id).delete();
+            success = true;
+          } catch (e) {
+            retryCount++;
+            await Future.delayed(const Duration(milliseconds: 200));
+            print("Retry $retryCount failed for doc ${doc.id}: $e");
+          }
+        }
+
+        deletedCountNotifier.value++;
+      }
+
+      Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+
+      ToastContext().init(context);
+      Toast.show(
+        'Cleanup complete. $totalItems activities deleted.',
+        backgroundRadius: 5,
+        duration: Toast.lengthLong,
+      );
+    } catch (e) {
+      Navigator.of(context, rootNavigator: true).pop();
+      print('Error during cleanup: $e');
+      ToastContext().init(context);
+      Toast.show(
+        'Error during cleanup: $e',
+        backgroundRadius: 5,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  void _showCleanupOptions(String title, String category) {
+    TextEditingController customDaysController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 15.0,
+                offset: Offset(0.0, 10.0),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(Iconsax.trash, color: Colors.orange.shade400, size: 48),
+              const SizedBox(height: 16.0),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12.0),
+              const Text(
+                'Select the number of days to clean up old activities. You can choose a preset or enter a custom number.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14.0, color: Colors.black54),
+              ),
+              const SizedBox(height: 24.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade50,
+                        foregroundColor: Colors.blue.shade700,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _performCleanup(category, 7);
+                      },
+                      child: const Text('7 Days', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade50,
+                        foregroundColor: Colors.blue.shade700,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _performCleanup(category, 30);
+                      },
+                      child: const Text('30 Days', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: customDaysController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        hintText: "Custom days...",
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.blue.shade400),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade400,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    ),
+                    onPressed: () {
+                      int? customDays = int.tryParse(customDaysController.text);
+                      if (customDays != null && customDays > 0) {
+                        Navigator.pop(context);
+                        _performCleanup(category, customDays);
+                      } else {
+                        ToastContext().init(context);
+                        Toast.show('Please enter a valid number', backgroundRadius: 5);
+                      }
+                    },
+                    child: const Text('Clean', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade600,
+                ),
+                child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w600)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

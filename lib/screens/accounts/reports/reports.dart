@@ -4,8 +4,8 @@ import '../../../utils/const.dart';
 import '../verify_payment.dart';
 
 class ViewReports extends StatefulWidget {
-  int selectedIndex;
-  ViewReports({required this.selectedIndex, super.key});
+  final int selectedIndex;
+  const ViewReports({required this.selectedIndex, super.key});
 
   @override
   State<ViewReports> createState() => _ViewReportsState();
@@ -13,62 +13,53 @@ class ViewReports extends StatefulWidget {
 
 class _ViewReportsState extends State<ViewReports> {
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // widget.selectedIndex = role_ == 'Parent' ? 0 : 1;
-  }
-  @override
   Widget build(BuildContext context) {
-    return
-      DefaultTabController(
+    return DefaultTabController(
       length: 3,
       initialIndex: widget.selectedIndex,
       child: Scaffold(
-        // drawer: BaseDrawer(),
+        backgroundColor: grey100,
         appBar: AppBar(
-          iconTheme: IconThemeData(color: kWhite),
+          elevation: 0,
+          iconTheme: const IconThemeData(color: kWhite),
           backgroundColor: kprimary,
-          title: Text(
-            'Accounts',
-            style: TextStyle(color: kWhite,fontSize: 14),
+          title: const Text(
+            'Accounts & Reports',
+            style: TextStyle(color: kWhite, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           bottom: TabBar(
-            labelStyle: TextStyle(
+            labelStyle: const TextStyle(
                 color: kWhite, fontSize: 14, fontWeight: FontWeight.bold),
-            unselectedLabelStyle: TextStyle(color: kWhite, fontSize: 14),
+            unselectedLabelStyle: TextStyle(
+                color: kWhite.withOpacity(0.7), fontSize: 14, fontWeight: FontWeight.w500),
             labelColor: kWhite,
-            unselectedLabelColor: Colors.grey[300],
-            indicatorColor: Colors.white,
+            unselectedLabelColor: kWhite.withOpacity(0.7),
+            indicatorColor: kWhite,
             indicatorSize: TabBarIndicatorSize.tab,
-            indicatorWeight: 2,
-            isScrollable: true,
-            tabAlignment: TabAlignment.center,
-            tabs: [
+            indicatorWeight: 3,
+            isScrollable: false,
+            indicatorPadding: const EdgeInsets.symmetric(horizontal: 16),
+            tabs: const [
               Tab(
                 text: 'Dues',
-                icon: Icon(Icons.account_balance_sharp),
-                // icon: Image.asset('assets/tractor.png',color: kWhite, width: mQ.width * 0.06, fit: BoxFit.contain,),
+                icon: Icon(Icons.account_balance_wallet_outlined, size: 20),
               ),
               Tab(
                 text: 'Paid',
-                icon: Icon(Icons.payments),
+                icon: Icon(Icons.payments_outlined, size: 20),
               ),
               Tab(
                 text: 'Verified',
-                icon: Icon(Icons.verified_user_outlined),
+                icon: Icon(Icons.verified_outlined, size: 20),
               ),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-        DocumentListVerify(paystatus: 'Not Paid'),
-        DocumentListVerify(paystatus: 'Paid'),
-        DocumentListVerify(paystatus: 'Verified')
-            // EquipmentScreen()
-            //      MaintenanceScreen()
-
+            DocumentListVerify(paystatus: 'Not Paid'),
+            DocumentListVerify(paystatus: 'Paid'),
+            DocumentListVerify(paystatus: 'Verified'),
           ],
         ),
       ),

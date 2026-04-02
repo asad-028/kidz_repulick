@@ -70,6 +70,7 @@ class MyApp extends StatelessWidget {
 
 }
 setcollectionnames(String? table_){
+  print('setcollectionnames: Updating collections with prefix "$table_"');
   users = '${table_}users';
   ClassRoom = '${table_}ClassRoom';
   accounts = '${table_}accounts';
@@ -82,5 +83,6 @@ setcollectionnames(String? table_){
   if (Get.isRegistered<BankAccountController>()) {
     Get.find<BankAccountController>().fetchDetails();
   }
+  print('setcollectionnames: Collections updated. Current users table: $users');
 }
 

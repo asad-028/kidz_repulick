@@ -38,17 +38,17 @@ class SplashScreen extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(400),
-                child: Container(
-                  height: 180,
-                  width: 180,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: Image.asset(
-                    'assets/littlediary.jpg',
-                    fit: BoxFit.fill,
-                  ),
+              child: Container(
+                height: 180,
+                width: 180,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
                 ),
+                child: Image.asset(
+                  'assets/littlediary.jpg',
+                  fit: BoxFit.fill,
+                ),
+              ),
             ),
           ),
           SizedBox(height: mQ.height * 0.2),

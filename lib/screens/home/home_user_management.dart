@@ -70,12 +70,21 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50], // Lighter, cleaner background
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            size: 20,
+            color: Colors.white,
+          ),
+          onPressed: () => Get.back(),
+        ),
         iconTheme: IconThemeData(color: kBlackColor), // Dark icons for contrast
         elevation: 0, // Remove heavy shadow for modern flat look
         title: Text(
           'User Management',
           style: TextStyle(
-              color: kBlackColor, fontSize: 18, fontWeight: FontWeight.bold),
+              color: kWhite, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         backgroundColor: kprimary, // Transparent/White app bar
         centerTitle: true,
@@ -525,7 +534,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           ]),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(50),
-        child: (imageUrl == null || imageUrl == 'Null')
+        child: (imageUrl == null || imageUrl == 'Null' || imageUrl.isEmpty)
             ? Image.asset('assets/staff.jpg', fit: BoxFit.cover)
             : CachedNetworkImage(
                 imageUrl: imageUrl,

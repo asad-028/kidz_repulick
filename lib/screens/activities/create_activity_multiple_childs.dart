@@ -115,357 +115,400 @@ class _CreateActivityForMultipleChildsScreenState
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: kWhite,
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: kWhite),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Create Activity' // '${widget.name_}'
-                ,
-                style: TextStyle(fontSize: 14, color: Colors.amberAccent),
+      backgroundColor: Colors.grey[50], // Soft background
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: kWhite),
+        title: Text(
+          'Create Activity',
+          style: const TextStyle(
+              fontSize: 18, color: kWhite, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: kprimary,
+        elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Center(
+              child: Text(
+                DateFormat('MMM dd, yyyy').format(DateTime.now()),
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
-            ],
+            ),
           ),
-          backgroundColor: kprimary,
-        ),
-        bottomNavigationBar: Obx(
-          () => createActivityScreenController.isLoading.value
-              ? Center(child: const CircularProgressIndicator())
-              : ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: kprimary, // Set the text color
-                    elevation: 3, // Set the elevation (shadow) of the button
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          18.0), // Set the button's border radius
+        ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Obx(
+            () => createActivityScreenController.isLoading.value
+                ? const SizedBox(
+                    height: 50,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kprimary,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
                     ),
-                    padding: EdgeInsets.all(16),
-                  ),
-                  onPressed: () async {
-                    if (widget.selectedBabies.isNotEmpty) {
-                      if (savepicture) {
-                        // Wait for image upload to complete
-                        await uploadimagetocloudstorage(image);
-                      } else {
-                        // After image upload is successful, call addActivityfunction
-                        await createActivityScreenController
-                            .addActivityfunction(
-                          context,
-                          widget.selectedBabies,
-                          (widget.selectedsubject_ != 'BiWeekly')
-                              ? widget.selectedsubject_
-                              : createActivityScreenController.subject_.text,
-                          (widget.selectedsubject_ == 'BiWeekly' ||
-                                  widget.selectedsubject_ == 'Activity' ||
-                                  widget.selectedsubject_ == 'Notes')
-                              ? createActivityScreenController.activity_.text
-                              : dropdownValue,
-                          (widget.selectedsubject_ != 'BiWeekly')
-                              ? '${createActivityScreenController.description_.text} ${descriptionplus}'
-                              : '${createActivityScreenController.description_.text}',
-                          imageUrl ?? "",
-                          sleeptime_ ??
-                              DateFormat('HH:mm').format(DateTime.now()),
-                          (widget.selectedsubject_ != 'BiWeekly')
-                              ? 'DailySheet'
-                              : 'BiWeekly',
-                        );
+                    onPressed: () async {
+                      if (widget.selectedBabies.isNotEmpty) {
+                        if (savepicture) {
+                          await uploadimagetocloudstorage(image);
+                        } else {
+                          await createActivityScreenController
+                              .addActivityfunction(
+                            context,
+                            widget.selectedBabies,
+                            (widget.selectedsubject_ != 'BiWeekly')
+                                ? widget.selectedsubject_
+                                : createActivityScreenController.subject_.text,
+                            (widget.selectedsubject_ == 'BiWeekly' ||
+                                    widget.selectedsubject_ == 'Activity' ||
+                                    widget.selectedsubject_ == 'Notes')
+                                ? createActivityScreenController.activity_.text
+                                : dropdownValue,
+                            (widget.selectedsubject_ != 'BiWeekly')
+                                ? '${createActivityScreenController.description_.text} ${descriptionplus}'
+                                : createActivityScreenController
+                                    .description_.text,
+                            imageUrl ?? "",
+                            sleeptime_ ??
+                                DateFormat('HH:mm').format(DateTime.now()),
+                            (widget.selectedsubject_ != 'BiWeekly')
+                                ? 'DailySheet'
+                                : 'BiWeekly',
+                          );
+                        }
                       }
-                    }
-                  },
-                  child: Text(
-                    'Create Activity',
-                    style: TextStyle(
-                      color: Colors.white,
+                    },
+                    child: const Text(
+                      'Create Activity',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                  )),
+                  ),
+          ),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              ImageSlideShowfunction(context),
-              Container(
-                height: mQ.height * 0.03,
-                color: Colors.grey[50],
-                width: mQ.width * 0.9,
-                // padding:mQ ,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Expanded(child: SizedBox(width: mQ.width * 0.5,)),
-                    Expanded(
-                      child: Text(
-                        '  ${subject}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        textAlign: TextAlign.right,
-                        ' ${getCurrentDateforattendance()}',
-                        style: TextStyle(
-                            fontSize: 10,
-                            fontFamily: 'Comic Sans MS',
-                            fontWeight: FontWeight.normal,
-                            color: Colors.grey),
-                      ),
-                    ),
-                  ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Header Info Area
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              decoration: BoxDecoration(
+                color: kprimary,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
                 ),
-              ), // Activity name and date
-              SizedBox(
-                height: mQ.height * 0.002,
               ),
+              child: Column(
+                children: [
+                  ImageSlideShowfunction(context),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          subject ?? '',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
 
-              Obx(
-                () => createActivityScreenController.isLoadingInitial.value
-                    ? Center(child: CircularProgressIndicator())
-                    : SingleChildScrollView(
-                        padding: EdgeInsets.only(left: 18, right: 18),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 4.0, horizontal: 4),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [],
+            Obx(
+              () => createActivityScreenController.isLoadingInitial.value
+                  ? const Padding(
+                      padding: EdgeInsets.only(top: 50.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Time Picker Card (if applicable)
+                          if (!(subject == 'Mood' ||
+                              subject == 'Activity' ||
+                              subject == 'Notes' ||
+                              subject == 'BiWeekly'))
+                            _buildCard(
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Icon(Icons.access_time_filled,
+                                    color: kprimary),
+                                title: const Text('Activity Time',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                                subtitle: Text(selectedTime?.format(context) ??
+                                    'Select Time'),
+                                trailing: const Icon(Icons.arrow_forward_ios,
+                                    size: 14),
+                                onTap: () async {
+                                  final TimeOfDay? time = await showTimePicker(
+                                    context: context,
+                                    initialTime:
+                                        selectedTime ?? TimeOfDay.now(),
+                                  );
+                                  if (time != null) {
+                                    setState(() {
+                                      selectedTime = time;
+                                      sleeptime_ = selectedTime.format(context);
+                                      timeupdated = true;
+                                    });
+                                  }
+                                },
                               ),
-                              (subject == 'Mood' ||
-                                      subject == 'Activity' ||
-                                      subject == 'Notes' ||
-                                      subject == 'BiWeekly')
-                                  ? Container()
-                                  : Container(
-                                      width: mQ.width * 0.9,
-                                      alignment: Alignment.centerLeft,
-                                      color: Colors.grey[50],
-                                      child: TextButton(
-                                        onPressed: () async {
-                                          setState(() {
-                                            timeupdated = true;
-                                          });
-                                          final TimeOfDay? time =
-                                              await showTimePicker(
-                                                  context: context,
-                                                  initialTime: selectedTime ??
-                                                      TimeOfDay.now(),
-                                                  initialEntryMode:
-                                                      TimePickerEntryMode.dial,
-                                                  orientation:
-                                                      Orientation.portrait,
-                                                  builder:
-                                                      (BuildContext context,
-                                                          Widget? child) {
-                                                    return MediaQuery(
-                                                      data: MediaQuery.of(
-                                                              context)
-                                                          .copyWith(
-                                                              alwaysUse24HourFormat:
-                                                                  true),
-                                                      child: child!,
-                                                    );
-                                                  });
-                                          selectedTime = time!;
-                                          sleeptime_ =
-                                              selectedTime.format(context);
-                                        },
-                                        child: (timeupdated)
-                                            ? Text(
-                                                textAlign: TextAlign.left,
-                                                'Select Time ${selectedTime.format(context)}',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontFamily: 'Comic Sans MS',
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    color: Colors.blue),
-                                              )
-                                            : Text(
-                                                'Select Time ${selectedTime.format(context)}',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontFamily: 'Comic Sans MS',
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    color: Colors.blue),
-                                              ),
+                            ),
+
+                          if (!(subject == 'Mood' ||
+                              subject == 'Activity' ||
+                              subject == 'Notes' ||
+                              subject == 'BiWeekly'))
+                            const SizedBox(height: 16),
+
+                          // Activity Content Card
+                          _buildCard(
+                            title: 'Activity Details',
+                            child: Column(
+                              children: [
+                                if (widget.selectedsubject_ == 'BiWeekly')
+                                  BiWeeklyDropDown(mQ)
+                                else if (widget.selectedsubject_ ==
+                                        'Activity' ||
+                                    widget.selectedsubject_ == 'Notes')
+                                  CustomTextField(
+                                    enabled: true,
+                                    controller: createActivityScreenController
+                                        .activity_,
+                                    inputType: TextInputType.multiline,
+                                    labelText: "Heading",
+                                    validators: (String? value) =>
+                                        value == null || value.isEmpty ? 'Required' : null,
+                                  )
+                                else if (widget.selectedsubject_ != 'Mood')
+                                  DropdownSearch<String>(
+                                    popupProps: PopupProps.menu(
+                                      showSelectedItems: true,
+                                      disabledItemFn: (s) => s.startsWith('I'),
+                                    ),
+                                    items: list,
+                                    dropdownDecoratorProps:
+                                        DropDownDecoratorProps(
+                                      dropdownSearchDecoration: InputDecoration(
+                                        labelText:
+                                            'Select ${widget.selectedsubject_} Remarks',
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
                                       ),
                                     ),
-                              SizedBox(
-                                height: mQ.height * 0.006,
-                              ),
-                              (widget.selectedsubject_ == 'BiWeekly')
-                                  ? Container(
-                                      width: mQ.width * 0.9,
-                                      child: BiWeeklyDropDown(mQ))
-                                  : (widget.selectedsubject_ != 'Mood')
-                                      ? (widget.selectedsubject_ ==
-                                                  'Activity' ||
-                                              widget.selectedsubject_ ==
-                                                  'Notes')
-                                          ?
-                                          // Container()
-                                          Container(
-                                              width: mQ.width * 0.9,
-                                              alignment: Alignment.centerLeft,
-                                              color: Colors.grey[50],
-                                              child: CustomTextField(
-                                                enabled: true,
-                                                controller:
-                                                    createActivityScreenController
-                                                        .activity_,
-                                                inputType:
-                                                    TextInputType.multiline,
-                                                labelText: "Heading",
-                                                validators: (String? value) {
-                                                  if (value!.isEmpty) {
-                                                    return 'Required';
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
-                                            )
-                                          : Container(
-                                              width: mQ.width * 0.9,
-                                              alignment: Alignment.centerLeft,
-                                              color: Colors.grey[50],
-                                              child: DropdownSearch<String>(
-                                                popupProps: PopupProps.menu(
-                                                  showSelectedItems: true,
-                                                  disabledItemFn: (String s) =>
-                                                      s.startsWith('I'),
-                                                ),
-                                                items: list,
-                                                dropdownDecoratorProps:
-                                                    DropDownDecoratorProps(
-                                                  dropdownSearchDecoration:
-                                                      InputDecoration(
-                                                    labelText:
-                                                        'Select ${widget.selectedsubject_} ${widget.selectedsubject_ == 'Toilet' || widget.selectedsubject_ == 'Sleep' || widget.selectedsubject_ == 'Health' ? 'remarks' : ''}',
-                                                    // teacherAssignments[index][i],
-                                                    hintText:
-                                                        'Select ${widget.selectedsubject_} ${widget.selectedsubject_ == 'Toilet' || widget.selectedsubject_ == 'Sleep' || widget.selectedsubject_ == 'Health' ? 'remarks' : ''}',
-                                                    // teacherAssignments[index][i],
-                                                  ),
-                                                ),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    dropdownValue = value!;
-                                                  });
-                                                },
-                                                selectedItem: dropdownValue,
-                                                // teacherAssignments[index][i],
-                                              ),
-                                            )
-                                      : Container(),
-                              SizedBox(
-                                  height: mQ.height * 0.006,
-                                  child: Container(
-                                    color: Colors.white,
-                                  )),
-                              Container(
-                                width: mQ.width * 0.9,
-                                alignment: Alignment.centerLeft,
-                                color: Colors.grey[50],
-                                child: CustomTextField(
+                                    onChanged: (value) {
+                                      setState(() {
+                                        dropdownValue = value!;
+                                      });
+                                    },
+                                    selectedItem: dropdownValue,
+                                  ),
+                                const SizedBox(height: 16),
+                                CustomTextField(
                                   enabled: true,
                                   controller: createActivityScreenController
                                       .description_,
                                   inputType: TextInputType.multiline,
                                   labelText: "Type Remarks (optional)",
-                                  validators: (String? value) {
-                                    if (value!.isEmpty) {
-                                      return 'Required';
-                                    }
-                                    return null;
-                                  },
+                                  validators: (String? value) =>
+                                      value == null || value.isEmpty ? 'Required' : null,
                                 ),
-                              ),
-                              (subject == 'Health')
-                                  ? checkboxfunction(
-                                      context, 'Recommended to consult the Dr.')
-                                  : (subject == 'Toilet') &&
-                                          (teachersClass_ == 'Infant' ||
-                                              teachersClass_ == 'Toddler' ||
-                                              teachersClass_ ==
-                                                  'Play Group - I')
-                                      ? checkboxfunction(
-                                          context, 'Diaper Changed.')
-                                      // : (subject == 'Sleep')
-                                      // ? sleepFuntion(context)
-                                      : (subject == 'Fluids')
-                                          ? fluidsfunction(context)
-                                          : (subject == 'Mood')
-                                              ? moodfunction(context)
-                                              : Container(),
-                              SizedBox(
-                                height: mQ.height * 0.01,
-                              ),
-                              SizedBox(
-                                  height: mQ.height * 0.004,
-                                  child: Container(
-                                    color: Colors.white,
-                                  )),
-                              takepicture
-                                  ? imageloading
-                                      ? Container(
-                                          width: mQ.width * 0.4,
-                                          height: mQ.height * 0.2,
-                                          child: Center(
-                                              child:
-                                                  CircularProgressIndicator()))
-                                      : Container(
-                                          width: mQ.width * 0.4,
-                                          height: mQ.height * 0.2,
-                                          child: Image.file(
-                                            File(imagefilepath),
-                                            fit: BoxFit.fill,
-                                          ))
-                                  : Container(),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  takepicture
-                                      ? IconButton(
-                                          icon: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text('Upload Image'),
-                                              Icon(Icons.camera_alt_outlined,
-                                                  size: 30),
-                                            ],
-                                          ),
-                                          constraints: const BoxConstraints(),
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 3, horizontal: 3),
-                                          onPressed: () async {
-                                            await _imageActionSheet(
-                                                context, subject!, mQ);
-                                          },
-                                        )
-                                      : Container(),
-                                ],
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
+
+                          const SizedBox(height: 16),
+
+                          // Special Inputs (Mood, Fluids, etc.)
+                          if (subject == 'Health' ||
+                              subject == 'Toilet' ||
+                              subject == 'Fluids' ||
+                              subject == 'Mood' ||
+                              subject == 'Sleep')
+                            _buildCard(
+                              title: subject == 'Mood'
+                                  ? 'Current Mood'
+                                  : 'Additional Info',
+                              child: _buildSpecialInputs(),
+                            ),
+
+                          if (subject == 'Health' ||
+                              subject == 'Toilet' ||
+                              subject == 'Fluids' ||
+                              subject == 'Mood' ||
+                              subject == 'Sleep')
+                            const SizedBox(height: 16),
+
+                          // Media Section
+                          _buildCard(
+                            title: 'Attachments',
+                            child: Column(
+                              children: [
+                                if (takepicture) ...[
+                                  if (imageloading)
+                                    const CircularProgressIndicator()
+                                  else if (imagefilepath.isNotEmpty)
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.file(
+                                        File(imagefilepath),
+                                        height: 200,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  const SizedBox(height: 12),
+                                  OutlinedButton.icon(
+                                    onPressed: () => _imageActionSheet(
+                                        context, subject!, mQ),
+                                    icon: const Icon(Icons.camera_alt),
+                                    label: Text(imagefilepath.isEmpty
+                                        ? 'Upload Photo'
+                                        : 'Change Photo'),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: kprimary,
+                                      side: BorderSide(color: kprimary),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                    ),
+                                  ),
+                                ] else
+                                  const Text(
+                                      'No photo attachment required for this activity.',
+                                      style: TextStyle(
+                                          color: Colors.grey, fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
                       ),
-              ),
-            ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCard({String? title, required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ));
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Text(
+              title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black87),
+            ),
+            const SizedBox(height: 12),
+          ],
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpecialInputs() {
+    if (subject == 'Health') {
+      return checkboxfunction(context, 'Recommended to consult the Dr.');
+    } else if (subject == 'Toilet') {
+      if (teachersClass_ == 'Infant' ||
+          teachersClass_ == 'Toddler' ||
+          teachersClass_ == 'Play Group - I') {
+        return checkboxfunction(context, 'Diaper Changed.');
+      } else {
+        return toiletfunction(context);
+      }
+    } else if (subject == 'Sleep') {
+      return sleepFuntion(context);
+    } else if (subject == 'Fluids') {
+      return fluidsfunction(context);
+    } else if (subject == 'Mood') {
+      return moodfunction(context);
+    }
+    return Container();
+  }
+
+  // Adding a missing toilet function to improve the Toilet subject selection
+  Widget toiletfunction(context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Toilet Activity',
+            style: TextStyle(
+                color: kprimary, fontSize: 13, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: ['Pee', 'Potty', 'Used Toilet'].map((type) {
+            final isSel = dropdownValue == type;
+            return ChoiceChip(
+              label: Text(type),
+              selected: isSel,
+              onSelected: (val) {
+                setState(() {
+                  dropdownValue = type;
+                });
+              },
+              selectedColor: kprimary.withOpacity(0.2),
+              labelStyle: TextStyle(color: isSel ? kprimary : Colors.black87),
+            );
+          }).toList(),
+        ),
+      ],
+    );
   }
 
   Future<void> _imageActionSheet2(
@@ -476,7 +519,7 @@ class _CreateActivityForMultipleChildsScreenState
     if (status.isPermanentlyDenied) {
       openAppSettings();
     } else if (status.isGranted) {
-      camerainitialize();
+      await camerainitialize();
 
       _controller = CameraController(
         firstCamera!,
@@ -486,10 +529,12 @@ class _CreateActivityForMultipleChildsScreenState
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return WillPopScope(
-              onWillPop: () async {
-                _controller.dispose();
-                return true;
+          return PopScope(
+              canPop: false,
+              onPopInvoked: (didPop) async {
+                if (didPop) return;
+                await _controller.dispose();
+                Navigator.of(context).pop();
               },
               child: Dialog(
                   backgroundColor: Colors.transparent,
@@ -661,40 +706,43 @@ class _CreateActivityForMultipleChildsScreenState
 
   void _pickFile() async {
     final result = await FilePicker.platform.pickFiles(allowMultiple: false);
-    setState(() {
-      imageloading = true;
-    });
-
-    if (result == null) return;
+    if (result == null) {
+      if (mounted) {
+        setState(() {
+          imageloading = false;
+        });
+      }
+      return;
+    }
 
     final file = result.files.first;
     imagefilepath = result.files.first.path!;
 
     // _openFile(file);
-    setState(() {
-      image = file;
-      savepicture = true;
-      imageloading = false;
-    });
+    if (mounted) {
+      setState(() {
+        image = file;
+        savepicture = true;
+        imageloading = false;
+      });
+    }
   }
 
   loadimagefunction(result) async {
-    setState(() {
-      imageloading = true;
-    });
-    if (result == null) return;
-    imagefilepath = result;
-    setState(() {
-      imageloading = false;
-    });
-    ToastContext().init(context);
-    Toast.show(
-      'Click on Create Activity to proceed!',
-      // Get.context,
-      duration: 5, backgroundRadius: 2,
-      backgroundColor: Colors.lightBlueAccent,
-      // gravity: Toast.top,
-    );
+    if (mounted) {
+      setState(() {
+        imageloading = false;
+      });
+    }
+    if (context.mounted) {
+      ToastContext().init(context);
+      Toast.show(
+        'Click on Create Activity to proceed!',
+        duration: 5,
+        backgroundRadius: 2,
+        backgroundColor: Colors.lightBlueAccent,
+      );
+    }
   }
 
   uploadimagetocloudstorage(imagefile) async {
@@ -706,14 +754,13 @@ class _CreateActivityForMultipleChildsScreenState
     uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) async {
       switch (taskSnapshot.state) {
         case TaskState.running:
+          if (!mounted) return;
           progress =
               100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
           ToastContext().init(context);
           Toast.show(
             'Photo is uploading,  ${progress?.toStringAsFixed(2)}%',
-            // Get.context,
             duration: 5, backgroundRadius: 2,
-            //gravity: Toast.top,
           );
           break;
         case TaskState.paused:
@@ -750,20 +797,19 @@ class _CreateActivityForMultipleChildsScreenState
           // Handle unsuccessful uploads
           break;
         case TaskState.success:
-          // Handle successful uploads on complete
-          // ...
+          if (!mounted) return;
           imageUrl = await storageRef.child(filename).getDownloadURL();
-          setState(() {
-            imageloading = false;
-            imagedownloading = true;
-            ToastContext().init(context);
-            Toast.show('Photo Uploaded Successfully',
-                // Get.context,
-                duration: 5,
-                backgroundRadius: 5,
-                backgroundColor: kprimary //gravity: Toast.top,
-                );
-          });
+          if (mounted) {
+            setState(() {
+              imageloading = false;
+              imagedownloading = true;
+              ToastContext().init(context);
+              Toast.show('Photo Uploaded Successfully',
+                  duration: 5,
+                  backgroundRadius: 5,
+                  backgroundColor: kprimary);
+            });
+          }
           await createActivityScreenController.addActivityfunction(
             context,
             widget.selectedBabies,
@@ -789,254 +835,228 @@ class _CreateActivityForMultipleChildsScreenState
   }
 
   int _groupValue = -1;
-  Widget _myRadioButton({title, value, onChanged}) {
-    return RadioListTile(
-      contentPadding: EdgeInsets.all(0),
-      value: value,
-      groupValue: _groupValue,
-      onChanged: onChanged,
-      title: Text(title),
+
+  Widget sleepFuntion(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Sleep Activity',
+            style: TextStyle(
+                color: kprimary, fontSize: 13, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionChip(
+                label: 'Nap Start',
+                icon: Icons.bedtime,
+                color: Colors.indigo,
+                isSelected: dropdownValue == 'Nap Start',
+                onTap: () {
+                  setState(() {
+                    descriptionplus =
+                        createActivityScreenController.description_.text;
+                    dropdownValue = 'Nap Start';
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildActionChip(
+                label: 'Wake up',
+                icon: Icons.wb_sunny,
+                color: Colors.orange,
+                isSelected: dropdownValue == 'Wake up',
+                onTap: () {
+                  setState(() {
+                    descriptionplus =
+                        createActivityScreenController.description_.text;
+                    dropdownValue = 'Wake up';
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _myRadioButtonMood({title, value, onChanged}) {
-    return RadioListTile(
-      value: value,
-      groupValue: _groupValue,
-      onChanged: onChanged,
-      title: Text(
-        title,
-        style: TextStyle(fontSize: 14),
+  Widget _buildActionChip({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.15) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: isSelected ? color : Colors.grey[600], size: 28),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? color : Colors.grey[700],
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  sleepFuntion(context) {
-    return Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: 20,
-          ),
-          InkWell(
-            onTap: () {
-              descriptionplus =
-                  createActivityScreenController.description_.text;
-              createActivityScreenController.description_.text = dropdownValue!;
-              dropdownValue = "Nap Start";
-            }, // Handle the click event
-            child: Wrap(
-              children: [
-                Text('Nap Start'),
-                Icon(
-                  Icons.bedtime,
-                  color: Colors.green[600],
-                  size: 26,
-                )
-              ],
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              descriptionplus =
-                  createActivityScreenController.description_.text;
-              createActivityScreenController.description_.text = dropdownValue!;
-              dropdownValue = "Wake up";
-            }, // Handle the click event
-            child: Wrap(
-              children: [
-                Text('Wake up'),
-                Icon(
-                  Icons.sunny_snowing,
-                  color: Colors.red[600],
-                  size: 26,
-                )
-              ],
-            ),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-        ]);
   }
 
   bool isChecked = false;
-  checkboxfunction(context, title) {
-    Color getColor(Set<MaterialState> states) {
-      const Set<MaterialState> interactiveStates = <MaterialState>{
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused,
-      };
-      if (states.any(interactiveStates.contains)) {
-        return Colors.blue;
-      }
-      return Colors.blue;
-    }
-
-    return Row(children: [
-      Checkbox(
-        checkColor: Colors.white,
-        fillColor: MaterialStateProperty.resolveWith(getColor),
+  Widget checkboxfunction(BuildContext context, String title) {
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      decoration: BoxDecoration(
+        color: kprimary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: CheckboxListTile(
+        title: Text(title,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         value: isChecked,
+        activeColor: kprimary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onChanged: (bool? value) {
           setState(() {
             isChecked = value!;
-            (isChecked) ? descriptionplus = title : descriptionplus = "";
+            descriptionplus = isChecked ? title : "";
           });
         },
+        controlAffinity: ListTileControlAffinity.leading,
       ),
-      Text(title)
-    ]);
+    );
   }
 
-  fluidsfunction(context) {
+  Widget fluidsfunction(BuildContext context) {
+    final quantities = ["All", "Most", "Some", "None", "NA"];
     return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '   Select Quantitity',
-            style: TextStyle(color: Colors.blue),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: _myRadioButton(
-                  title: "All.",
-                  value: 0,
-                  onChanged: (newValue) => setState(() => (
-                        _groupValue = newValue,
-                        descriptionplus = "Quantity: All"
-                      )),
-                ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Quantity Drunk',
+            style: TextStyle(
+                color: kprimary, fontSize: 13, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: quantities.map((q) {
+            final isSel = descriptionplus == "Quantity: $q" ||
+                (q == 'NA' && _groupValue == 4);
+            return ChoiceChip(
+              label: Text(q),
+              selected: isSel,
+              onSelected: (val) {
+                setState(() {
+                  if (q == 'NA') {
+                    _groupValue = 4;
+                    descriptionplus = "";
+                  } else {
+                    _groupValue = quantities.indexOf(q);
+                    descriptionplus = "Quantity: $q";
+                  }
+                });
+              },
+              selectedColor: kprimary.withOpacity(0.2),
+              labelStyle: TextStyle(
+                color: isSel ? kprimary : Colors.black87,
+                fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
               ),
-              Expanded(
-                child: _myRadioButton(
-                  title: "Most.",
-                  value: 1,
-                  onChanged: (newValue) => setState(() => (
-                        _groupValue = newValue,
-                        descriptionplus = "Quantity: Most"
-                      )),
-                ),
-              ),
-              Expanded(
-                child: _myRadioButton(
-                  title: "Some.",
-                  value: 2,
-                  onChanged: (newValue) => setState(() => (
-                        _groupValue = newValue,
-                        descriptionplus = "Quantity: Some"
-                      )),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: _myRadioButton(
-                  title: "None.",
-                  value: 3,
-                  onChanged: (newValue) => setState(() => (
-                        _groupValue = newValue,
-                        descriptionplus = "Quantity: None"
-                      )),
-                ),
-              ),
-              Expanded(
-                child: _myRadioButton(
-                  title: "NA.",
-                  value: 4,
-                  onChanged: (newValue) =>
-                      setState(() => (_groupValue = newValue)),
-                ),
-              ),
-              Expanded(child: Text('')),
-            ],
-          ),
-        ]);
+            );
+          }).toList(),
+        ),
+      ],
+    );
   }
 
-  moodfunction(context) {
-    dropdownValue = ''; // descriptionplus = '';
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        // textBaseline: TextBaseline.ideographic,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(children: [
-            Expanded(
-              child: _myRadioButtonMood(
-                title: "Happy 😁",
-                value: 0,
-                onChanged: (newValue) => setState(() =>
-                    (_groupValue = newValue, descriptionplus = "Happy 😁")),
+  Widget moodfunction(BuildContext context) {
+    final moods = [
+      {'label': 'Happy', 'emoji': '😁', 'color': Colors.amber},
+      {'label': 'Sleep', 'emoji': '😴', 'color': Colors.indigo},
+      {'label': 'Grumpy', 'emoji': '😣', 'color': Colors.red},
+      {'label': 'Sick', 'emoji': '🤢', 'color': Colors.green},
+      {'label': 'Sad', 'emoji': '🥺', 'color': Colors.blue},
+      {'label': 'Shy', 'emoji': '😊', 'color': Colors.pink},
+      {'label': 'Playful', 'emoji': '😂', 'color': Colors.orange},
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: moods.length,
+      itemBuilder: (context, index) {
+        final mood = moods[index];
+        final isSelected =
+            descriptionplus == "${mood['label']} ${mood['emoji']}";
+        return InkWell(
+          onTap: () {
+            setState(() {
+              descriptionplus = "${mood['label']} ${mood['emoji']}";
+              _groupValue = index;
+            });
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? (mood['color'] as Color).withOpacity(0.15)
+                  : Colors.grey[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color:
+                    isSelected ? (mood['color'] as Color) : Colors.grey[200]!,
+                width: 2,
               ),
             ),
-            Expanded(
-              child: _myRadioButtonMood(
-                title: "Sleep 😴",
-                value: 1,
-                onChanged: (newValue) => setState(() =>
-                    (_groupValue = newValue, descriptionplus = "Sleep 😴")),
-              ),
-            ),
-          ]),
-          Row(children: [
-            Expanded(
-              child: _myRadioButtonMood(
-                title: "Grupmy 😣",
-                value: 2,
-                onChanged: (newValue) => setState(() =>
-                    (_groupValue = newValue, descriptionplus = "Grupmy 😣")),
-              ),
-            ),
-            Expanded(
-              child: _myRadioButtonMood(
-                title: "Sick 🤢",
-                value: 3,
-                onChanged: (newValue) => setState(() =>
-                    (_groupValue = newValue, descriptionplus = "Sick 🤢")),
-              ),
-            ),
-          ]),
-          Row(children: [
-            Expanded(
-              child: _myRadioButtonMood(
-                title: "Sad 🥺",
-                value: 4,
-                onChanged: (newValue) => setState(
-                    () => (_groupValue = newValue, descriptionplus = "Sad 🥺")),
-              ),
-            ),
-            Expanded(
-              child: _myRadioButtonMood(
-                title: "Shy 😊",
-                value: 5,
-                onChanged: (newValue) => setState(
-                    () => (_groupValue = newValue, descriptionplus = "Shy 😊")),
-              ),
-            ),
-          ]),
-          Row(
-            children: [
-              Expanded(
-                child: _myRadioButtonMood(
-                  title: "Playful 😂",
-                  value: 6,
-                  onChanged: (newValue) => setState(() => (
-                        _groupValue = newValue,
-                        descriptionplus = "Playfull 😂"
-                      )),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(mood['emoji'] as String,
+                    style: const TextStyle(fontSize: 28)),
+                const SizedBox(height: 4),
+                Text(
+                  mood['label'] as String,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected
+                        ? (mood['color'] as Color)
+                        : Colors.grey[600],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ]);
+        );
+      },
+    );
   }
 
   selectlist() {
@@ -1264,7 +1284,7 @@ class _CreateActivityForMultipleChildsScreenState
                   inputType: TextInputType.text,
                   labelText: "Subject",
                   validators: (String? value) {
-                    if (value!.isEmpty) {
+                    if (value == null || value.isEmpty) {
                       return 'Required';
                     }
                     return null;
@@ -1279,7 +1299,7 @@ class _CreateActivityForMultipleChildsScreenState
                   inputType: TextInputType.text,
                   labelText: "Topic / Title",
                   validators: (String? value) {
-                    if (value!.isEmpty) {
+                    if (value == null || value.isEmpty) {
                       return 'Required';
                     }
                     return null;

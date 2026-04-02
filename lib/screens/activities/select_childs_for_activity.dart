@@ -17,62 +17,164 @@ class SelectChildsForActivity extends StatefulWidget {
   // String activitybabyid_ = '';
 
   @override
-  State<SelectChildsForActivity> createState() => _SelectChildsForActivityState();
+  State<SelectChildsForActivity> createState() =>
+      _SelectChildsForActivityState();
 }
 
 class _SelectChildsForActivityState extends State<SelectChildsForActivity> {
   final collectionReference = FirebaseFirestore.instance.collection(BabyData);
-  ScrollController scrollController = ScrollController();
-    List<Map<String, dynamic>> selectedBabies = [];
-  int selectedChildIndex = -1; // Initialize with -1, indicating no selection
-@override
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> selectedBabies = [];
+  String _searchQuery = '';
+  List<String> _currentFilteredBabyIds = []; // To hold IDs for 'Select All'
+
+  @override
   void initState() {
-    // TODO: implement initState
-  selectedBabies = [];
-  super.initState();
+    super.initState();
   }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final mQ = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: kWhite),
-          title: Text(
-            'Class ${(widget.activityclass_)}',
-            style: TextStyle(fontSize: 14,color: kWhite),
-          ),
-          backgroundColor: kprimary,
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: kWhite),
+        title: Text(
+          'Class ${widget.activityclass_}',
+          style: const TextStyle(
+              fontSize: 18, color: kWhite, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blue[50],
-        body:
-        Column(children: [
-          ImageSlideShowfunction(context),
+        backgroundColor: kprimary,
+        elevation: 0,
+      ),
+      body: Column(
+        children: [
+          // Header Section
           Container(
-            height: mQ.height * 0.025,
-            color: Colors.grey[50],
-            width: mQ.width,
-            child: Text(
-              'Select from ${((widget.activityclass_)=='Kinder Garten - I')?'KG-I':(widget.activityclass_=='Kinder Garten - II')?'KG-II':(widget.activityclass_=='Play Group - I')?'PG-I':widget.activityclass_} class for ${widget.selectedsubject_}',
-              style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),
-              textAlign: TextAlign.center,
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: kprimary,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Select Students for ${widget.selectedsubject_}',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+                const SizedBox(height: 16),
+                // Search Bar
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value.toLowerCase();
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search students...',
+                      prefixIcon: Icon(Icons.search, color: kprimary),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear, size: 20),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                });
+                              },
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+
+          // Selection Options
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Checked In Students',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      if (_currentFilteredBabyIds.isNotEmpty &&
+                          selectedBabies.length ==
+                              _currentFilteredBabyIds.length) {
+                        // If all filtered are selected, deselect all
+                        selectedBabies.clear();
+                      } else {
+                        // Select all filtered students
+                        selectedBabies
+                            .clear(); // Clear existing to avoid duplicates
+                        for (String babyId in _currentFilteredBabyIds) {
+                          selectedBabies.add({'babyId': babyId});
+                        }
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    _currentFilteredBabyIds.isNotEmpty &&
+                            selectedBabies.length ==
+                                _currentFilteredBabyIds.length
+                        ? Icons.deselect
+                        : Icons.done_all,
+                    size: 18,
+                  ),
+                  label: Text(
+                    _currentFilteredBabyIds.isNotEmpty &&
+                            selectedBabies.length ==
+                                _currentFilteredBabyIds.length
+                        ? 'Deselect All'
+                        : 'Select All',
+                  ),
+                  style: TextButton.styleFrom(foregroundColor: kprimary),
+                ),
+              ],
+            ),
+          ),
+
+          // Students Grid
+          Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: collectionReference
                   .where('class_', isEqualTo: widget.activityclass_)
                   .where('checkin', isEqualTo: 'Checked In')
-                  // 'Todlers' )
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 2.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  ); // Show loading indicator
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (snapshot.hasError) {
@@ -80,98 +182,213 @@ class _SelectChildsForActivityState extends State<SelectChildsForActivity> {
                 }
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return EmptyBackground(
-                    title: 'Curently, No student is present in the class. First Check In the student then select activity to select Student(s)',
-                  ); // No data
+                  _currentFilteredBabyIds = []; // Clear IDs if no data
+                  return const EmptyBackground(
+                    title:
+                        'Currently, no students are checked in for this class.',
+                  );
                 }
 
-                // Data is available, build the list
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      height: mQ.height * 0.18,
-                      child: ListView.builder(
-                        physics: AlwaysScrollableScrollPhysics(),
-                        itemCount: snapshot.data!.docs.length,
-                        controller: scrollController,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, position) {
-                          final childData = snapshot.data!.docs[position].data()
-                              as Map<String, dynamic>;
-                          return
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  // Check if the baby is already selected
-                                  bool isAlreadySelected = selectedBabies.any((baby) => baby['babyId'] == snapshot.data!.docs[position].id);
+                final allDocs = snapshot.data!.docs;
+                final filteredDocs = allDocs.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final name =
+                      (data['childFullName'] ?? '').toString().toLowerCase();
+                  return name.contains(_searchQuery);
+                }).toList();
 
-                                  // If already selected, remove it; otherwise, add it
-                                  if (isAlreadySelected) {
-                                    selectedBabies.removeWhere((baby) => baby['babyId'] == snapshot.data!.docs[position].id);
-                                    selectedChildIndex = -1; // No baby is selected
-                                  } else {
-                                    selectedBabies.add({
-                                      'babyId': snapshot.data!.docs[position].id,
-                                      // 'fullName': childData['childFullName'],
-                                      // 'picture': childData['picture'],
-                                      // ... other parameters
-                                    });
-                                    selectedChildIndex = position; // Update selected index
-                                  }
-                                });
-                              },
+                // Update the list of current filtered baby IDs for 'Select All'
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!listEquals(_currentFilteredBabyIds,
+                      filteredDocs.map((doc) => doc.id).toList())) {
+                    setState(() {
+                      _currentFilteredBabyIds =
+                          filteredDocs.map((doc) => doc.id).toList();
+                    });
+                  }
+                });
 
-                            child:
-                            Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: mQ.width * 0.15,
-                                    height: mQ.height * 0.07,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: CachedNetworkImageProvider(
-                                          childData['picture'],
-                                        ),
-                                        fit: BoxFit.fill,
+                if (filteredDocs.isEmpty) {
+                  return const Center(
+                      child: Text('No students match your search.'));
+                }
+
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: filteredDocs.length,
+                  itemBuilder: (context, index) {
+                    final doc = filteredDocs[index];
+                    final childData = doc.data() as Map<String, dynamic>;
+                    final babyId = doc.id;
+                    final isSelected =
+                        selectedBabies.any((baby) => baby['babyId'] == babyId);
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          if (isSelected) {
+                            selectedBabies.removeWhere(
+                                (baby) => baby['babyId'] == babyId);
+                          } else {
+                            selectedBabies.add({'babyId': babyId});
+                          }
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected ? kprimary : Colors.transparent,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
                                       ),
-                                      border: selectedBabies.any((baby) => baby['babyId'] == snapshot.data!.docs[position].id)
-                                          ? Border.all(color: kprimary, width: 4.0) // Change the color and width as needed
-                                          : null,
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: (childData['picture'] != null &&
+                                            childData['picture'].isNotEmpty)
+                                        ? CachedNetworkImage(
+                                            imageUrl: childData['picture'],
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) =>
+                                                Container(
+                                                    color: Colors.grey[200]),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.person),
+                                          )
+                                        : const Icon(Icons.person),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 4.0),
+                                  child: Text(
+                                    childData['childFullName'] ?? '',
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
                                     ),
                                   ),
-                                  Text(" ${childData['childFullName']}",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontFamily: 'Comic Sans MS',
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blue)),
-                                   Text(
-                                        '${childData['fathersName']}',
-                                        style: TextStyle(
-                                            color: Colors.black)),
-                                ],
-                              ),
+                                ),
+                                Text(
+                                  childData['fathersName'] ?? '',
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
                             ),
-                          );
-                        },
+                            if (isSelected)
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: kprimary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                    TextButton(
-                        onPressed:() {
-                      Get.to(CreateActivityForMultipleChildsScreen(selectedBabies: selectedBabies,selectedsubject_: widget.selectedsubject_,));
-                      },
-                        child: Text(textAlign: TextAlign.center,'Proceed>>')
-                    )
-
-                  ],
+                    );
+                  },
                 );
               },
             ),
           ),
-        ]));
+        ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
+            onPressed: selectedBabies.isEmpty
+                ? null
+                : () {
+                    Get.to(CreateActivityForMultipleChildsScreen(
+                      selectedBabies: selectedBabies,
+                      selectedsubject_: widget.selectedsubject_,
+                    ));
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kprimary,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: Colors.grey[300],
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+            ),
+            child: Text(
+              selectedBabies.isEmpty
+                  ? 'Select Students to Proceed'
+                  : 'Proceed with ${selectedBabies.length} Students',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ),
+    );
   }
+}
+
+// Helper function to compare lists (for WidgetsBinding.instance.addPostFrameCallback)
+bool listEquals<T>(List<T>? a, List<T>? b) {
+  if (a == null) return b == null;
+  if (b == null || a.length != b.length) return false;
+  if (identical(a, b)) return true;
+  for (int i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
 }

@@ -194,15 +194,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                             ),
                                           ),
                                           onPressed: () async {
-                                            showDialog(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              builder: (BuildContext context) => Center(
-                                                child: Container()
-                                                // CircularProgressIndicator(),
-
-                                              ),
-                                            );
                                             // loginController.signInUserAPI(context);
                                             loginController.signInUser(context);
                                           },

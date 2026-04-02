@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart'
+    show CachedNetworkImage;
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ import 'package:snackbar/snackbar.dart';
 import 'package:toast/toast.dart';
 import 'package:kids_republik/controllers/bank_account_controller.dart'; // Added import
 
+import '../../utils/const.dart';
 import 'manager_accounts_home.dart';
 
 class DocumentListVerify extends StatefulWidget {
@@ -28,8 +31,8 @@ class DocumentListVerify extends StatefulWidget {
 // String _selectedCategory =  role_ ==  'Manager'?'Paid':'Not Paid';
 
 class _DocumentListVerifyState extends State<DocumentListVerify> {
-String? voucherid;
-List<DocumentSnapshot> _documents = [];
+  String? voucherid;
+  List<DocumentSnapshot> _documents = [];
   final _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
 
@@ -48,7 +51,7 @@ List<DocumentSnapshot> _documents = [];
           ? await _firestore
               .collection(accounts)
               .where('status', isEqualTo: condition2!)
-              .where('fathersEmail', isEqualTo: useremail )
+              .where('fathersEmail', isEqualTo: useremail)
               // .where('fathersEmail', isEqualTo: user!.email)
               .get()
           : await _firestore
@@ -77,220 +80,204 @@ List<DocumentSnapshot> _documents = [];
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
     return Scaffold(
-      floatingActionButton:
-         (role_ != 'Parent' && widget.paystatus == 'Not Paid') ?
-      ElevatedButton.icon(
-        onPressed: () async {
-          await sendReminders(context);
-        },
-        icon: Icon(Icons.notifications_on_outlined),
-        label: Text('Fees Reminder'),
-      ):Container()
-      ,
-      body: Column(
+      backgroundColor: grey100,
+      floatingActionButton: (role_ != 'Parent' &&
+              widget.paystatus == 'Not Paid')
+          ? FloatingActionButton.extended(
+              onPressed: () async => await sendReminders(context),
+              backgroundColor: kprimary,
+              icon: const Icon(Icons.notifications_active_outlined,
+                  color: kWhite),
+              label:
+                  const Text('Send Reminders', style: TextStyle(color: kWhite)),
+            )
+          : null,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _documents.isEmpty
+              ? _buildEmptyState()
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _documents.length,
+                  itemBuilder: (context, index) {
+                    final document = _documents[index];
+                    final documentId = document.id;
+                    return _buildPaymentCard(document, documentId);
+                  },
+                ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _isLoading // Check loading state
-              ? Container(
-                  height: mq.height * 0.6,
-                  child: Center(
-                      child: CircularProgressIndicator())) // Show progress bar
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: (_documents.length < 1)
-                      ? Center(
-                          child: Text('Payment record will be displayed here'),
-                        )
-                      : Container(
-                          height: mq.height * 0.70,
-                          width: mq.width * 0.98,
-                          color:
-                      Colors.blue[50],
-                          child: ListView.builder(
-                              itemCount: _documents.length,
-                              itemBuilder: (context, index) {
-                                final document = _documents[index];
-                                final documentName = document.id;
-                                return Dismissible( // Enable swipe to dismiss for delete
-                                  key: Key(document.id),
-                                confirmDismiss: (direction) => confirm(context, content: Text('Are you sure you want to delete this Fees Slip?')),
-                                onDismissed: (direction) => role_ != 'Parent'? deleteSlip(document.id):null,
-                                  child: ListTile(
-                                    title: Column(
-                                      children: [
-                                        Card(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Column(
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                document[
-                                                                    'childFullName'],
-                                                                style: TextStyle(
-                                                                  color: Colors
-                                                                      .blue[900],
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                              Spacer(),
-                                                              Text(
-                                                                "Rs.${document['amountPayable'].toString()}", // Replace with fetched price data if applicable
-                                                                style: TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 12,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                "${document['month']}", // Replace with fetched price data if applicable
-                                                                style: TextStyle(
-                                                                  color: widget
-                                                                              .paystatus ==
-                                                                          "Not Paid"
-                                                                      ? Colors
-                                                                          .brown
-                                                                      : widget.paystatus ==
-                                                                              "Paid"
-                                                                          ? Colors.blue[
-                                                                              900]
-                                                                          : widget.paystatus ==
-                                                                                  "Verified"
-                                                                              ? Colors.green[900]
-                                                                              : Colors.grey,
-                                                                  // Colors.deepOrange,
-                                                                  fontSize: 12,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                ),
-                                                              ),
-                                                              Spacer(),
-                                                              Text(
-                                                                "Slip#:$documentName", // Replace with fetched price data if applicable
-                                                                style: TextStyle(
-                                                                  color:
-                                                                      Colors.grey,
-                                                                  fontSize: 10,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                "Status :",
-                                                                style: TextStyle(
-                                                                  color:
-                                                                      Colors.black,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                  fontSize: 11,
-                                                                ),
-                                                              ),
-                                                              SizedBox(width: 10,),
-                                                              Text(
-                                                                "${document['status'] == "Not Paid" ? "Due" : document['status']}",
-                                                                // "Status",
-                                                                style: TextStyle(
-                                                                  color:
-                                                                      Colors.grey,
-                                                                  fontSize: 11,
-                                                                ),
-                                                              ),
-                                                              Spacer(),
-                                                              Text(
-                                                                "${document['status'] == 'Not Paid' ? ' Due Date ' : ' Paid on '}:",
-                                                                // "100 GBs",
-                                                                style: TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                  fontSize: 11,
-                                                                ),
-                                                              ),
-                                                              SizedBox(width: 10,),
-                                                              // Spacer(),
-                                                              Text(
-                                                                "${document['status'] == 'Not Paid' ? document['lastDate'] : document['dateOfPayment']}",
-                                                                // "${document['status'] == 'Not Paid' ? ' Due Date ' : ' Paid on '}",
-                                                                style: TextStyle(
-                                                                  color:
-                                                                      Colors.grey,
-                                                                  fontSize: 11,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          _handleDocumentClick(
-                                                              document.id),
-                                                      child: Text(
-                                                        'Proceed',
-                                                        style: TextStyle(
-                                                            fontSize: 10),
-                                                      ),
-                                                      style: TextButton.styleFrom(
-                                                        foregroundColor:
-                                                            Colors.white,
-                                                        backgroundColor:
-                                                            Colors.blue,
-                                                        padding:
-                                                            EdgeInsets.symmetric(
-                                                                horizontal: 10.0,
-                                                                vertical: 2.0),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              })),
-                )
+          Icon(Icons.receipt_long_outlined, size: 64, color: grey100),
+          const SizedBox(height: 16),
+          Text(
+            'No payment records found',
+            style: k14500.copyWith(color: kGrey),
+          ),
         ],
       ),
     );
   }
-void deleteSlip(String documentId) async {
-  await confirm(context, content: Text('Are you sure you want to delete this Slip?'))?
-  await _firestore.collection(accounts).doc(documentId).delete():null;
-}
+
+  Widget _buildPaymentCard(DocumentSnapshot document, String documentId) {
+    final String status = document['status'];
+    final String childName = document['childFullName'];
+    final String amount = document['amountPayable'].toString();
+    final String month = document['month'];
+    final String date =
+        status == 'Not Paid' ? document['lastDate'] : document['dateOfPayment'];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Dismissible(
+          key: Key(documentId),
+          direction: role_ == 'Parent'
+              ? DismissDirection.none
+              : DismissDirection.endToStart,
+          confirmDismiss: (direction) => confirm(context,
+              title: const Text('Delete Slip'),
+              content: const Text(
+                  'Are you sure you want to delete this fees slip?')),
+          onDismissed: (direction) => deleteSlip(documentId),
+          background: Container(
+            color: kRedColor,
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            child: const Icon(Icons.delete_outline, color: kWhite, size: 28),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        childName,
+                        style: k16bold.copyWith(color: kBlackColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    _buildStatusBadge(status),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Month', style: k10500.copyWith(color: kGrey)),
+                        Text(month, style: k12500.copyWith(color: kBlackColor)),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('Amount', style: k10500.copyWith(color: kGrey)),
+                        Text('Rs. $amount',
+                            style: k14bold.copyWith(color: kprimary)),
+                      ],
+                    ),
+                  ],
+                ),
+                const Divider(height: 24, thickness: 0.5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(status == 'Not Paid' ? 'Due Date' : 'Paid Date',
+                            style: k10500.copyWith(color: kGrey)),
+                        Text(date, style: k12500.copyWith(color: kBlackColor)),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _handleDocumentClick(documentId),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kprimary.withOpacity(0.1),
+                        foregroundColor: kprimary,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 0),
+                        minimumSize: const Size(0, 32),
+                      ),
+                      child: const Text('Proceed',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text('Slip #: $documentId',
+                    style: k10500.copyWith(color: kGrey.withOpacity(0.6))),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(String status) {
+    Color color;
+    String label = status == 'Not Paid' ? 'DUE' : status.toUpperCase();
+
+    switch (status) {
+      case 'Paid':
+        color = Colors.blue;
+        break;
+      case 'Verified':
+        color = kSuccessColor;
+        break;
+      default:
+        color = kRedColor;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style:
+            TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  void deleteSlip(String documentId) async {
+    await confirm(context,
+            content: Text('Are you sure you want to delete this Slip?'))
+        ? await _firestore.collection(accounts).doc(documentId).delete()
+        : null;
+  }
 
   Future<List<DocumentSnapshot>> getStudentsForReminder() async {
     QuerySnapshot querySnapshot;
@@ -301,12 +288,15 @@ void deleteSlip(String documentId) async {
 
     List<DocumentSnapshot> validDocuments = [];
     // DateTime now = DateTime.now();
-    DateTime now = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    DateTime now =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
     for (var doc in querySnapshot.docs) {
       String lastDateStr = doc['lastDate'];
       DateTime lastDate = DateFormat('dd-MMM-yyyy').parse(lastDateStr);
-      if (lastDate.isBefore(now)) {validDocuments.add(doc);}
+      if (lastDate.isBefore(now)) {
+        validDocuments.add(doc);
+      }
     }
     setState(() {
       _documents = validDocuments;
@@ -316,35 +306,43 @@ void deleteSlip(String documentId) async {
 
   Future<void> sendReminders(BuildContext context) async {
     List<DocumentSnapshot> students = await getStudentsForReminder();
-    CollectionReference consentCollection = FirebaseFirestore.instance.collection(Activity);
-    await confirm(context,title: Text('Send Fees Reminder',style: TextStyle(fontSize: 14),),content:
-    Text('Are you sure you want to send fee/slip submission reminders to all parents whose payments/uploads are overdue? This action will send a reminder to parents.',style: TextStyle(fontSize: 12)),textOK: Text('Send'),textCancel: Text('Not Now'))?
+    CollectionReference consentCollection =
+        FirebaseFirestore.instance.collection(Activity);
+    await confirm(context,
+            title: Text(
+              'Send Fees Reminder',
+              style: TextStyle(fontSize: 14),
+            ),
+            content: Text(
+                'Are you sure you want to send fee/slip submission reminders to all parents whose payments/uploads are overdue? This action will send a reminder to parents.',
+                style: TextStyle(fontSize: 12)),
+            textOK: Text('Send'),
+            textCancel: Text('Not Now'))
+        ? () async {
+            for (var student in students) {
+              String studentId = student['child_'];
+              voucherid = student.id;
+              String fathersEmail = student['fathersEmail'];
 
-    () async {
-      for (var student in students) {
-        String studentId = student['child_'];
-        voucherid = student.id;
-        String fathersEmail = student['fathersEmail'];
-
-        await consentCollection.add({
-          'child_': studentId,
-          'parentid_': fathersEmail,
-          'title_': 'Fees Reminder',
-          'description_': "Dear Parents, \n \n This is a friendly reminder that the due date for fee submission/slip upload has passed. We kindly request you to submit the outstanding amount/upload the missing slip as soon as possible. Your cooperation is greatly appreciated. \n \n If you have any questions or need assistance, please contact Manager at KidzRepublik Islamabad.\n \n Thank you for your prompt attention to this matter.",
-          'date_': DateFormat('dd-MM-yyyy').format(DateTime.now()),
-          'result_': 'Waiting',
-          'category_': 'Reminder'
-        });
-      }
-    ToastContext().init(context);
-    Toast.show(
-      'Fees Reminders sent to Parents successfully',
-      backgroundRadius: 5,
-    );
-    }: null;
-
+              await consentCollection.add({
+                'child_': studentId,
+                'parentid_': fathersEmail,
+                'title_': 'Fees Reminder',
+                'description_':
+                    "Dear Parents, \n \n This is a friendly reminder that the due date for fee submission/slip upload has passed. We kindly request you to submit the outstanding amount/upload the missing slip as soon as possible. Your cooperation is greatly appreciated. \n \n If you have any questions or need assistance, please contact Manager at KidzRepublik Islamabad.\n \n Thank you for your prompt attention to this matter.",
+                'date_': DateFormat('dd-MM-yyyy').format(DateTime.now()),
+                'result_': 'Waiting',
+                'category_': 'Reminder'
+              });
+            }
+            ToastContext().init(context);
+            Toast.show(
+              'Fees Reminders sent to Parents successfully',
+              backgroundRadius: 5,
+            );
+          }
+        : null;
   }
-
 }
 
 String formatTimestamp(timestamp) {
@@ -368,7 +366,8 @@ class PrepareBankCopyFromFirebasePDF extends StatefulWidget {
 
 class _PrepareBankCopyFromFirebasePDFState
     extends State<PrepareBankCopyFromFirebasePDF> {
-  final BankAccountController bankController = Get.find<BankAccountController>();
+  final BankAccountController bankController =
+      Get.find<BankAccountController>();
   final CollectionReference feesCollection =
       FirebaseFirestore.instance.collection(accounts);
   String slipNumber = '';
@@ -389,12 +388,10 @@ class _PrepareBankCopyFromFirebasePDFState
   void initState() {
     super.initState();
     _fetchData(); // Fetch data on widget initialization
-
   }
-// ... (lines 393-616 skipped in replacement for brevity, but I need to target the build method specifically or the whole class if I want to be safe. 
+// ... (lines 393-616 skipped in replacement for brevity, but I need to target the build method specifically or the whole class if I want to be safe.
 // The file is large. I will target chunks.
 // First chunk: State class start and fields.
-
 
   Future<void> _fetchData() async {
     try {
@@ -439,363 +436,384 @@ class _PrepareBankCopyFromFirebasePDFState
 
   @override
   Widget build(BuildContext context) {
-    final mQ = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Colors.blue[50],
-        floatingActionButton: Container(
-          height: mQ.height*0.25,
-          width: mQ.width*0.55,
-          alignment: Alignment.bottomRight,
-          padding: EdgeInsets.symmetric(horizontal: mQ.width*0.01),
-          child:
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // Spacer(), // Remove unused Spacer
-                status == 'Not Paid'?
-                    Column(crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-             role_ == 'Parent'? ElevatedButton.icon(
-                  onPressed: () async {Get.to(AddCashBankTransfer());},
-                  icon: Icon(
-                    Icons.payment,
-                    size: 14,
-                  ),
-                  label: Text(
-                    'Pay Online',
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[50], // Customize button color
-                  ),
-                ):Container(),
-                          ElevatedButton.icon(
-                  onPressed: () => _generatePdf(),
-                  icon: Icon(
-                    Icons.print,
-                    size: 14,
-                  ),
-                  label: Text(
-                    'Save/ Print',
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[50], // Customize button color
-                  ),
-                ),
-                          ElevatedButton.icon(
-                        onPressed: () => Get.to(
-                                () => MyUploadPaymentProof(documentId: slipNumber)),
-                        icon: Icon(
-                          Icons.upload_file,
-                          size: 14,
-                        ),
-                        label: Text(
-                          'Upload Slip',
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange[50], // Customize button color
-                        ),
-                      ),
-                          ElevatedButton.icon(
-                            onPressed: () => Get.back(),
-                            icon: Icon(
-                              Icons.close,
-                              size: 14,
-                            ),
-                            label: Text(
-                              'Close',
-                              style: TextStyle(fontSize: 10),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                              Colors.blue[50], // Customize button color
-                            ),
-                          )
-
-                ]):
-                // SizedBox(width: 10), // Add another gap between buttons
-                status == 'Paid' && (role_ == 'Manager'||role_ == 'Director')?
-                ElevatedButton.icon(
-    onPressed: () =>
-     Get.to(() =>
-    ManagerVerifyProof(documentId: slipNumber))
-    //     :
-    // ScaffoldMessenger.of(context).showSnackBar(
-    // SnackBar(
-    // backgroundColor: Colors.blue[50],
-    // content: Wrap(children: [
-    // Icon(Icons.error_outline_sharp),
-    // SizedBox(
-    // width: 12,
-    // ),
-    // Text(
-    // 'Payment slip not uploaded, Unable to verify',
-    // style: TextStyle(color: Colors.black),
-    // )
-    // ]),
-    // ),
-    // ),
-    ,icon: Icon(
-    Icons.verified_user_outlined,
-    size: 14,
-    ),
-    label: Text(
-    'Verify',
-    style: TextStyle(fontSize: 10),
-    ),
-    style: ElevatedButton.styleFrom(
-    backgroundColor:
-    Colors.orange[50], // Customize button color
-    ),
-    ):
-                status == 'Verified' ?
-                ElevatedButton.icon(
-                  onPressed: () => Get.back(),
-                  icon: Icon(
-                    Icons.close,
-                    size: 14,
-                  ),
-                  label: Text(
-                    'Close',
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                    Colors.blue[50], // Customize button color
-                  ),
-                )
-                    :
-                ElevatedButton.icon(
-                  onPressed: () => Get.back(),
-                  icon: Icon(
-                    Icons.close,
-                    size: 14,
-                  ),
-                  label: Text(
-                    'Close',
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                    Colors.blue[50], // Customize button color
-                  ),
-                )
-              ],
-            )
-        ),
-        body: Padding(
-          padding:
-              const EdgeInsets.only(top: 25.0, bottom: 10, left: 5, right: 5),
-          child: Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                  color: Colors.black, width: 1.5), // Add border here
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Header
-                Text(
-                  'Fees Voucher',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Image on the left
-                    Container(
-                      width: 50,
-                      child: Image(
-                        image: AssetImage('assets/${table_}bank_icon.png'),
-                        fit: BoxFit
-                            .cover, // Adjust fit as needed (cover, contain, etc.)
-                      ),
-                    ),
-                    // Text in the center
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            bankController.bankName.value,
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          Text("Any Branch within Pakistan"),
-                        ],
-                      ),
-                    ),
-                    // Image on the right
-                    Container(
-                      width: 050,
-                      child: Image(
-                        image: AssetImage('assets/${table_}app_icon.png'),
-                        fit: BoxFit
-                            .cover, // Adjust fit as needed (cover, contain, etc.)
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Payee Information
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'AC No: ${bankController.accountNumber.value}',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                  ],
-                ),
-                // Slip Information
-                Row(
-                  children: [
-                    Text("NO:                   $slipNumber"),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text("Credit:              ${bankController.creditTo.value}"),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text("Dated:              ${dated}"),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text("Full Name:       $fullName"),
-                  ],
-                ),
-                // Student Information
-                Row(
-                  children: [
-                    Text("Class:              $studentClass"),
-                    Spacer(),
-                    Text("Reg #:     $registrationNumber"),
-                    Spacer(),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text("Month:            $month"),
-                  ],
-                ),
-                // Fee Breakdown
-                Row(
-                  children: [
-                    Text("Sr#",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 12)),
-                    SizedBox(width: 20),
-                    Text("Type of Fee",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 12)),
-                    Spacer(),
-                    Text("Amount",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 12)),
-                  ],
-                ),
-                // Fees breakdown
-                if (_feesData.isNotEmpty)
-                  ListView.builder(
-                    padding: EdgeInsets.only(top: 5, bottom: 10),
-                    shrinkWrap:
-                        true, // Prevent the list from expanding unnecessarily
-                    itemCount: _feesData.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      final fee = _feesData[index];
-                      return Column(
-                        children: [
-                          (fee['name'] == 'childFullName' ||
-                                  fee['name'] == 'fathersEmail')
-                              ? Container()
-                              : Row(
-                                  children: [
-                                    Text(
-                                        "${index + 1}.        ${fee['name']}"), // Display fee type
-                                    Spacer(),
-                                    Text('${fee['amount']}.00'.toString()),
-                                  ],
-                                ),
-                          const Divider(
-                              height: 1,
-                              color: Colors
-                                  .grey), // Add divider after each ListTile
-                        ],
-                      );
-                    },
-                  ),
-                // Totals
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Amount Payable:",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        )),
-                    Text(amountPayable!.toStringAsFixed(2)),
-                  ],
-                ),
-                Column(
+      backgroundColor: grey100,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: kprimary,
+        iconTheme: const IconThemeData(color: kWhite),
+        title: const Text('Fees Voucher Preview',
+            style: TextStyle(
+                color: kWhite, fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+      bottomNavigationBar: _buildBottomActions(),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: kWhite,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4))
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildVoucherHeader(),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "1. Tuition Fee is payable in advance and once paid is Non- Refundable",
-                      style: TextStyle(fontSize: 10),
-                    ),
-                    Text(
-                        "2. Tuition Fee must be paid before the last date of payment stated on the Fee Bill. A fine of Rs. 100/- per day will be charged after lapse of last date of payment.",
-                        style: TextStyle(fontSize: 10)),
-                    Text(
-                        "3. If a student fails to pay tuition fee within 5 days after the last date of payment. He/ She will not be permitted to sit in the class.",
-                        style: TextStyle(fontSize: 10)),
-                    Text(
-                        "4. Tuition Fee for the month(s) of June August Quarter must be paid before the beginning of Summer Vacation",
-                        style: TextStyle(fontSize: 10)),
-                    Text(
-                        "5. If a student is to be withdrawn, A notice of one month must be given in writing or one month's fee is payment on lieu of the notice",
-                        style: TextStyle(fontSize: 10)),
-                    Text(
-                        "6. If a student fails to give fee bill to his/her parents. It is the responsibility of the parents to bring it to the notice of the school account officer Rs. 100/- will be charged if a fee bill is reported lost and duplicate copy asked for.",
-                        style: TextStyle(fontSize: 10)),
+                    _buildAccountInfo(),
+                    const Divider(height: 32),
+                    _buildStudentInfo(),
+                    const SizedBox(height: 24),
+                    _buildFeesTable(),
+                    const SizedBox(height: 24),
+                    _buildTotalSection(),
+                    const SizedBox(height: 32),
+                    _buildInstructions(),
+                    const SizedBox(height: 32),
+                    _buildVoucherFooter(),
                   ],
                 ),
-                SizedBox(height: 10),
-                // Footer
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Issue Date: ${issueDate}",
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
-                    Text("Last Date: ${lastDate}",
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                Spacer(),
-                Row(
-                  children: [
-                    Text(
-                      "Accounts Office",
-                      textAlign: TextAlign.right,
-                    ),
-                  ],
-                ),
-                Spacer(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomActions() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: kWhite,
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -5))
+        ],
+      ),
+      child: SafeArea(
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          alignment: WrapAlignment.center,
+          children: [
+            if (status == 'Not Paid') ...[
+              if (role_ == 'Parent')
+                _buildActionButton('Pay Online', Icons.payment, Colors.green,
+                    () => Get.to(AddCashBankTransfer())),
+              _buildActionButton(
+                  'Save/Print', Icons.print, Colors.blue, _generatePdf),
+              _buildActionButton(
+                  'Upload Slip',
+                  Icons.upload_file,
+                  Colors.orange,
+                  () => Get.to(
+                      () => MyUploadPaymentProof(documentId: slipNumber))),
+            ] else if (status == 'Paid' &&
+                (role_ == 'Manager' || role_ == 'Director'))
+              _buildActionButton(
+                  'Verify',
+                  Icons.verified_user,
+                  Colors.orange,
+                  () =>
+                      Get.to(() => ManagerVerifyProof(documentId: slipNumber))),
+            _buildActionButton('Close', Icons.close, kGrey, () => Get.back()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+      String label, IconData icon, Color color, VoidCallback onPressed) {
+    return SizedBox(
+      width: (MediaQuery.of(context).size.width - 44) / 2,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18),
+        label: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color.withOpacity(0.1),
+          foregroundColor: color,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVoucherHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      decoration: BoxDecoration(
+        color: kprimary,
+        borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50, // Added fixed height
+            child: Obx(() {
+              if (bankController.bankImage.value.isNotEmpty) {
+                return CachedNetworkImage(
+                  imageUrl: bankController.bankImage.value,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) =>
+                      Image.asset('assets/bank_icon.png'),
+                  errorWidget: (context, url, error) =>
+                      Image.asset('assets/bank_icon.png'),
+                );
+              } else {
+                return Image(
+                  image: AssetImage('assets/bank_icon.png'),
+                  fit: BoxFit.cover,
+                );
+              }
+            }),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(bankController.bankName.value,
+                    style: const TextStyle(
+                        color: kWhite,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16)),
+                const Text("Any Branch within Pakistan",
+                    style: TextStyle(
+                      color: kWhite,
+                      fontSize: 12,
+                    )),
               ],
             ),
           ),
-        ));
+          Image.asset('assets/${table_}app_icon.png', height: 40, width: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccountInfo() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Slip Number', style: k10500.copyWith(color: kGrey)),
+              Text(slipNumber, style: k10bold, overflow: TextOverflow.visible),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text('Account Number', style: k10500.copyWith(color: kGrey)),
+              Text(bankController.accountNumber.value,
+                  style: k10500, overflow: TextOverflow.visible),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStudentInfo() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildInfoRow('Full Name', fullName),
+            _buildInfoRow('Account Holder', bankController.creditTo.value),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildInfoRow('Class', studentClass ?? '-'),
+            _buildInfoRow('Reg #', registrationNumber),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(child: _buildInfoRow('Month', month)),
+            Expanded(child: _buildInfoRow('Date', dated ?? '-')),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: k10500.copyWith(color: kGrey)),
+        Text(value, style: k12500.copyWith(color: kBlackColor)),
+      ],
+    );
+  }
+
+  Widget _buildFeesTable() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Fees Breakdown', style: k14bold),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _feesData.length,
+            itemBuilder: (context, index) {
+              final fee = _feesData[index];
+              if (fee['name'] == 'childFullName' ||
+                  fee['name'] == 'fathersEmail') return const SizedBox.shrink();
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  border: index < _feesData.length - 1
+                      ? Border(bottom: BorderSide(color: Colors.grey.shade100))
+                      : null,
+                ),
+                child: Row(
+                  children: [
+                    Text('${index + 1}.', style: k12500.copyWith(color: kGrey)),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(fee['name'], style: k12500)),
+                    Text('Rs. ${fee['amount']}.00',
+                        style: k12500.copyWith(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTotalSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: kprimary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Amount Payable', style: k14bold),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text('Rs. ${amountPayable?.toStringAsFixed(2)}',
+                style: k16bold.copyWith(color: kprimary),
+                overflow: TextOverflow.ellipsis),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstructions() {
+    final instructions = [
+      "1. Tuition Fee is payable in advance and once paid is Non-Refundable.",
+      "2. Tuition Fee must be paid before the last date of payment stated on the Fee Bill. A fine of Rs. 100/- per day will be charged after lapse of last date of payment.",
+      "3. If a student fails to pay tuition fee within 5 days after the last date of payment. He/She will not be permitted to sit in the class.",
+      "4. Tuition Fee for the month(s) of June August Quarter must be paid before the beginning of Summer Vacation.",
+      "5. If a student is to be withdrawn, A notice of one month must be given in writing or one month's fee is payment on lieu of the notice.",
+      "6. If a student fails to receive fee bill, it is the responsibility of the parents to notify the school. Rs. 100/- will be charged for duplicate copy."
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Important Instructions',
+            style: k12500.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        ...instructions.map((text) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(text,
+                  style:
+                      TextStyle(fontSize: 10, color: kGrey.withOpacity(0.8))),
+            )),
+      ],
+    );
+  }
+
+  Widget _buildVoucherFooter() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Issue Date', style: k10500.copyWith(color: kGrey)),
+                  Text(issueDate ?? '-',
+                      style: k12500.copyWith(fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('Last Date', style: k10500.copyWith(color: kGrey)),
+                  Text(lastDate ?? '-',
+                      style: k12bold.copyWith(color: kRedColor),
+                      overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 40),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              width: 150,
+              padding: const EdgeInsets.only(top: 5),
+              decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: kBlackColor))),
+              child: const Text('Accounts Office',
+                  textAlign: TextAlign.center, style: k10500),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   pw.Widget _buildContent(title, imagebank, imagekrdc) {
@@ -1037,5 +1055,4 @@ class _PrepareBankCopyFromFirebasePDFState
     await Printing.layoutPdf(
         onLayout: (PdfPageFormat format) async => pdf.save());
   }
-
 }

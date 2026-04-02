@@ -7,7 +7,6 @@ import 'package:kids_republik/screens/dailysheet/gallery_screen_staff.dart';
 
 import '../../main.dart';
 
-RxBool isLoading = true.obs;
 final subjects_ = <String>['Food', 'Fluids', 'Health', 'Activity'];
 
 class GalleryReportShapeScreen extends StatelessWidget {
@@ -167,6 +166,7 @@ class GalleryReportShapeScreen extends StatelessWidget {
                 subject: 'Activity',
                 category: 'DailySheet',
                 reportdate_: date_,
+                fathersEmail_: fathersEmail_,
                 subjectcolor_: const Color(0xFF0EA5E9), // Modern Sky Blue
               ),
             ),

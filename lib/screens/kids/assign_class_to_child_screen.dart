@@ -180,8 +180,9 @@ class _AssignClassToChildrenState extends State<AssignClassToChildren> {
                                     shape: BoxShape.circle,
                                     image: DecorationImage(
                                         alignment: FractionalOffset.topCenter,
-                                        image: CachedNetworkImageProvider(
-                                            childData['picture']),
+                                        image: (childData['picture'] != null && childData['picture'].isNotEmpty) 
+                                            ? CachedNetworkImageProvider(childData['picture']) 
+                                            : AssetImage('assets/staff.jpg') as ImageProvider, // Fallback to a local asset or placeholder
                                         fit: BoxFit.cover),
                                   ),
                                 ),
@@ -257,12 +258,12 @@ class _AssignClassToChildrenState extends State<AssignClassToChildren> {
                                                         }),
                                               await collectionReferenceClassRoom
                                                   .doc(selectedItem)
-                                                  .update({
+                                                  .set({
                                                 "strength_":
                                                     FieldValue.increment(1),
                                                 'absent_':
                                                     FieldValue.increment(1)
-                                              })
+                                              }, SetOptions(merge: true))
                                             }
                                           : null
                                       : null;

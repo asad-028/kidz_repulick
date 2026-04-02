@@ -48,6 +48,7 @@ const profileBg = Color(0xFF808080);
 
 //////
 var grey100 = Colors.grey[100];
+var grey300 = Colors.grey[300];
 
 const kPrimaryGradient = LinearGradient(
   colors: [Color(0xFF46A0AE), Color(0xFF00FFCB)],
@@ -93,6 +94,10 @@ const k15500 = TextStyle(fontSize: 15.0, fontWeight: FontWeight.w500);
 const k14500 = TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500);
 const k13500 = TextStyle(fontSize: 13.0, fontWeight: FontWeight.w500);
 const k12500 = TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500);
+const k10500 = TextStyle(fontSize: 10.0, fontWeight: FontWeight.w500);
+const k14bold = TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold);
+const k12bold = TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
+const k10bold = TextStyle(fontSize: 10.0, fontWeight: FontWeight.bold);
 
 const kTextFieldTitle =
     TextStyle(color: kBlackColor, fontWeight: FontWeight.bold);

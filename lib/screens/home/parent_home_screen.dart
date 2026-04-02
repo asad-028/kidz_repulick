@@ -36,15 +36,19 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
   final collectionReferenceAccounts =
       FirebaseFirestore.instance.collection(accounts);
   User? user = FirebaseAuth.instance.currentUser;
-  // final collectionReferenceActivity = FirebaseFirestore.instance.collection(Activity);
+  
+  // Cache for report data to avoid duplicate reads
+  final Map<String, Map<String, dynamic>> _reportCache = {};
+  final Map<String, DateTime> _reportCacheTime = {};
+  static const Duration _cacheExpiry = Duration(minutes: 5);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
-    int  dailyApproved = 0 ;
-    int BiWeeklyApproved = 0;
+  
+  int dailyApproved = 0;
+  int BiWeeklyApproved = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -456,42 +460,55 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         }
     }});
   }
+  // Optimized: Single method to fetch and cache report data - prevents duplicate reads
+  Future<Map<String, dynamic>> _fetchReportData(String babyId) async {
+    // Check cache first
+    if (_reportCache.containsKey(babyId) && 
+        _reportCacheTime.containsKey(babyId)) {
+      final cacheTime = _reportCacheTime[babyId]!;
+      if (DateTime.now().difference(cacheTime) < _cacheExpiry) {
+        return _reportCache[babyId]!;
+      }
+    }
+
+    // Fetch from Firestore only if not cached or cache expired
+    final DocumentSnapshot reportSnapshot =
+        await collectionReferenceReports.doc(babyId).get();
+
+    Map<String, dynamic> reportData = {};
+    if (reportSnapshot.exists) {
+      reportData = reportSnapshot.data() as Map<String, dynamic>;
+      // Cache the data
+      _reportCache[babyId] = reportData;
+      _reportCacheTime[babyId] = DateTime.now();
+    }
+
+    return reportData;
+  }
+
+  // Optimized: Use cached data instead of separate read
   Future<int> _fetchDailyApproved(String babyId) async {
-    final DocumentSnapshot reportSnapshot =
-    await FirebaseFirestore.instance.collection(Reports).doc(babyId).get();
-
-    if (reportSnapshot.exists) {
-      final reportData = reportSnapshot.data() as Map<String, dynamic>;
-      // BiWeeklyApproved = reportData['BiWeekly_Approved'] ;
-      dailyApproved = reportData['DailySheet_Approved'] ;
-    }
-    // Implement your logic to fetch daily approved count
-    // ...
-    return dailyApproved; // Return the actual count
+    final reportData = await _fetchReportData(babyId);
+    return reportData['DailySheet_Approved'] ?? 0;
   }
 
+  // Optimized: Use cached data instead of separate read (fixed bug - was using wrong field)
   Future<int> _fetchBiWeeklyApproved(String babyId) async {
-    final DocumentSnapshot reportSnapshot =
-    await FirebaseFirestore.instance.collection(Reports).doc(babyId).get();
-
-    if (reportSnapshot.exists) {
-      final reportData = reportSnapshot.data() as Map<String, dynamic>;
-      // BiWeeklyApproved = reportData['BiWeekly_Approved'] ;
-      dailyApproved = reportData['DailySheet_Approved'] ;
-    }
-    // Implement your logic to fetch biweekly approved count
-    // ...
-    return BiWeeklyApproved; // Return the actual count
+    final reportData = await _fetchReportData(babyId);
+    return reportData['BiWeekly_Approved'] ?? 0;
   }
-  Future<void> fetchBiWeeklyApproved(String babyId) async {
-    final DocumentSnapshot reportSnapshot =
-    await FirebaseFirestore.instance.collection(Reports).doc(babyId).get();
 
-    if (reportSnapshot.exists) {
-      final reportData = reportSnapshot.data() as Map<String, dynamic>;
-       BiWeeklyApproved = reportData['BiWeekly_Approved'] ;
-       dailyApproved = reportData['DailySheet_Approved'] ;
-    }
+  // Optimized: Use cached data instead of separate read
+  Future<void> fetchBiWeeklyApproved(String babyId) async {
+    final reportData = await _fetchReportData(babyId);
+    BiWeeklyApproved = reportData['BiWeekly_Approved'] ?? 0;
+    dailyApproved = reportData['DailySheet_Approved'] ?? 0;
+  }
+
+  // Clear cache when needed (e.g., after updates)
+  void _clearReportCache(String babyId) {
+    _reportCache.remove(babyId);
+    _reportCacheTime.remove(babyId);
   }
 
   // Function to fetch and display activities

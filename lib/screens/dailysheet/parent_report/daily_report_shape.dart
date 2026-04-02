@@ -13,7 +13,10 @@ import 'package:snackbar/snackbar.dart';
 
 import '../../../main.dart';
 import 'parent_report_recomendations.dart';
+import '../../widgets/primary_button.dart';
+
 RxBool isLoading = true.obs;
+
 class DailyReportShape extends StatelessWidget {
   final String babyID_;
   final String name_;
@@ -27,322 +30,535 @@ class DailyReportShape extends StatelessWidget {
     required this.babyID_,
     required this.name_,
     required this.date_,
-    required this.class_, required this.childPicture_, required this.reportType_,
+    required this.class_,
+    required this.childPicture_,
+    required this.reportType_,
   }) : super(key: key);
   final collectionReference = FirebaseFirestore.instance.collection(Activity);
-  final collectionReferencebabydata = FirebaseFirestore.instance.collection(BabyData);
-  final collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
+  final collectionReferencebabydata =
+      FirebaseFirestore.instance.collection(BabyData);
+  final collectionReferenceReports =
+      FirebaseFirestore.instance.collection(Reports);
   List<Map<String, dynamic>>? activityPhotos;
-
 
   @override
   Widget build(BuildContext context) {
-    final mQ = MediaQuery
-        .of(context)
-        .size;
+    print("Report Type: $reportType_");
+    print(babyID_);
+    final mQ = MediaQuery.of(context).size;
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: kprimary, // Change this to the desired color
     ));
     return Scaffold(
-        backgroundColor: Colors.white,
-        bottomNavigationBar:
-
-        (role_ == "Principal" ) ?
-        Container(
-          color: kprimary,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              (reportType_!="Approved")?
-              TextButton(
-                child:
-              Text(
-                  'Approve'
-                  ,style: TextStyle(color: Colors.white)
-              ),
-                // icon: Icon(Icons.done,size: 24,color: Colors.white,)
-                // ,
-                  onPressed: () async => {
-                await confirm(context)?updateDocumentsWithStatusForwarded(babyID_,"Forwarded","Approved",context):Get.back(),
-
-              },)
-              :TextButton(
-              child: Text(
-                  'Close'
-                  ,style: TextStyle(color: Colors.white)
-              ),
-                onPressed: () async => {
-                Get.back(),
-
-              },)
-              ,
-            ],
-          ),
-        ):
-        (role_ == "Teacher") ?
-        Container(
-          color: kprimary,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-              (reportType_=="Approved"||reportType_=="Forwarded") ?
-              'Close':
-                  'Forward',style: TextStyle(color: Colors.white)),
-              (reportType_=="Approved"||reportType_=="Forwarded") ?
-              IconButton(icon: Icon(color:Colors.white, Icons.close,size: 24),onPressed: () async => {
-                Get.back(),
-              }):IconButton(icon: Icon(color:Colors.white, Icons.send,size: 24),onPressed: () async => {
-                await confirm(context)?updateDocumentsWithStatusForwarded(babyID_,"New","Forwarded",context):null,
-                Get.back(),
-              }),
-            ],
-          ),
-        )
-            :
-        (role_ == "Parent") ?
-        Container(color: kprimary,
-          child: TextButton(
-              onPressed: () async {
-                await collectionReferenceReports.doc(babyID_).set({"DailySheet_Approved": 0}, SetOptions(merge: true));
-
-                await collectionReferencebabydata
-                    .doc(babyID_)
-                    .update({'parentfeedback_': "Seen"});
-                Get.back();
-              },
-              child: Text('Close',style: TextStyle(fontSize: 14, color: Colors.white,)),
-        ))
-        :
-        (role_ == "Director") ?
-        Container(color: kprimary,
-          child: TextButton(
-              onPressed: () async {
-                await collectionReferencebabydata
-                    .doc(babyID_)
-                    .update({'directorremarks_': "Seen"});
-                Get.back();
-              },
-            child:
-               Text('Close',style: TextStyle(
-                  fontSize: 14, color: Colors.white),
-               )
-            ),
-        ):Container(),
-
+        backgroundColor: grey100,
+        bottomNavigationBar: _buildBottomActions(context),
         body: SingleChildScrollView(
-          padding: EdgeInsets.only(top: mQ.height*0.04,left: mQ.width*0.03,right: mQ.width*0.03,bottom: mQ.height*0.03),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.white, Colors.white], // Define your gradient colors
-              ),
-              borderRadius: BorderRadius.circular(10), // Apply rounded corners if desired
-              border: Border.all(color: Colors.grey,width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.6),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 2), // Add a shadow effect
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-            Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(left: 7),
-                                height: mQ.height*0.03,alignment: AlignmentDirectional.bottomStart,
-                                child:  Text(" ${(name_)}'s Report",
-                                    style: TextStyle(
-                                        fontSize: mQ.height*0.022,
-                                        fontFamily: 'Comic Sans MS',
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue)),
-                              ),
-                              Container(height: 20,
-                                padding: EdgeInsets.only(left: 7),
-                                child: Text(
-                                    ' ${DateFormat('E, d, MMM, yyyy').format(DateFormat('d-M-yyyy').parse(date_))},',
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        fontFamily: 'Comic Sans MS',
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.blue[900])),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // SizedBox(width: mQ.width*0.45),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.only(right: 7),
-                                  alignment: AlignmentDirectional.bottomEnd,
-                                  width: mQ.width * 0.08,
-                                  height: mQ.height * 0.05,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    // image: DecorationImage(image:NetworkImage(childPicture_),fit: BoxFit.scaleDown),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.only(right: 7),
-                                  alignment: AlignmentDirectional.bottomEnd,
-                                  width: mQ.width * 0.08,
-                                  height: mQ.height * 0.05,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    // image: DecorationImage(image:NetworkImage(childPicture_),fit: BoxFit.scaleDown),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.only(right: 7),
-                                  alignment: AlignmentDirectional.bottomEnd,
-                                  width: mQ.width * 0.08,
-                                  height: mQ.height * 0.05,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(image:NetworkImage(childPicture_),fit: BoxFit.fill),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ]),
-                Row(
-                      children: [
-                        Expanded(child: ParentDailySheetScreen(baby: babyID_, subject: 'Attendance', reportdate_: date_, subjectcolor_: Colors.green, boxcolor_: Colors.transparent,category: 'DailySheet',boxheading: "Checked In", boxwidth_: mQ.width*0.9, boxheight_: mQ.height*0.03,reportType_: reportType_)),
-                        Expanded(child: ParentDailySheetScreen(baby: babyID_, subject: 'Attendance', reportdate_: date_, subjectcolor_: Colors.red, boxcolor_: Colors.transparent,category: 'DailySheet',boxheading: "Checked Out", boxwidth_: mQ.width*0.9, boxheight_: mQ.height*0.03,reportType_: reportType_)),
-                      ],
-                    ),
-                Row(
-                  children: [
-                    Expanded(child: ParentDailySheetScreen(baby: babyID_, subject: 'Food', reportdate_: date_, subjectcolor_: Colors.brown.withOpacity(0.8), boxcolor_: Colors.deepOrange.shade50,category: 'DailySheet',boxheading: "Feeding", boxwidth_: mQ.width*0.45,reportType_: reportType_)),
-                    Expanded(child: ParentDailySheetScreen(baby: babyID_, subject: 'Fluids', reportdate_: date_, subjectcolor_: Colors.cyan.withOpacity(0.8), boxcolor_: Colors.blue.shade50,category: "DailySheet",boxheading: "Water / Juice", boxwidth_: mQ.width*0.45,reportType_: reportType_)),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(child: ParentDailySheetScreen(baby: babyID_, subject: 'Mood', reportdate_: date_, subjectcolor_: Colors.purple.withOpacity(0.8), boxcolor_: Colors.green.shade50,category: "DailySheet",boxheading: "Mood", boxwidth_: mQ.width*0.45,reportType_: reportType_,boxheight_: mQ.height*0.065,)),
-                    Expanded(child: ParentDailySheetScreen(baby: babyID_, subject: 'Sleep', reportdate_: date_, subjectcolor_: Colors.black.withOpacity(0.8), boxcolor_: CupertinoColors.extraLightBackgroundGray,category: "DailySheet",boxheading: "Napping", boxwidth_: mQ.width*0.45,reportType_: reportType_,boxheight_: mQ.height*0.065)),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(child: ParentDailySheetScreen(baby: babyID_, subject: 'Toilet', reportdate_: date_, subjectcolor_: Colors.deepPurple.withOpacity(0.8), boxcolor_:Colors.orange.shade50,category: "DailySheet",boxheading: "Diapers / Potty", boxwidth_: mQ.width*0.45,reportType_: reportType_,boxheight_: mQ.height*0.065)),
-                    Expanded(child: ParentDailySheetScreen(baby: babyID_, subject: 'Health', reportdate_: date_, subjectcolor_: Colors.green.withOpacity(0.8), boxcolor_: CupertinoColors.quaternaryLabel,category: "DailySheet",boxheading: "Medicine", boxwidth_: mQ.width*0.45,reportType_: reportType_,boxheight_: mQ.height*0.065,)),
-                  ],
-                ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      StreamBuilder<QuerySnapshot>(
-                        stream: collectionReference
-                            .where('id', isEqualTo: babyID_)
-                            .where('date_', isEqualTo: date_)
-                            .where('photostatus_', isEqualTo: 'Approved')
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(child: Text('Error: ${snapshot.error}'));
-                          }
-
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-
-                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return Image.asset('assets/dailycars.png', height: mQ.height * 0.08);
-                          }
-
-                          activityPhotos = [];
-
-                          for (var doc in snapshot.data!.docs) {
-                            var imageUrl = doc['image_'];
-                            activityPhotos?.add({'image_': imageUrl});
-                          }
-
-                          return Row(
-                            children: snapshot.data!.docs.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final imageUrl = entry.value['image_'] as String;
-
-                              return Padding(
-                                padding: EdgeInsets.all(mQ.width * 0.01),
-                                child:
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(ZoomableImageGallery(imageUrls: activityPhotos ?? [], initialIndex: index));
-                                  },
-                                  child: CachedNetworkImage(
-                                    alignment: Alignment.center,
-                                    imageUrl: imageUrl,
-                                    width: mQ.width * 0.2,
-                                    height: 100,
-                                    fit: BoxFit.fill,
-                                    placeholder: (context, url) => CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) => Icon(Icons.error),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
+          child: Column(
+            children: [
+              _buildHeader(mQ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: kWhite,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
+                  child: Column(
+                    children: [
+                      _buildAttendanceSection(mQ),
+                      _buildActivityGrid(mQ),
+                      _buildGallerySection(mQ),
+                      _buildLongSections(mQ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
-                     Padding(
-                       padding: EdgeInsets.symmetric(horizontal: 4.0),
-                       child: ParentDailySheetScreen(baby: babyID_, subject: 'Activity', reportdate_: date_, subjectcolor_: Colors.pink.withOpacity(0.8), boxcolor_: CupertinoColors.extraLightBackgroundGray,category: "DailySheet",boxheading: "Today's Activities", boxwidth_: mQ.width*0.95, boxheight_: mQ.height*0.24,reportType_: reportType_),
-                     ),
-                    Padding(
-                       padding: EdgeInsets.symmetric(horizontal: 4.0),
-                      child: ParentDailySheetScreen(baby: babyID_, subject: 'Notes', reportdate_: date_, subjectcolor_: Colors.brown.withOpacity(0.8), boxcolor_: Colors.brown.shade50,category: "DailySheet",boxheading: "Notes", boxwidth_: mQ.width*0.95, boxheight_: mQ.height*0.08,reportType_: reportType_),
-                    ),
-              SizedBox(height: mQ.height*0.01,)
-              ],
-            ),
+              ),
+            ],
           ),
         ));
   }
 
+  Widget _buildHeader(Size mQ) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(
+          top: mQ.height * 0.06, bottom: 24, left: 16, right: 16),
+      decoration: BoxDecoration(
+        color: kprimary,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: kWhite, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                )
+              ],
+            ),
+            child: ClipOval(
+              child: (childPicture_ != null && childPicture_.isNotEmpty)
+                  ? CachedNetworkImage(
+                      imageUrl: childPicture_,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: kWhite,
+                        strokeWidth: 2,
+                      )),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.person, size: 40, color: kWhite),
+                    )
+                  : const Icon(Icons.person, size: 40, color: kWhite),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "$name_'s Report",
+            style: kMediumTitle.copyWith(color: kWhite),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            DateFormat('EEEE, d MMMM, yyyy')
+                .format(DateFormat('d-M-yyyy').parse(date_)),
+            style: k12500.copyWith(color: kWhite.withOpacity(0.8)),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildAttendanceSection(Size mQ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: kprimary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text("Attendance",
+                  style: k14500.copyWith(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildAttendanceItem(
+                  Icons.login,
+                  "Check In",
+                  'Attendance',
+                  'Checked In',
+                  kSuccessColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildAttendanceItem(
+                  Icons.logout,
+                  "Check Out",
+                  'Attendance',
+                  'Checked Out',
+                  kRedColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildAttendanceItem(IconData icon, String label, String subject,
+      String boxheading, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.1)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 4),
+          Text(label, style: k12500.copyWith(color: kGrey)),
+          ParentDailySheetScreen(
+            baby: babyID_,
+            subject: subject,
+            reportdate_: date_,
+            subjectcolor_: color,
+            boxcolor_: Colors.transparent,
+            category: 'DailySheet',
+            boxheading: boxheading,
+            boxwidth_: 100,
+            boxheight_: 40,
+            reportType_: reportType_,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActivityGrid(Size mQ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 1.5,
+        children: [
+          _buildGridItem('Food', 'Feeding', Icons.restaurant, Colors.brown,
+              Colors.orange.shade50),
+          _buildGridItem('Fluids', 'Water / Juice', Icons.water_drop,
+              Colors.cyan, Colors.blue.shade50),
+          _buildGridItem(
+              'Mood', 'Mood', Icons.mood, Colors.purple, Colors.green.shade50),
+          _buildGridItem('Sleep', 'Napping', Icons.hotel, Colors.black,
+              CupertinoColors.extraLightBackgroundGray),
+          _buildGridItem('Toilet', 'Diapers / Potty', Icons.wc,
+              Colors.deepPurple, Colors.orange.shade50),
+          _buildGridItem('Health', 'Medicine', Icons.medical_services,
+              Colors.green, CupertinoColors.quaternaryLabel),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGridItem(String subject, String heading, IconData icon,
+      Color color, Color bgColor) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bgColor.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 18),
+              const SizedBox(width: 8),
+              Text(heading,
+                  style: k12500.copyWith(
+                      fontWeight: FontWeight.bold, color: color)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Expanded(
+            child: ParentDailySheetScreen(
+              baby: babyID_,
+              subject: subject,
+              reportdate_: date_,
+              subjectcolor_: color,
+              boxcolor_: Colors.transparent,
+              category: "DailySheet",
+              boxheading: heading,
+              boxwidth_: 150,
+              boxheight_: 40,
+              reportType_: reportType_,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGallerySection(Size mQ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: kprimary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text("Activity Gallery",
+                  style: k14500.copyWith(fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 120,
+          child: StreamBuilder<QuerySnapshot>(
+            stream: collectionReference
+                .where('id', isEqualTo: babyID_)
+                .where('date_', isEqualTo: date_)
+                .where('photostatus_', isEqualTo: 'Approved')
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) return const SizedBox.shrink();
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.photo_library_outlined,
+                          color: kGreyColor, size: 32),
+                      const SizedBox(height: 4),
+                      Text("No photos today",
+                          style: k12500.copyWith(color: kGreyColor)),
+                    ],
+                  ),
+                );
+              }
+
+              activityPhotos = [];
+              for (var doc in snapshot.data!.docs) {
+                activityPhotos?.add({'image_': doc['image_']});
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                scrollDirection: Axis.horizontal,
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  final imageUrl =
+                      snapshot.data!.docs[index]['image_'] as String;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: InkWell(
+                      onTap: () {
+                        Get.to(ZoomableImageGallery(
+                            imageUrls: activityPhotos ?? [],
+                            initialIndex: index));
+                      },
+                      child: Container(
+                        width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: (imageUrl != null && imageUrl.isNotEmpty)
+                                ? CachedNetworkImageProvider(imageUrl)
+                                : const AssetImage('assets/staff.jpg')
+                                    as ImageProvider,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLongSections(Size mQ) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          _buildLongSectionItem("Today's Activities", 'Activity', Colors.pink,
+              CupertinoColors.extraLightBackgroundGray, 120),
+          const SizedBox(height: 12),
+          _buildLongSectionItem(
+              "Notes", 'Notes', Colors.brown, Colors.brown.shade50, 60),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLongSectionItem(String heading, String subject, Color color,
+      Color bgColor, double height) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: bgColor.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(heading,
+              style:
+                  k14500.copyWith(fontWeight: FontWeight.bold, color: color)),
+          const SizedBox(height: 8),
+          ParentDailySheetScreen(
+            baby: babyID_,
+            subject: subject,
+            reportdate_: date_,
+            subjectcolor_: color,
+            boxcolor_: Colors.transparent,
+            category: "DailySheet",
+            boxheading: heading,
+            boxwidth_: 400,
+            boxheight_: height,
+            reportType_: reportType_,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomActions(BuildContext context) {
+    if (role_ == "Principal") {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kWhite,
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5))
+          ],
+        ),
+        child: reportType_ != "Approved"
+            ? PrimaryButton(
+                onPressed: () async {
+                  if (await confirm(context)) {
+                    updateDocumentsWithStatusForwarded(
+                        babyID_, "Forwarded", "Approved", context);
+                  }
+                },
+                label: "Approve Report",
+                bgColor: kprimary,
+              )
+            : PrimaryButton(
+                onPressed: () => Get.back(),
+                label: "Close",
+                bgColor: kGrey,
+              ),
+      );
+    }
+
+    if (role_ == "Teacher") {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kWhite,
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5))
+          ],
+        ),
+        child: (reportType_ == "Approved" || reportType_ == "Forwarded")
+            ? PrimaryButton(
+                onPressed: () => Get.back(),
+                label: "Close",
+                bgColor: kGrey,
+              )
+            : PrimaryButton(
+                onPressed: () async {
+                  if (await confirm(context)) {
+                    updateDocumentsWithStatusForwarded(
+                        babyID_, "New", "Forwarded", context);
+                  }
+                },
+                label: "Forward to Principal",
+                bgColor: kprimary,
+              ),
+      );
+    }
+
+    if (role_ == "Parent" || role_ == "Director") {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: kWhite,
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5))
+          ],
+        ),
+        child: PrimaryButton(
+          onPressed: () async {
+            if (role_ == "Parent") {
+              await collectionReferenceReports
+                  .doc(babyID_)
+                  .set({"DailySheet_Approved": 0}, SetOptions(merge: true));
+              await collectionReferencebabydata
+                  .doc(babyID_)
+                  .update({'parentfeedback_': "Seen"});
+            } else {
+              await collectionReferencebabydata
+                  .doc(babyID_)
+                  .update({'directorremarks_': "Seen"});
+            }
+            Get.back();
+          },
+          label: "Close",
+          bgColor: kprimary,
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
 }
 
-void updateDocumentsWithStatusForwarded(babyid_,existingstatus_, update_,context) async {
-  final CollectionReference collection = FirebaseFirestore.instance.collection(Activity);
-  final CollectionReference collectionReferenceReports = FirebaseFirestore.instance.collection(Reports);
+void updateDocumentsWithStatusForwarded(
+    babyid_, existingstatus_, update_, context) async {
+  final CollectionReference collection =
+      FirebaseFirestore.instance.collection(Activity);
+  final CollectionReference collectionReferenceReports =
+      FirebaseFirestore.instance.collection(Reports);
   final QuerySnapshot snapshot = await collection
       .where('status_', isEqualTo: existingstatus_)
-      .where('date_',isEqualTo: getCurrentDate())
+      .where('date_', isEqualTo: getCurrentDate())
       // .where('Subject',isEqualTo: getCurrentDate())
-      .where('id', isEqualTo: babyid_).get();
+      .where('id', isEqualTo: babyid_)
+      .get();
 
   for (QueryDocumentSnapshot doc in snapshot.docs) {
     // Update the status to a new value, e.g., 'UpdatedStatus'
     await collection.doc(doc.id).update({'status_': update_});
-    await collectionReferenceReports.doc(babyid_).update({'DailySheet_$update_': FieldValue.increment(1),'DailySheet_$existingstatus_': FieldValue.increment(-1)});
+    await collectionReferenceReports.doc(babyid_).update({
+      'DailySheet_$update_': FieldValue.increment(1),
+      'DailySheet_$existingstatus_': FieldValue.increment(-1)
+    });
   }
-  snack('Report ${update_} successfully', );
+  snack(
+    'Report ${update_} successfully',
+  );
   Get.back();
 }
